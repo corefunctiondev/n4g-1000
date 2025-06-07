@@ -44,49 +44,40 @@ export function Mixer() {
   }, []);
 
   return (
-    <div className="pioneer-mixer p-4 w-[400px] h-[320px]">
+    <div className="pioneer-mixer p-4 w-[400px] h-[320px] flex flex-col">
       {/* Top Section - Pioneer Branding */}
-      <div className="text-center mb-6">
-        <div className="text-lg font-bold text-white mb-1">Pioneer DJ</div>
+      <div className="text-center mb-3">
+        <div className="text-sm font-bold text-white mb-1">Pioneer DJ</div>
         <div className="text-xs text-gray-400 font-mono">DJM-750MK2</div>
       </div>
 
-      {/* Channel Strips */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      {/* Channel Strips - Horizontal Layout */}
+      <div className="flex gap-4 mb-4 flex-1">
         {/* Channel A */}
-        <div className="pioneer-eq-section p-4">
-          <div className="text-center mb-4">
+        <div className="pioneer-eq-section p-2 flex-1">
+          <div className="text-center mb-2">
             <div className="text-sm font-bold text-blue-400">CH A</div>
           </div>
           
-          {/* Gain Knob */}
-          <div className="text-center mb-4">
-            <div 
-              className="pioneer-knob w-10 h-10 mx-auto mb-1 cursor-pointer"
-              style={{ transform: `rotate(${(75 - 50) * 2.7}deg)` }}
-            />
-            <div className="text-xs text-gray-400">GAIN</div>
-          </div>
-
-          {/* Channel EQ Knobs */}
-          <div className="space-y-4 mb-6">
+          {/* Horizontal EQ Controls */}
+          <div className="flex gap-2 justify-center mb-3">
             <div className="text-center">
               <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
                 style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">HI</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
                 style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">MID</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
                 style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">LOW</div>
@@ -94,9 +85,9 @@ export function Mixer() {
           </div>
 
           {/* Channel Fader */}
-          <div className="flex justify-center mb-4">
-            <div className="pioneer-fader-track h-32 w-8 relative">
-              <div className="pioneer-fader-handle w-10 h-6 absolute -left-1 top-8" />
+          <div className="flex justify-center">
+            <div className="pioneer-fader-track h-16 w-6 relative">
+              <div className="pioneer-fader-handle w-8 h-4 absolute -left-1 top-4" />
             </div>
           </div>
 
@@ -112,39 +103,30 @@ export function Mixer() {
         </div>
 
         {/* Channel B */}
-        <div className="pioneer-eq-section p-4">
-          <div className="text-center mb-4">
+        <div className="pioneer-eq-section p-2 flex-1">
+          <div className="text-center mb-2">
             <div className="text-sm font-bold text-orange-400">CH B</div>
           </div>
           
-          {/* Gain Knob */}
-          <div className="text-center mb-4">
-            <div 
-              className="pioneer-knob w-10 h-10 mx-auto mb-1 cursor-pointer"
-              style={{ transform: `rotate(${(75 - 50) * 2.7}deg)` }}
-            />
-            <div className="text-xs text-gray-400">GAIN</div>
-          </div>
-
-          {/* Channel EQ Knobs */}
-          <div className="space-y-4 mb-6">
+          {/* Horizontal EQ Controls */}
+          <div className="flex gap-2 justify-center mb-3">
             <div className="text-center">
               <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
                 style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">HI</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
                 style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">MID</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
                 style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">LOW</div>
@@ -152,9 +134,9 @@ export function Mixer() {
           </div>
 
           {/* Channel Fader */}
-          <div className="flex justify-center mb-4">
-            <div className="pioneer-fader-track h-32 w-8 relative">
-              <div className="pioneer-fader-handle w-10 h-6 absolute -left-1 top-8" />
+          <div className="flex justify-center">
+            <div className="pioneer-fader-track h-16 w-6 relative">
+              <div className="pioneer-fader-handle w-8 h-4 absolute -left-1 top-4" />
             </div>
           </div>
 
