@@ -23,9 +23,17 @@ export function Deck({ deckId, color }: DeckProps) {
     setTempo,
     setEQ,
     seek,
+    setCuePoint,
+    jumpToCue,
+    setLoop,
+    toggleLoop,
+    beatJump,
+    sync,
   } = useAudio(deckId);
 
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isDraggingTempo, setIsDraggingTempo] = useState(false);
+  const [tempoRange, setTempoRange] = useState(8); // Default ±8%
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -64,6 +72,62 @@ export function Deck({ deckId, color }: DeckProps) {
       play();
     }
   }, [deck.isPlaying, play, pause]);
+
+  // Tempo fader interaction
+  const handleTempoMouseDown = useCallback((event: React.MouseEvent) => {
+    setIsDraggingTempo(true);
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const height = rect.height;
+      const percentage = Math.max(0, Math.min(1, (height - y) / height));
+      const tempoValue = (percentage - 0.5) * 2 * tempoRange; // Convert to ±tempoRange%
+      setTempo(tempoValue);
+    };
+    
+    const handleMouseUp = () => {
+      setIsDraggingTempo(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [setTempo, tempoRange]);
+
+  // Hot cue button interactions
+  const handleCueClick = useCallback((cueIndex: number, event: React.MouseEvent) => {
+    if (event.shiftKey) {
+      // Set cue point
+      setCuePoint(cueIndex);
+    } else {
+      // Jump to cue point
+      jumpToCue(cueIndex);
+    }
+  }, [setCuePoint, jumpToCue]);
+
+  // Sync button
+  const handleSync = useCallback(() => {
+    sync();
+  }, [sync]);
+
+  // Beat jump buttons
+  const handleBeatJump = useCallback((beats: number) => {
+    beatJump(beats);
+  }, [beatJump]);
+
+  // Tempo range cycling
+  const cycleTempoRange = useCallback(() => {
+    const ranges = [4, 8, 16, 100];
+    const currentIndex = ranges.indexOf(tempoRange);
+    const nextIndex = (currentIndex + 1) % ranges.length;
+    setTempoRange(ranges[nextIndex]);
+  }, [tempoRange]);
+
+  // Reset tempo to 0
+  const resetTempo = useCallback(() => {
+    setTempo(0);
+  }, [setTempo]);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -236,18 +300,33 @@ export function Deck({ deckId, color }: DeckProps) {
             </div>
           </div>
           <div className="flex justify-center">
-            <div className="pioneer-fader-track h-16 w-6 relative">
+            <div 
+              className="pioneer-fader-track h-16 w-6 relative cursor-pointer"
+              onMouseDown={handleTempoMouseDown}
+            >
               <div 
-                className="pioneer-fader-handle w-8 h-4 absolute -left-1"
+                className={`pioneer-fader-handle w-8 h-4 absolute -left-1 transition-colors ${
+                  isDraggingTempo ? 'bg-blue-400' : ''
+                }`}
                 style={{ 
-                  top: `${((50 - deck.tempo) / 100) * (64 - 16)}px`,
+                  top: `${((tempoRange - deck.tempo) / (tempoRange * 2)) * (64 - 16)}px`,
                 }}
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-3">
-            <button className="pioneer-button py-1 text-xs">RANGE</button>
-            <button className="pioneer-button py-1 text-xs">RESET</button>
+            <button 
+              className="pioneer-button py-1 text-xs hover:bg-blue-500 hover:text-white"
+              onClick={cycleTempoRange}
+            >
+              ±{tempoRange}%
+            </button>
+            <button 
+              className="pioneer-button py-1 text-xs hover:bg-green-500 hover:text-white"
+              onClick={resetTempo}
+            >
+              RESET
+            </button>
           </div>
         </div>
       </div>

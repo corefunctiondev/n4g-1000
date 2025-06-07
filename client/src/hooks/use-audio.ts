@@ -219,6 +219,47 @@ export function useAudio(deckId: 'A' | 'B') {
     }
   }, [deck.track, deck.isPlaying, pause, play]);
 
+  const setCuePoint = useCallback((index: number) => {
+    if (deck.track) {
+      const newCuePoints = [...deck.cuePoints];
+      newCuePoints[index] = deck.currentTime;
+      setDeck(prev => ({ ...prev, cuePoints: newCuePoints }));
+    }
+  }, [deck.currentTime, deck.track]);
+
+  const jumpToCue = useCallback((index: number) => {
+    if (deck.cuePoints[index] !== undefined) {
+      seek(deck.cuePoints[index]);
+    }
+  }, [deck.cuePoints, seek]);
+
+  const setLoop = useCallback((start: number, end: number) => {
+    setDeck(prev => ({ 
+      ...prev, 
+      loopStart: start, 
+      loopEnd: end, 
+      isLooping: true 
+    }));
+  }, []);
+
+  const toggleLoop = useCallback(() => {
+    setDeck(prev => ({ ...prev, isLooping: !prev.isLooping }));
+  }, []);
+
+  const beatJump = useCallback((beats: number) => {
+    if (deck.track) {
+      const beatDuration = 60 / deck.track.bpm;
+      const jumpTime = beats * beatDuration;
+      const newTime = Math.max(0, Math.min(deck.track.duration, deck.currentTime + jumpTime));
+      seek(newTime);
+    }
+  }, [deck.track, deck.currentTime, seek]);
+
+  const sync = useCallback(() => {
+    // Sync to master tempo - would connect to other deck in real implementation
+    console.log(`Syncing deck ${deckId} to master tempo`);
+  }, [deckId]);
+
   return {
     deck,
     loadTrack,
@@ -230,6 +271,12 @@ export function useAudio(deckId: 'A' | 'B') {
     setTempo,
     setEQ,
     seek,
+    setCuePoint,
+    jumpToCue,
+    setLoop,
+    toggleLoop,
+    beatJump,
+    sync,
     getAnalyser: () => audioNodes.current?.analyser || null,
   };
 }

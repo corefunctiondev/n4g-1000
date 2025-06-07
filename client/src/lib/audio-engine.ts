@@ -53,6 +53,7 @@ export class AudioEngine {
   }
 
   createDeckNodes(): {
+    source: AudioBufferSourceNode | null;
     gainNode: GainNode;
     eqNodes: {
       high: BiquadFilterNode;
@@ -99,6 +100,7 @@ export class AudioEngine {
     analyser.connect(this.masterGain!);
 
     return {
+      source: null,
       gainNode,
       eqNodes: {
         high: highShelf,
