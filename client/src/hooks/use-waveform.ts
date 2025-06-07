@@ -100,7 +100,7 @@ export function useWaveform(
     const centerY = height / 2;
     const amp = height / 4; // Amplitude scaling
 
-    // Draw 3-band waveform like CDJ-3000
+    // Draw 3-band waveform exactly like CDJ-3000
     for (let x = 0; x < width; x++) {
       const sampleStart = startSample + Math.floor(x * samplesPerPixel);
       const sampleEnd = Math.min(sampleStart + samplesPerPixel, track.waveformData.length);
@@ -118,86 +118,139 @@ export function useWaveform(
         }
       }
 
-      // Draw bass (orange) - bottom layer
-      if (bassMax > 0) {
-        ctx.fillStyle = '#ff8c00';
-        const bassHeight = bassMax * amp * 1.2;
+      // Draw bass (orange like CDJ-3000) - full amplitude
+      if (bassMax > 0.01) {
+        ctx.fillStyle = '#ff9500'; // CDJ orange
+        const bassHeight = bassMax * amp * 1.1;
         ctx.fillRect(x, centerY, 1, bassHeight);
         ctx.fillRect(x, centerY - bassHeight, 1, bassHeight);
       }
 
-      // Draw mids (blue) - middle layer
-      if (midMax > 0) {
-        ctx.fillStyle = '#4080ff';
-        const midHeight = midMax * amp;
+      // Draw mids (blue like CDJ-3000) - overlaid on bass
+      if (midMax > 0.01) {
+        ctx.fillStyle = '#0099ff'; // CDJ blue
+        const midHeight = midMax * amp * 0.9;
         ctx.fillRect(x, centerY, 1, midHeight);
         ctx.fillRect(x, centerY - midHeight, 1, midHeight);
       }
 
-      // Draw highs (cyan) - top layer
-      if (highMax > 0) {
-        ctx.fillStyle = '#00ffff';
-        const highHeight = highMax * amp * 0.8;
+      // Draw highs (white/light blue) - top layer
+      if (highMax > 0.01) {
+        ctx.fillStyle = '#ffffff'; // White like CDJ highs
+        const highHeight = highMax * amp * 0.7;
         ctx.fillRect(x, centerY, 1, highHeight);
         ctx.fillRect(x, centerY - highHeight, 1, highHeight);
       }
     }
 
-    // Draw beat grid in zoomed view
+    // Draw beat grid exactly like CDJ-3000
     if (track.bpm > 0 && duration > 0) {
       const beatDuration = 60 / track.bpm;
       const firstBeat = Math.floor(startTime / beatDuration) * beatDuration;
       
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      ctx.lineWidth = 1;
-      
       for (let beatTime = firstBeat; beatTime <= endTime; beatTime += beatDuration) {
         if (beatTime >= startTime && beatTime <= endTime) {
           const x = ((beatTime - startTime) / (endTime - startTime)) * width;
+          const beatNumber = Math.round(beatTime / beatDuration);
+          
+          // Draw different beat markers like CDJ-3000
+          if (beatNumber % 16 === 0) {
+            // 16-beat marker (phrase) - thick white line
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 0.8;
+          } else if (beatNumber % 4 === 0) {
+            // 4-beat marker (measure) - medium red line
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.6;
+          } else {
+            // Regular beat - thin white line
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.3;
+          }
           
           ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, height);
           ctx.stroke();
-          
-          // Highlight every 4th beat (downbeat)
-          const beatNumber = Math.round(beatTime / beatDuration);
-          if (beatNumber % 4 === 0) {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
-            ctx.stroke();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 1;
-          }
         }
       }
+      
+      // Reset alpha
+      ctx.globalAlpha = 1.0;
     }
 
-    // Draw playhead in center (CDJ style)
+    // Draw CDJ-3000 style playhead with triangle needle
     const playheadX = width / 2;
-    ctx.strokeStyle = '#ff0040';
-    ctx.lineWidth = 3;
-    ctx.shadowColor = '#ff0040';
-    ctx.shadowBlur = 8;
+    
+    // Main playhead line
+    ctx.strokeStyle = '#ff3366';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#ff3366';
+    ctx.shadowBlur = 6;
     
     ctx.beginPath();
     ctx.moveTo(playheadX, 0);
     ctx.lineTo(playheadX, height);
     ctx.stroke();
     
+    // Draw triangle needle at top (like CDJ-3000)
+    ctx.fillStyle = '#ff3366';
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    ctx.moveTo(playheadX, 0);
+    ctx.lineTo(playheadX - 8, 16);
+    ctx.lineTo(playheadX + 8, 16);
+    ctx.closePath();
+    ctx.fill();
+    
     // Reset shadow
     ctx.shadowBlur = 0;
 
-    // Draw cue points relative to zoomed view
-    ctx.fillStyle = '#00ff00';
-    for (let i = 1; i <= 4; i++) {
-      const cueTime = duration * (i / 10);
+    // Draw hot cue points with colored markers (like CDJ-3000)
+    const cueColors = ['#ff0000', '#00ff00', '#0066ff', '#ffff00', '#ff8800', '#ff00ff', '#00ffff', '#ffffff'];
+    for (let i = 1; i <= 8; i++) {
+      const cueTime = duration * (i / 20); // Spread cues across track
       if (cueTime >= startTime && cueTime <= endTime) {
         const cueX = ((cueTime - startTime) / (endTime - startTime)) * width;
-        ctx.fillRect(cueX - 1, height - 6, 2, 6);
+        
+        // Draw cue marker
+        ctx.fillStyle = cueColors[i - 1] || '#ffffff';
+        ctx.fillRect(cueX - 2, height - 8, 4, 8);
+        
+        // Add cue number
+        ctx.fillStyle = '#000000';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(i.toString(), cueX, height - 1);
+      }
+    }
+    
+    // Add time markers like CDJ-3000
+    ctx.fillStyle = '#888888';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+    
+    // Show time markers every 30 seconds in zoomed view
+    const timeInterval = 30; // seconds
+    const firstTimeMarker = Math.floor(startTime / timeInterval) * timeInterval;
+    
+    for (let time = firstTimeMarker; time <= endTime; time += timeInterval) {
+      if (time >= startTime && time <= endTime && time > 0) {
+        const x = ((time - startTime) / (endTime - startTime)) * width;
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        const timeText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Draw time marker
+        ctx.fillStyle = '#666666';
+        ctx.fillRect(x - 1, height - 20, 2, 12);
+        
+        // Draw time text
+        ctx.fillStyle = '#cccccc';
+        ctx.fillText(timeText, x, height - 22);
       }
     }
 
