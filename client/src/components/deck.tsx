@@ -81,15 +81,15 @@ export function Deck({ deckId, color }: DeckProps) {
 
   return (
     <div 
-      className="pioneer-cdj p-6 w-full max-w-md mx-auto"
+      className="pioneer-cdj p-4 w-[650px] h-[320px]"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {/* Top Section - Screen and Info Display */}
-      <div className="mb-6">
+      <div className="mb-3 flex-1">
         {/* Main LCD Screen */}
-        <div className="pioneer-screen p-4 mb-4">
+        <div className="pioneer-screen p-3 mb-3 h-full flex flex-col">
           <div className="flex justify-between items-start mb-2">
             <div className="text-xs text-blue-400 font-mono">CDJ-3000</div>
             <div className="text-xs text-green-400 font-mono">
@@ -107,13 +107,13 @@ export function Deck({ deckId, color }: DeckProps) {
             </div>
           </div>
           
-          {/* 3-Band Waveform Display */}
-          <div className="pioneer-waveform mb-3 relative">
+          {/* 3-Band Waveform Display - Wider and Shorter */}
+          <div className="pioneer-waveform mb-2 relative flex-1">
             <Waveform
               track={deck.track}
               currentTime={deck.currentTime}
-              width={280}
-              height={80}
+              width={580}
+              height={60}
               color={color}
               onSeek={seek}
               className="w-full"
@@ -180,77 +180,75 @@ export function Deck({ deckId, color }: DeckProps) {
         </div>
       </div>
 
-      {/* Center Section - Jog Wheel */}
-      <div className="flex justify-center mb-6">
-        <div className="pioneer-jog cursor-pointer hover:scale-105 transition-transform"></div>
-      </div>
-
-      {/* Transport Controls */}
-      <div className="grid grid-cols-4 gap-2 mb-6">
-        <button 
-          onClick={cue}
-          className="pioneer-button py-3 text-orange-400 hover:text-orange-300"
-        >
-          <div className="text-lg">⏮</div>
-          <div className="text-xs">CUE</div>
-        </button>
-        
-        <button 
-          onClick={handlePlayPause}
-          className={`pioneer-button py-3 ${deck.isPlaying ? 'active text-green-400' : 'text-green-400'}`}
-        >
-          <div className="text-lg">{deck.isPlaying ? '⏸' : '▶'}</div>
-          <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
-        </button>
-        
-        <button 
-          onClick={stop}
-          className="pioneer-button py-3 text-red-400 hover:text-red-300"
-        >
-          <div className="text-lg">⏹</div>
-          <div className="text-xs">STOP</div>
-        </button>
-        
-        <button className="pioneer-button py-3 text-blue-400 hover:text-blue-300">
-          <div className="text-lg">🔗</div>
-          <div className="text-xs">SYNC</div>
-        </button>
-      </div>
-
-      {/* Hot Cue Pads */}
-      <div className="grid grid-cols-4 gap-2 mb-6">
-        {[1, 2, 3, 4].map((cueNum) => (
-          <button
-            key={cueNum}
-            className="pioneer-button py-4 hover:bg-pink-500 hover:text-white transition-all"
+      {/* Bottom Controls Section - Compact Layout */}
+      <div className="flex items-center justify-between gap-4">
+        {/* Left Side - Transport Controls */}
+        <div className="flex gap-2">
+          <button 
+            onClick={cue}
+            className="pioneer-button py-2 px-3 text-orange-400 hover:text-orange-300"
           >
-            <div className="text-lg font-bold">{cueNum}</div>
-            <div className="text-xs">HOT CUE</div>
+            <div className="text-sm">⏮</div>
+            <div className="text-xs">CUE</div>
           </button>
-        ))}
-      </div>
+          
+          <button 
+            onClick={handlePlayPause}
+            className={`pioneer-button py-2 px-3 ${deck.isPlaying ? 'active text-green-400' : 'text-green-400'}`}
+          >
+            <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
+            <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
+          </button>
+          
+          <button 
+            onClick={stop}
+            className="pioneer-button py-2 px-3 text-red-400 hover:text-red-300"
+          >
+            <div className="text-sm">⏹</div>
+            <div className="text-xs">STOP</div>
+          </button>
+          
+          <button className="pioneer-button py-2 px-3 text-blue-400 hover:text-blue-300">
+            <div className="text-sm">🔗</div>
+            <div className="text-xs">SYNC</div>
+          </button>
+        </div>
 
-      {/* Tempo Control Section */}
-      <div className="pioneer-eq-section p-4 mb-6">
-        <div className="text-xs text-center mb-2 text-gray-300">TEMPO</div>
-        <div className="text-center mb-3">
-          <div className="text-lg font-mono pioneer-led" style={{ color }}>
-            {formatTempo(deck.tempo)}
-          </div>
+        {/* Center - Hot Cue Pads */}
+        <div className="flex gap-1">
+          {[1, 2, 3, 4].map((cueNum) => (
+            <button
+              key={cueNum}
+              className="pioneer-button py-2 px-2 hover:bg-pink-500 hover:text-white transition-all"
+            >
+              <div className="text-sm font-bold">{cueNum}</div>
+              <div className="text-xs">CUE</div>
+            </button>
+          ))}
         </div>
-        <div className="flex justify-center">
-          <div className="pioneer-fader-track h-32 w-8 relative">
-            <div 
-              className="pioneer-fader-handle w-10 h-6 absolute -left-1"
-              style={{ 
-                top: `${((50 - deck.tempo) / 100) * (128 - 24)}px`,
-              }}
-            />
+
+        {/* Right Side - Tempo Control */}
+        <div className="pioneer-eq-section p-2">
+          <div className="text-xs text-center mb-1 text-gray-300">TEMPO</div>
+          <div className="text-center mb-2">
+            <div className="text-sm font-mono pioneer-led" style={{ color }}>
+              {formatTempo(deck.tempo)}
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-2 mt-3">
-          <button className="pioneer-button py-1 text-xs">RANGE</button>
-          <button className="pioneer-button py-1 text-xs">RESET</button>
+          <div className="flex justify-center">
+            <div className="pioneer-fader-track h-16 w-6 relative">
+              <div 
+                className="pioneer-fader-handle w-8 h-4 absolute -left-1"
+                style={{ 
+                  top: `${((50 - deck.tempo) / 100) * (64 - 16)}px`,
+                }}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            <button className="pioneer-button py-1 text-xs">RANGE</button>
+            <button className="pioneer-button py-1 text-xs">RESET</button>
+          </div>
         </div>
       </div>
 

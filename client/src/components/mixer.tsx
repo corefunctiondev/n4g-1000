@@ -44,7 +44,7 @@ export function Mixer() {
   }, []);
 
   return (
-    <div className="pioneer-mixer p-6 w-full max-w-sm mx-auto">
+    <div className="pioneer-mixer p-4 w-[400px] h-[320px]">
       {/* Top Section - Pioneer Branding */}
       <div className="text-center mb-6">
         <div className="text-lg font-bold text-white mb-1">Pioneer DJ</div>
