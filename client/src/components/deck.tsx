@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useAudio } from '@/hooks/use-audio';
 import { Waveform } from './waveform';
 import { Knob } from './knob';
@@ -25,10 +25,35 @@ export function Deck({ deckId, color }: DeckProps) {
     seek,
   } = useAudio(deckId);
 
+  const [isDragOver, setIsDragOver] = useState(false);
+
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       loadTrack(file);
+    }
+  }, [loadTrack]);
+
+  const handleDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('audio/')) {
+        loadTrack(file);
+      }
     }
   }, [loadTrack]);
 
@@ -55,7 +80,12 @@ export function Deck({ deckId, color }: DeckProps) {
   };
 
   return (
-    <Card className="bg-cdj-light border-cdj-border shadow-2xl">
+    <Card 
+      className="bg-cdj-light border-cdj-border shadow-2xl"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <CardContent className="p-6">
         {/* Deck Header */}
         <div className="flex items-center justify-between mb-6">
@@ -108,16 +138,22 @@ export function Deck({ deckId, color }: DeckProps) {
 
         {/* File Upload */}
         <div className="mb-6">
-          <label className="block w-full p-4 border-2 border-dashed border-cdj-border rounded-lg cursor-pointer hover:border-cdj-blue transition-colors text-center">
+          <label className={`block w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-all text-center ${
+            isDragOver 
+              ? 'border-cdj-blue bg-cdj-blue bg-opacity-10 scale-105' 
+              : 'border-cdj-border hover:border-cdj-blue'
+          }`}>
             <input
               type="file"
               accept="audio/*"
               onChange={handleFileUpload}
               className="hidden"
             />
-            <i className="fas fa-upload text-2xl mb-2" style={{ color }} />
-            <div className="text-sm text-gray-400">Drop audio file or click to browse</div>
-            <div className="text-xs text-gray-500 mt-1">MP3, WAV supported</div>
+            <i className={`fas fa-upload text-2xl mb-2 ${isDragOver ? 'animate-bounce' : ''}`} style={{ color }} />
+            <div className="text-sm text-gray-400">
+              {isDragOver ? 'Drop your audio file here!' : 'Drop audio file or click to browse'}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">MP3, WAV, FLAC, OGG supported</div>
           </label>
         </div>
 
