@@ -97,30 +97,74 @@ export function Deck({ deckId, color }: DeckProps) {
             </div>
           </div>
           
-          {/* Waveform Display */}
-          <div className="pioneer-waveform mb-3">
+          {/* BPM and Bar Display */}
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-orange-400 font-mono text-sm">
+              {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm / 4))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm / 4)) * 4) + 1}` : '0.1'} Bars
+            </div>
+            <div className="text-green-400 font-mono text-sm">
+              {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm)) * 4) + 1}` : '0.1'} Bars
+            </div>
+          </div>
+          
+          {/* 3-Band Waveform Display */}
+          <div className="pioneer-waveform mb-3 relative">
             <Waveform
               track={deck.track}
               currentTime={deck.currentTime}
               width={280}
-              height={60}
+              height={80}
               color={color}
               onSeek={seek}
               className="w-full"
             />
+            
+            {/* Frequency Band Labels */}
+            <div className="absolute top-1 left-2 text-xs text-cyan-400 font-mono">HIGH</div>
+            <div className="absolute top-1/2 left-2 text-xs text-blue-400 font-mono">MID</div>
+            <div className="absolute bottom-1 left-2 text-xs text-orange-400 font-mono">LOW</div>
+            
+            {/* Hot Cue Markers */}
+            <div className="absolute bottom-0 left-0 right-0 h-2 flex">
+              {[1, 2, 3, 4].map((cue) => (
+                <div 
+                  key={cue}
+                  className="w-1 h-2 bg-green-400 mr-4"
+                  style={{ left: `${cue * 20}%` }}
+                />
+              ))}
+            </div>
           </div>
           
-          {/* Track Info */}
+          {/* Track Info and Time Display */}
           <div className="text-white">
-            <div className="text-sm font-bold truncate mb-1">
-              {deck.track?.name || 'No Track Loaded'}
+            <div className="flex justify-between items-start mb-1">
+              <div className="text-sm font-bold truncate flex-1 mr-2">
+                {deck.track?.name || 'No Track Loaded'}
+              </div>
+              <div className="text-xs text-gray-400">TRACK 01</div>
             </div>
-            <div className="flex justify-between text-xs text-gray-300">
-              <span>{formatTime(deck.currentTime)}</span>
-              <span className="pioneer-led" style={{ color }}>
-                {deck.track ? formatBPM(deck.track.bpm) : '---.-'} BPM
-              </span>
-              <span>{deck.track ? formatTime(deck.track.duration - deck.currentTime) : '--:--'}</span>
+            
+            <div className="flex justify-between items-center text-xs">
+              <div className="text-orange-400 font-mono">
+                {formatTime(deck.currentTime)}
+              </div>
+              <div className="pioneer-led text-center" style={{ color }}>
+                <div className="text-lg font-bold">
+                  {deck.track ? formatBPM(deck.track.bpm) : '---.-'}
+                </div>
+                <div className="text-xs">BPM</div>
+              </div>
+              <div className="text-orange-400 font-mono">
+                -{deck.track ? formatTime(deck.track.duration - deck.currentTime) : '--:--'}
+              </div>
+            </div>
+            
+            {/* Additional CDJ Info */}
+            <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
+              <span>A.HOT CUE</span>
+              <span>{deck.track ? `${formatTempo(deck.tempo)}` : '+0.0%'}</span>
+              <span>02:34</span>
             </div>
           </div>
         </div>
