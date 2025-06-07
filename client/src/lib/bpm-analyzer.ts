@@ -14,21 +14,118 @@ export class BPMAnalyzer {
 
   async analyzeBPM(audioBuffer: AudioBuffer): Promise<number> {
     try {
+      console.log('Starting BPM analysis...');
       const channelData = audioBuffer.getChannelData(0);
+      const sampleRate = audioBuffer.sampleRate;
       
-      // Use multiple analysis methods for better accuracy
-      const peaksBPM = this.analyzePeaks(channelData);
-      const spectralBPM = this.analyzeSpectral(channelData, audioBuffer.sampleRate);
-      const autocorrelationBPM = this.analyzeAutocorrelation(channelData, audioBuffer.sampleRate);
+      // Analyze first 30 seconds for performance
+      const analysisLength = Math.min(channelData.length, sampleRate * 30);
+      const analysisData = channelData.slice(0, analysisLength);
       
-      // Weight the results - spectral analysis is most reliable
-      const weightedBPM = (spectralBPM * 0.5) + (peaksBPM * 0.3) + (autocorrelationBPM * 0.2);
+      console.log(`Analyzing ${analysisLength} samples at ${sampleRate}Hz`);
       
-      return Math.round(weightedBPM * 10) / 10;
+      // Enhanced onset detection
+      const onsets = this.detectOnsets(analysisData, sampleRate);
+      console.log(`Detected ${onsets.length} onsets`);
+      
+      if (onsets.length < 8) {
+        console.log('Not enough onsets detected, using fallback');
+        return 120.0;
+      }
+      
+      // Calculate intervals between onsets
+      const intervals = this.calculateIntervals(onsets);
+      
+      // Find most common interval (tempo)
+      const bpm = this.findTempoFromIntervals(intervals, sampleRate);
+      
+      console.log(`Calculated BPM: ${bpm}`);
+      return Math.round(bpm * 10) / 10;
     } catch (error) {
       console.error('BPM analysis failed:', error);
       return 120.0;
     }
+  }
+
+  private detectOnsets(channelData: Float32Array, sampleRate: number): number[] {
+    const onsets: number[] = [];
+    const windowSize = Math.floor(sampleRate * 0.05); // 50ms windows
+    const hopSize = Math.floor(windowSize / 4);
+    const threshold = 0.3;
+    
+    // Calculate spectral flux for onset detection
+    for (let i = hopSize; i < channelData.length - windowSize; i += hopSize) {
+      const currentWindow = channelData.slice(i, i + windowSize);
+      const previousWindow = channelData.slice(i - hopSize, i - hopSize + windowSize);
+      
+      // Calculate energy difference
+      const currentEnergy = this.calculateEnergy(currentWindow);
+      const previousEnergy = this.calculateEnergy(previousWindow);
+      
+      const energyDiff = currentEnergy - previousEnergy;
+      
+      if (energyDiff > threshold) {
+        // Ensure minimum distance between onsets
+        if (onsets.length === 0 || (i - onsets[onsets.length - 1]) > sampleRate * 0.1) {
+          onsets.push(i);
+        }
+      }
+    }
+    
+    return onsets;
+  }
+
+  private calculateEnergy(window: Float32Array): number {
+    let energy = 0;
+    for (let i = 0; i < window.length; i++) {
+      energy += window[i] * window[i];
+    }
+    return energy / window.length;
+  }
+
+  private findTempoFromIntervals(intervals: number[], sampleRate: number): number {
+    if (intervals.length === 0) return 120.0;
+    
+    // Convert intervals to BPM
+    const bpmCandidates: number[] = [];
+    
+    for (const interval of intervals) {
+      const intervalSeconds = interval / sampleRate;
+      if (intervalSeconds > 0.2 && intervalSeconds < 2.0) { // 30-300 BPM range
+        const bpm = 60 / intervalSeconds;
+        bpmCandidates.push(bpm);
+        
+        // Also consider half and double time
+        if (bpm > 150) bpmCandidates.push(bpm / 2);
+        if (bpm < 90) bpmCandidates.push(bpm * 2);
+      }
+    }
+    
+    if (bpmCandidates.length === 0) return 120.0;
+    
+    // Find most common BPM (with tolerance)
+    const tolerance = 3;
+    const bpmGroups: { [key: number]: number[] } = {};
+    
+    for (const bpm of bpmCandidates) {
+      const roundedBPM = Math.round(bpm / tolerance) * tolerance;
+      if (!bpmGroups[roundedBPM]) bpmGroups[roundedBPM] = [];
+      bpmGroups[roundedBPM].push(bpm);
+    }
+    
+    // Find group with most candidates
+    let bestBPM = 120;
+    let maxCount = 0;
+    
+    for (const [groupBPM, group] of Object.entries(bpmGroups)) {
+      if (group.length > maxCount) {
+        maxCount = group.length;
+        const avgBPM = group.reduce((sum, bpm) => sum + bpm, 0) / group.length;
+        bestBPM = avgBPM;
+      }
+    }
+    
+    return Math.max(60, Math.min(200, bestBPM)); // Clamp to reasonable range
   }
 
   private analyzePeaks(channelData: Float32Array): number {
