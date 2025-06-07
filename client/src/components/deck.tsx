@@ -36,9 +36,15 @@ export function Deck({ deckId, color }: DeckProps) {
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File input changed:', event.target.files);
     const file = event.target.files?.[0];
     if (file) {
+      console.log('Selected file:', file.name, file.type, file.size);
       loadTrack(file);
+      // Reset input to allow same file to be selected again
+      event.target.value = '';
+    } else {
+      console.log('No file selected');
     }
   }, [loadTrack]);
 

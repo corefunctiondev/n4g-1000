@@ -68,11 +68,20 @@ export function useAudio(deckId: 'A' | 'B') {
 
   const loadTrack = useCallback(async (file: File) => {
     try {
+      console.log(`Starting to load track on deck ${deckId}:`, file.name);
+      
+      // Initialize audio engine
+      await audioEngine.initialize();
       await audioEngine.resumeContext();
       
+      console.log(`Audio engine ready, decoding file...`);
       const audioBuffer = await audioEngine.decodeAudioFile(file);
+      console.log(`Audio decoded, duration: ${audioBuffer.duration}s`);
+      
+      console.log(`Analyzing BPM...`);
       const bpmAnalyzer = new BPMAnalyzer(audioEngine.getContext()!);
       const bpm = await bpmAnalyzer.analyzeBPM(audioBuffer);
+      console.log(`BPM detected: ${bpm}`);
       
       const track: AudioTrack = {
         file,
@@ -89,11 +98,13 @@ export function useAudio(deckId: 'A' | 'B') {
         currentTime: 0,
         isPlaying: false,
         isPaused: false,
+        isReady: true,
       }));
 
-      console.log(`Track loaded on deck ${deckId}:`, file.name, `BPM: ${bpm}`);
+      console.log(`Track successfully loaded on deck ${deckId}:`, file.name, `BPM: ${bpm.toFixed(1)}`);
     } catch (error) {
       console.error(`Failed to load track on deck ${deckId}:`, error);
+      console.error('Error details:', error instanceof Error ? error.message : String(error));
     }
   }, [deckId]);
 
