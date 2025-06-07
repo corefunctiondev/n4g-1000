@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 8%);
+  --muted-foreground: hsl(0, 0%, 64%);
+  --popover: hsl(0, 0%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 10%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 23%);
+  --input: hsl(0, 0%, 23%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(0, 0%, 16%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(0, 0%, 16%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(60, 9%, 98%);
+  --ring: hsl(0, 0%, 83%);
+  --radius: 0.5rem;
+  
+  /* CDJ specific colors */
+  --cdj-dark: hsl(0, 0%, 4%);
+  --cdj-gray: hsl(0, 0%, 7%);
+  --cdj-light: hsl(0, 0%, 10%);
+  --cdj-surface: hsl(0, 0%, 16%);
+  --cdj-border: hsl(0, 0%, 23%);
+  --cdj-blue: hsl(195, 100%, 50%);
+  --cdj-orange: hsl(21, 100%, 50%);
+  --cdj-green: hsl(120, 100%, 55%);
+  --cdj-red: hsl(0, 100%, 63%);
+  --cdj-silver: hsl(0, 0%, 75%);
+  --cdj-metal: hsl(0, 0%, 50%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 8%);
+  --muted-foreground: hsl(0, 0%, 64%);
+  --popover: hsl(0, 0%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 10%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 23%);
+  --input: hsl(0, 0%, 23%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(0, 0%, 16%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(0, 0%, 16%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(60, 9%, 98%);
+  --ring: hsl(0, 0%, 83%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* CDJ-specific styles */
+.cdj-knob {
+  background: conic-gradient(from 0deg, hsl(0, 0%, 50%), hsl(0, 0%, 75%), hsl(0, 0%, 50%));
+  position: relative;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.cdj-knob::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  width: 2px;
+  height: 25%;
+  background: hsl(0, 100%, 63%);
+  transform: translateX(-50%);
+  border-radius: 1px;
+}
+
+.cdj-button {
+  background: radial-gradient(circle at 30% 30%, hsl(0, 0%, 40%), hsl(0, 0%, 16%));
+  border: 2px solid hsl(0, 0%, 27%);
+  transition: all 0.1s ease;
+}
+
+.cdj-button:hover {
+  border-color: hsl(0, 0%, 40%);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.cdj-button.active {
+  background: radial-gradient(circle at 30% 30%, currentColor, rgba(0, 0, 0, 0.8));
+  box-shadow: 0 0 12px currentColor, inset 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+.cdj-led {
+  text-shadow: 0 0 8px currentColor;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.cdj-fader-track {
+  background: linear-gradient(to bottom, hsl(0, 0%, 4%), hsl(0, 0%, 16%));
+  border: 1px solid hsl(0, 0%, 25%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.cdj-fader-handle {
+  background: linear-gradient(145deg, hsl(0, 0%, 75%), hsl(0, 0%, 50%));
+  border: 1px solid hsl(0, 0%, 60%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cdj-waveform {
+  background: hsl(0, 0%, 4%);
+  border: 2px solid hsl(0, 0%, 25%);
+}
+
+.cdj-display {
+  background: linear-gradient(to bottom, hsl(120, 30%, 10%), hsl(120, 20%, 5%));
+  border: 2px solid hsl(0, 0%, 25%);
+  color: hsl(120, 100%, 55%);
+  font-family: 'Inter', monospace;
+  text-shadow: 0 0 8px currentColor;
+}
+
+/* Animation classes */
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Crossfader specific styles */
+.crossfader-track {
+  background: linear-gradient(90deg, hsl(0, 0%, 20%) 0%, hsl(0, 0%, 33%) 50%, hsl(0, 0%, 20%) 100%);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.crossfader-handle {
+  background: radial-gradient(circle at 30% 30%, hsl(0, 0%, 55%), hsl(0, 0%, 27%));
+  border: 2px solid hsl(0, 0%, 40%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Responsive design */
+@media (max-width: 1280px) {
+  .cdj-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
