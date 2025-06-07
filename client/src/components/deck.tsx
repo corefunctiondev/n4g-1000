@@ -244,7 +244,15 @@ export function Deck({ deckId, color }: DeckProps) {
           <button className="pioneer-button py-2 px-1 text-xs">INFO</button>
           <button className="pioneer-button py-2 px-1 text-xs">TIME</button>
           <button className="pioneer-button py-2 px-1 text-xs">AUTO</button>
-          <button className="pioneer-button py-2 px-1 text-xs">TRACK</button>
+          <label className="pioneer-button py-2 px-1 text-xs cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500">
+            LOAD
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+          </label>
         </div>
       </div>
 
