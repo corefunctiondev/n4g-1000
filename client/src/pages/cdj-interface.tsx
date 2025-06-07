@@ -1,90 +1,115 @@
 import { useEffect, useState } from 'react';
-import { Deck } from '@/components/deck';
+import { CDJScreen } from '@/components/cdj-screen';
 import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function CDJInterface() {
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedDeck, setSelectedDeck] = useState<'A' | 'B'>('A');
 
   useEffect(() => {
     // Set page title
-    document.title = 'Virtual CDJ Pro - Professional DJ Interface';
+    document.title = 'Pioneer CDJ-3000 Professional Interface';
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-8">
-      {/* Pioneer DJ Setup Layout */}
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Pioneer DJ Virtual Setup</h1>
-          <div className="flex items-center justify-center space-x-6 text-sm text-gray-400">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span>System Ready</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button 
-                onClick={() => setIsRecording(!isRecording)}
-                className={`px-3 py-1 rounded text-xs font-medium transition-all ${
-                  isRecording 
-                    ? 'bg-red-500 text-white' 
-                    : 'bg-gray-700 text-gray-300 hover:bg-red-500'
-                }`}
-              >
-                {isRecording ? '● REC' : '○ REC'}
-              </button>
-            </div>
-            <div className="text-gray-500 font-mono">
-              Latency: 5ms | CPU: 12%
-            </div>
-          </div>
+    <div className="min-h-screen bg-black overflow-hidden">
+      {/* Deck Selection Tabs */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900 border-b border-gray-700">
+        <div className="flex">
+          <button
+            onClick={() => setSelectedDeck('A')}
+            className={`flex-1 py-4 px-8 text-xl font-bold transition-colors ${
+              selectedDeck === 'A' 
+                ? 'bg-red-600 text-white' 
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            CDJ DECK A
+          </button>
+          <button
+            onClick={() => setSelectedDeck('B')}
+            className={`flex-1 py-4 px-8 text-xl font-bold transition-colors ${
+              selectedDeck === 'B' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            CDJ DECK B
+          </button>
+          <button
+            className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold transition-colors"
+            onClick={() => {
+              // Toggle mixer view
+              const mixerEl = document.getElementById('mixer-panel');
+              if (mixerEl) {
+                mixerEl.style.display = mixerEl.style.display === 'none' ? 'block' : 'none';
+              }
+            }}
+          >
+            MIXER
+          </button>
         </div>
+      </div>
 
-        {/* Main DJ Setup - Horizontal Layout */}
-        <div className="flex items-start justify-center gap-8">
-          {/* Left CDJ (Deck A) */}
-          <div className="flex-shrink-0">
-            <Deck deckId="A" color="#00d4ff" />
-          </div>
+      {/* Full Screen CDJ Interface */}
+      <div className="pt-16 h-screen">
+        {selectedDeck === 'A' && (
+          <CDJScreen deckId="A" color="#ff6b6b" />
+        )}
+        {selectedDeck === 'B' && (
+          <CDJScreen deckId="B" color="#4ecdc4" />
+        )}
+      </div>
 
-          {/* Center Mixer */}
-          <div className="flex-shrink-0 mt-16">
-            <Mixer />
+      {/* Floating Mixer Panel */}
+      <div 
+        id="mixer-panel"
+        className="fixed bottom-4 right-4 w-80 bg-black/95 border-2 border-gray-600 rounded-lg shadow-2xl"
+        style={{ display: 'none' }}
+      >
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-white font-bold">MIXER CONTROLS</h3>
+            <button
+              onClick={() => {
+                const mixerEl = document.getElementById('mixer-panel');
+                if (mixerEl) mixerEl.style.display = 'none';
+              }}
+              className="text-gray-400 hover:text-white"
+            >
+              ✕
+            </button>
           </div>
-
-          {/* Right CDJ (Deck B) */}
-          <div className="flex-shrink-0">
-            <Deck deckId="B" color="#ff6b00" />
-          </div>
+          <Mixer />
         </div>
+      </div>
 
-        {/* Connection Cables Visual */}
-        <div className="mt-8 flex justify-center">
-          <div className="text-xs text-gray-600 font-mono">
-            CDJ-A ═══════════ DJM-750MK2 ═══════════ CDJ-B
-          </div>
+      {/* Recording Status */}
+      {isRecording && (
+        <div className="fixed top-20 right-4 bg-red-600 text-white px-4 py-2 rounded-lg font-bold animate-pulse">
+          ⏺ RECORDING
         </div>
+      )}
 
-        {/* Footer Info */}
-        <div className="mt-8 text-center">
-          <div className="pioneer-eq-section inline-block p-4">
-            <div className="text-xs text-gray-400 mb-2">MASTER OUTPUT</div>
-            <div className="flex items-center justify-center space-x-4 text-sm">
-              <div className="flex items-center space-x-2">
-                <i className="fas fa-headphones text-blue-400" />
-                <span className="text-gray-400">Monitoring</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <i className="fas fa-volume-up text-green-400" />
-                <span className="text-gray-400">Main Out</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <i className="fas fa-microphone text-orange-400" />
-                <span className="text-gray-400">Booth Out</span>
-              </div>
-            </div>
+      {/* Master Status Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 px-6 py-2">
+        <div className="flex justify-between items-center text-sm">
+          <div className="flex space-x-6 text-gray-300">
+            <span>MASTER BPM: <span className="text-orange-400 font-mono">120.0</span></span>
+            <span>SYNC: <span className="text-green-400">AUTO</span></span>
+            <span>STATUS: <span className="text-green-400">READY</span></span>
           </div>
+          <button
+            onClick={() => setIsRecording(!isRecording)}
+            className={`px-4 py-1 rounded font-bold transition-colors ${
+              isRecording
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-gray-600 hover:bg-gray-700 text-white'
+            }`}
+          >
+            {isRecording ? '⏹ STOP' : '⏺ REC'}
+          </button>
         </div>
       </div>
     </div>
