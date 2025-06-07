@@ -73,8 +73,8 @@ export function useWaveform(
     canvas.width = width;
     canvas.height = height;
 
-    // Clear canvas
-    ctx.fillStyle = backgroundColor;
+    // Clear canvas with black background
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, width, height);
 
     // Analyze frequency bands if not already done
@@ -88,100 +88,117 @@ export function useWaveform(
     const bands = frequencyBandsRef.current;
     if (!bands.bass || !bands.mid || !bands.high) return;
 
-    const step = Math.ceil(track.waveformData.length / width);
-    const amp = height / 6; // Divide height into 3 bands (top and bottom)
+    // Calculate zoom window around current position (like CDJ zoomed view)
+    const zoomSeconds = 30; // Show 30 seconds of waveform
+    const startTime = Math.max(0, currentTime - zoomSeconds / 2);
+    const endTime = Math.min(duration, currentTime + zoomSeconds / 2);
+    
+    const startSample = Math.floor((startTime / duration) * track.waveformData.length);
+    const endSample = Math.floor((endTime / duration) * track.waveformData.length);
+    const samplesPerPixel = Math.max(1, Math.floor((endSample - startSample) / width));
+
+    const centerY = height / 2;
+    const amp = height / 4; // Amplitude scaling
 
     // Draw 3-band waveform like CDJ-3000
-    for (let i = 0; i < width; i++) {
-      const dataIndex = i * step;
-      if (dataIndex >= track.waveformData.length) continue;
-
-      // Calculate amplitudes for each band
-      let bassAmp = 0, midAmp = 0, highAmp = 0;
+    for (let x = 0; x < width; x++) {
+      const sampleStart = startSample + Math.floor(x * samplesPerPixel);
+      const sampleEnd = Math.min(sampleStart + samplesPerPixel, track.waveformData.length);
       
-      for (let j = 0; j < step && dataIndex + j < track.waveformData.length; j++) {
-        bassAmp = Math.max(bassAmp, Math.abs(bands.bass[dataIndex + j]));
-        midAmp = Math.max(midAmp, Math.abs(bands.mid[dataIndex + j]));
-        highAmp = Math.max(highAmp, Math.abs(bands.high[dataIndex + j]));
+      if (sampleStart >= track.waveformData.length) continue;
+
+      // Calculate max amplitudes for each band in this pixel
+      let bassMax = 0, midMax = 0, highMax = 0;
+      
+      for (let i = sampleStart; i < sampleEnd; i++) {
+        if (i < bands.bass.length) {
+          bassMax = Math.max(bassMax, Math.abs(bands.bass[i]));
+          midMax = Math.max(midMax, Math.abs(bands.mid[i]));
+          highMax = Math.max(highMax, Math.abs(bands.high[i]));
+        }
       }
 
-      const x = i;
-      const centerY = height / 2;
+      // Draw bass (orange) - bottom layer
+      if (bassMax > 0) {
+        ctx.fillStyle = '#ff8c00';
+        const bassHeight = bassMax * amp * 1.2;
+        ctx.fillRect(x, centerY, 1, bassHeight);
+        ctx.fillRect(x, centerY - bassHeight, 1, bassHeight);
+      }
 
-      // Draw bass (orange/yellow) - bottom
-      ctx.fillStyle = '#ff8c00'; // Orange
-      const bassHeight = bassAmp * amp;
-      ctx.fillRect(x, centerY, 1, bassHeight);
-      ctx.fillRect(x, centerY - bassHeight, 1, bassHeight);
+      // Draw mids (blue) - middle layer
+      if (midMax > 0) {
+        ctx.fillStyle = '#4080ff';
+        const midHeight = midMax * amp;
+        ctx.fillRect(x, centerY, 1, midHeight);
+        ctx.fillRect(x, centerY - midHeight, 1, midHeight);
+      }
 
-      // Draw mids (blue) - middle
-      ctx.fillStyle = '#0080ff'; // Blue
-      const midHeight = midAmp * amp * 0.8;
-      ctx.fillRect(x, centerY, 1, midHeight);
-      ctx.fillRect(x, centerY - midHeight, 1, midHeight);
-
-      // Draw highs (white/cyan) - top
-      ctx.fillStyle = '#00ffff'; // Cyan
-      const highHeight = highAmp * amp * 0.6;
-      ctx.fillRect(x, centerY, 1, highHeight);
-      ctx.fillRect(x, centerY - highHeight, 1, highHeight);
+      // Draw highs (cyan) - top layer
+      if (highMax > 0) {
+        ctx.fillStyle = '#00ffff';
+        const highHeight = highMax * amp * 0.8;
+        ctx.fillRect(x, centerY, 1, highHeight);
+        ctx.fillRect(x, centerY - highHeight, 1, highHeight);
+      }
     }
 
-    // Draw beat grid
+    // Draw beat grid in zoomed view
     if (track.bpm > 0 && duration > 0) {
       const beatDuration = 60 / track.bpm;
-      const beatsCount = Math.floor(duration / beatDuration);
+      const firstBeat = Math.floor(startTime / beatDuration) * beatDuration;
       
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = 1;
       
-      for (let i = 0; i <= beatsCount; i++) {
-        const beatTime = i * beatDuration;
-        const x = (beatTime / duration) * width;
-        
-        // Draw beat markers
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-        
-        // Highlight every 4th beat (downbeat)
-        if (i % 4 === 0) {
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-          ctx.lineWidth = 2;
+      for (let beatTime = firstBeat; beatTime <= endTime; beatTime += beatDuration) {
+        if (beatTime >= startTime && beatTime <= endTime) {
+          const x = ((beatTime - startTime) / (endTime - startTime)) * width;
+          
           ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, height);
           ctx.stroke();
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-          ctx.lineWidth = 1;
+          
+          // Highlight every 4th beat (downbeat)
+          const beatNumber = Math.round(beatTime / beatDuration);
+          if (beatNumber % 4 === 0) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+          }
         }
       }
     }
 
-    // Draw playhead
-    if (duration > 0) {
-      const playheadX = (currentTime / duration) * width;
-      ctx.strokeStyle = '#ff0040';
-      ctx.lineWidth = 3;
-      ctx.shadowColor = '#ff0040';
-      ctx.shadowBlur = 8;
-      
-      ctx.beginPath();
-      ctx.moveTo(playheadX, 0);
-      ctx.lineTo(playheadX, height);
-      ctx.stroke();
-      
-      // Reset shadow
-      ctx.shadowBlur = 0;
-    }
+    // Draw playhead in center (CDJ style)
+    const playheadX = width / 2;
+    ctx.strokeStyle = '#ff0040';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = '#ff0040';
+    ctx.shadowBlur = 8;
+    
+    ctx.beginPath();
+    ctx.moveTo(playheadX, 0);
+    ctx.lineTo(playheadX, height);
+    ctx.stroke();
+    
+    // Reset shadow
+    ctx.shadowBlur = 0;
 
-    // Draw cue points (if any)
+    // Draw cue points relative to zoomed view
     ctx.fillStyle = '#00ff00';
     for (let i = 1; i <= 4; i++) {
-      const cueTime = duration * (i / 10); // Example cue points
-      const cueX = (cueTime / duration) * width;
-      ctx.fillRect(cueX - 1, height - 8, 2, 8);
+      const cueTime = duration * (i / 10);
+      if (cueTime >= startTime && cueTime <= endTime) {
+        const cueX = ((cueTime - startTime) / (endTime - startTime)) * width;
+        ctx.fillRect(cueX - 1, height - 6, 2, 6);
+      }
     }
 
   }, [track, options, analyzeFrequencyBands]);
