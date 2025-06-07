@@ -186,57 +186,27 @@ export function Deck({ deckId, color }: DeckProps) {
         ))}
       </div>
 
-      {/* Left Side Controls */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {/* EQ Section */}
-        <div className="pioneer-eq-section p-3">
-          <div className="text-xs text-center mb-2 text-gray-300">EQ</div>
-          <div className="space-y-3">
-            <div className="text-center">
-              <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(deck.eq.high - 50) * 2.7}deg)` }}
-                onMouseDown={(e) => {
-                  // Add knob interaction logic
-                }}
-              />
-              <div className="text-xs text-gray-400">HI</div>
-            </div>
-            <div className="text-center">
-              <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(deck.eq.mid - 50) * 2.7}deg)` }}
-              />
-              <div className="text-xs text-gray-400">MID</div>
-            </div>
-            <div className="text-center">
-              <div 
-                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(deck.eq.low - 50) * 2.7}deg)` }}
-              />
-              <div className="text-xs text-gray-400">LOW</div>
-            </div>
+      {/* Tempo Control Section */}
+      <div className="pioneer-eq-section p-4 mb-6">
+        <div className="text-xs text-center mb-2 text-gray-300">TEMPO</div>
+        <div className="text-center mb-3">
+          <div className="text-lg font-mono pioneer-led" style={{ color }}>
+            {formatTempo(deck.tempo)}
           </div>
         </div>
-
-        {/* Tempo Control */}
-        <div className="pioneer-eq-section p-3">
-          <div className="text-xs text-center mb-2 text-gray-300">TEMPO</div>
-          <div className="text-center mb-3">
-            <div className="text-lg font-mono pioneer-led" style={{ color }}>
-              {formatTempo(deck.tempo)}
-            </div>
+        <div className="flex justify-center">
+          <div className="pioneer-fader-track h-32 w-8 relative">
+            <div 
+              className="pioneer-fader-handle w-10 h-6 absolute -left-1"
+              style={{ 
+                top: `${((50 - deck.tempo) / 100) * (128 - 24)}px`,
+              }}
+            />
           </div>
-          <div className="flex justify-center">
-            <div className="pioneer-fader-track h-32 w-8 relative">
-              <div 
-                className="pioneer-fader-handle w-10 h-6 absolute -left-1"
-                style={{ 
-                  top: `${((50 - deck.tempo) / 100) * (128 - 24)}px`,
-                }}
-              />
-            </div>
-          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2 mt-3">
+          <button className="pioneer-button py-1 text-xs">RANGE</button>
+          <button className="pioneer-button py-1 text-xs">RESET</button>
         </div>
       </div>
 

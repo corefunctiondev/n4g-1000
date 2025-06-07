@@ -52,77 +52,119 @@ export function Mixer() {
       </div>
 
       {/* Channel Strips */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-6 mb-6">
         {/* Channel A */}
-        <div className="pioneer-eq-section p-3">
-          <div className="text-center mb-3">
-            <div className="text-xs font-bold text-blue-400">CH A</div>
+        <div className="pioneer-eq-section p-4">
+          <div className="text-center mb-4">
+            <div className="text-sm font-bold text-blue-400">CH A</div>
           </div>
           
-          {/* Channel EQ */}
-          <div className="space-y-2 mb-4">
+          {/* Gain Knob */}
+          <div className="text-center mb-4">
+            <div 
+              className="pioneer-knob w-10 h-10 mx-auto mb-1 cursor-pointer"
+              style={{ transform: `rotate(${(75 - 50) * 2.7}deg)` }}
+            />
+            <div className="text-xs text-gray-400">GAIN</div>
+          </div>
+
+          {/* Channel EQ Knobs */}
+          <div className="space-y-4 mb-6">
             <div className="text-center">
-              <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+              />
               <div className="text-xs text-gray-400">HI</div>
             </div>
             <div className="text-center">
-              <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+              />
               <div className="text-xs text-gray-400">MID</div>
             </div>
             <div className="text-center">
-              <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+              />
               <div className="text-xs text-gray-400">LOW</div>
             </div>
           </div>
 
           {/* Channel Fader */}
-          <div className="flex justify-center mb-3">
-            <div className="pioneer-fader-track h-24 w-6 relative">
-              <div className="pioneer-fader-handle w-8 h-4 absolute -left-1 top-4" />
+          <div className="flex justify-center mb-4">
+            <div className="pioneer-fader-track h-32 w-8 relative">
+              <div className="pioneer-fader-handle w-10 h-6 absolute -left-1 top-8" />
             </div>
           </div>
 
-          {/* PFL Button */}
-          <div className="text-center">
-            <button className="pioneer-button py-1 px-2 text-xs text-blue-400">
+          {/* PFL and CUE Buttons */}
+          <div className="space-y-2">
+            <button className="pioneer-button w-full py-2 text-xs text-blue-400">
               PFL
+            </button>
+            <button className="pioneer-button w-full py-2 text-xs text-orange-400">
+              CUE
             </button>
           </div>
         </div>
 
         {/* Channel B */}
-        <div className="pioneer-eq-section p-3">
-          <div className="text-center mb-3">
-            <div className="text-xs font-bold text-orange-400">CH B</div>
+        <div className="pioneer-eq-section p-4">
+          <div className="text-center mb-4">
+            <div className="text-sm font-bold text-orange-400">CH B</div>
           </div>
           
-          {/* Channel EQ */}
-          <div className="space-y-2 mb-4">
+          {/* Gain Knob */}
+          <div className="text-center mb-4">
+            <div 
+              className="pioneer-knob w-10 h-10 mx-auto mb-1 cursor-pointer"
+              style={{ transform: `rotate(${(75 - 50) * 2.7}deg)` }}
+            />
+            <div className="text-xs text-gray-400">GAIN</div>
+          </div>
+
+          {/* Channel EQ Knobs */}
+          <div className="space-y-4 mb-6">
             <div className="text-center">
-              <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+              />
               <div className="text-xs text-gray-400">HI</div>
             </div>
             <div className="text-center">
-              <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+              />
               <div className="text-xs text-gray-400">MID</div>
             </div>
             <div className="text-center">
-              <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+              />
               <div className="text-xs text-gray-400">LOW</div>
             </div>
           </div>
 
           {/* Channel Fader */}
-          <div className="flex justify-center mb-3">
-            <div className="pioneer-fader-track h-24 w-6 relative">
-              <div className="pioneer-fader-handle w-8 h-4 absolute -left-1 top-4" />
+          <div className="flex justify-center mb-4">
+            <div className="pioneer-fader-track h-32 w-8 relative">
+              <div className="pioneer-fader-handle w-10 h-6 absolute -left-1 top-8" />
             </div>
           </div>
 
-          {/* PFL Button */}
-          <div className="text-center">
-            <button className="pioneer-button py-1 px-2 text-xs text-orange-400">
+          {/* PFL and CUE Buttons */}
+          <div className="space-y-2">
+            <button className="pioneer-button w-full py-2 text-xs text-orange-400">
               PFL
+            </button>
+            <button className="pioneer-button w-full py-2 text-xs text-blue-400">
+              CUE
             </button>
           </div>
         </div>
