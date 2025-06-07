@@ -63,18 +63,21 @@ export function Mixer() {
 
   // Knob interaction handlers
   const handleKnobMouseDown = useCallback((knobType: string, channel?: 'A' | 'B') => (event: React.MouseEvent) => {
-    setIsDragging(knobType);
+    event.preventDefault();
+    setIsDragging(`${knobType}${channel ? `-${channel}` : ''}`);
     const startY = event.clientY;
     const startValue = getKnobValue(knobType, channel);
 
     const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
       const deltaY = startY - e.clientY;
       const sensitivity = 0.5;
       const newValue = Math.max(0, Math.min(100, startValue + deltaY * sensitivity));
       updateKnobValue(knobType, newValue, channel);
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.preventDefault();
       setIsDragging(null);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -86,17 +89,20 @@ export function Mixer() {
 
   // Fader interaction handlers
   const handleFaderMouseDown = useCallback((faderType: string, channel?: 'A' | 'B') => (event: React.MouseEvent) => {
-    setIsDragging(faderType);
+    event.preventDefault();
+    setIsDragging(`${faderType}${channel ? `-${channel}` : ''}`);
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
 
     const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
       const y = e.clientY - rect.top;
       const height = rect.height;
       const percentage = Math.max(0, Math.min(100, ((height - y) / height) * 100));
       updateFaderValue(faderType, percentage, channel);
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.preventDefault();
       setIsDragging(null);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -108,17 +114,20 @@ export function Mixer() {
 
   // Crossfader interaction
   const handleCrossfaderMouseDown = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
     setIsDragging('crossfader');
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
 
     const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
       const x = e.clientX - rect.left;
       const width = rect.width;
       const percentage = Math.max(0, Math.min(100, (x / width) * 100));
       handleCrossfader(percentage);
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.preventDefault();
       setIsDragging(null);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -163,7 +172,9 @@ export function Mixer() {
   };
 
   const updateFaderValue = (faderType: string, value: number, channel?: 'A' | 'B') => {
-    if (channel === 'A') {
+    if (faderType === 'master') {
+      handleMasterVolume(value);
+    } else if (channel === 'A') {
       setChannelA(prev => ({ ...prev, volume: value }));
     } else if (channel === 'B') {
       setChannelB(prev => ({ ...prev, volume: value }));
@@ -274,6 +285,58 @@ export function Mixer() {
           </div>
         </div>
 
+        {/* Center Section - Crossfader and Master */}
+        <div className="pioneer-eq-section p-2 flex-1">
+          <div className="text-center mb-2">
+            <div className="text-sm font-bold text-white">MASTER</div>
+          </div>
+
+          {/* Crossfader */}
+          <div className="mb-3">
+            <div className="text-center mb-1">
+              <div className="text-xs text-gray-400">CROSSFADER</div>
+            </div>
+            <div className="flex justify-center">
+              <div 
+                className="pioneer-fader-track w-32 h-6 relative cursor-pointer"
+                onMouseDown={handleCrossfaderMouseDown}
+              >
+                <div 
+                  className={`pioneer-fader-handle w-4 h-8 absolute -top-1 transition-colors ${
+                    isDragging === 'crossfader' ? 'bg-purple-400' : ''
+                  }`}
+                  style={{ left: `${(mixer.crossfader / 100) * (128 - 16)}px` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Master Volume Knobs */}
+          <div className="flex justify-center gap-4">
+            <div className="text-center">
+              <div 
+                className={`pioneer-knob w-10 h-10 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'master' ? 'bg-green-400' : ''
+                }`}
+                style={{ transform: `rotate(${(mixer.masterVolume - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('master')}
+              />
+              <div className="text-xs text-gray-400">MASTER</div>
+            </div>
+            
+            <div className="text-center">
+              <div 
+                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'cue' ? 'bg-orange-400' : ''
+                }`}
+                style={{ transform: `rotate(${(mixer.cueVolume - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('cue')}
+              />
+              <div className="text-xs text-gray-400">CUE</div>
+            </div>
+          </div>
+        </div>
+
         {/* Channel B */}
         <div className="pioneer-eq-section p-2 flex-1">
           <div className="text-center mb-2">
@@ -359,10 +422,15 @@ export function Mixer() {
         </div>
         
         <div className="relative mb-2">
-          <div className="pioneer-fader-track h-6 w-full relative">
+          <div 
+            className="pioneer-fader-track h-6 w-full relative cursor-pointer"
+            onMouseDown={handleCrossfaderMouseDown}
+          >
             <div 
-              className="pioneer-fader-handle w-8 h-8 absolute top-1/2 transform -translate-y-1/2"
-              style={{ left: `${mixer.crossfader}%` }}
+              className={`pioneer-fader-handle w-8 h-8 absolute top-1/2 transform -translate-y-1/2 transition-colors ${
+                isDragging === 'crossfader' ? 'bg-purple-400' : ''
+              }`}
+              style={{ left: `calc(${mixer.crossfader}% - 16px)` }}
             />
           </div>
           <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -402,10 +470,15 @@ export function Mixer() {
 
         {/* Master Volume */}
         <div className="flex justify-center mb-3">
-          <div className="pioneer-fader-track h-20 w-6 relative">
+          <div 
+            className="pioneer-fader-track h-20 w-6 relative cursor-pointer"
+            onMouseDown={handleFaderMouseDown('master')}
+          >
             <div 
-              className="pioneer-fader-handle w-8 h-4 absolute -left-1"
-              style={{ top: `${(100 - mixer.masterVolume) / 100 * 16 * 4}px` }}
+              className={`pioneer-fader-handle w-8 h-4 absolute -left-1 transition-colors ${
+                isDragging === 'master' ? 'bg-green-400' : ''
+              }`}
+              style={{ top: `${((100 - mixer.masterVolume) / 100) * (80 - 16)}px` }}
             />
           </div>
         </div>

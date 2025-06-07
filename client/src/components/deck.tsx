@@ -75,9 +75,12 @@ export function Deck({ deckId, color }: DeckProps) {
 
   // Tempo fader interaction
   const handleTempoMouseDown = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
     setIsDraggingTempo(true);
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      e.preventDefault();
       const y = e.clientY - rect.top;
       const height = rect.height;
       const percentage = Math.max(0, Math.min(1, (height - y) / height));
@@ -85,7 +88,8 @@ export function Deck({ deckId, color }: DeckProps) {
       setTempo(tempoValue);
     };
     
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.preventDefault();
       setIsDraggingTempo(false);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
