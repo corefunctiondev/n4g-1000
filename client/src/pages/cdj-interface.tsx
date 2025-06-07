@@ -12,78 +12,81 @@ export default function CDJInterface() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cdj-dark to-cdj-gray">
-      {/* Header Section */}
-      <header className="bg-cdj-gray border-b border-cdj-border p-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-cdj-blue w-8 h-8 rounded flex items-center justify-center">
-              <i className="fas fa-music text-cdj-dark text-lg" />
+    <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-8">
+      {/* Pioneer DJ Setup Layout */}
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">Pioneer DJ Virtual Setup</h1>
+          <div className="flex items-center justify-center space-x-6 text-sm text-gray-400">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span>System Ready</span>
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-cdj-blue to-cdj-green bg-clip-text text-transparent">
-              Virtual CDJ Pro
-            </h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => setIsRecording(!isRecording)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isRecording 
-                  ? 'bg-cdj-red text-white shadow-led' 
-                  : 'bg-cdj-red hover:bg-opacity-80'
-              }`}
-            >
-              <i className="fas fa-circle mr-2" />
-              REC
-            </button>
-            <button className="bg-cdj-surface px-4 py-2 rounded-lg font-medium hover:bg-cdj-border transition-all duration-200">
-              <i className="fas fa-cog mr-2" />
-              Settings
-            </button>
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={() => setIsRecording(!isRecording)}
+                className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                  isRecording 
+                    ? 'bg-red-500 text-white' 
+                    : 'bg-gray-700 text-gray-300 hover:bg-red-500'
+                }`}
+              >
+                {isRecording ? '● REC' : '○ REC'}
+              </button>
+            </div>
+            <div className="text-gray-500 font-mono">
+              Latency: 5ms | CPU: 12%
+            </div>
           </div>
         </div>
-      </header>
 
-      {/* Main CDJ Interface */}
-      <main className="max-w-7xl mx-auto p-6">
-        {/* Dual Deck Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 cdj-grid">
-          {/* Left Deck (Deck A) */}
-          <Deck deckId="A" color="#00d4ff" />
+        {/* Main DJ Setup - Horizontal Layout */}
+        <div className="flex items-start justify-center gap-8">
+          {/* Left CDJ (Deck A) */}
+          <div className="flex-shrink-0">
+            <Deck deckId="A" color="#00d4ff" />
+          </div>
 
-          {/* Center Mixer Section */}
-          <Mixer />
+          {/* Center Mixer */}
+          <div className="flex-shrink-0 mt-16">
+            <Mixer />
+          </div>
 
-          {/* Right Deck (Deck B) */}
-          <Deck deckId="B" color="#ff6b00" />
+          {/* Right CDJ (Deck B) */}
+          <div className="flex-shrink-0">
+            <Deck deckId="B" color="#ff6b00" />
+          </div>
         </div>
 
-        {/* Status Bar */}
-        <Card className="mt-6 bg-cdj-light border-cdj-border">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-cdj-green" />
-                  <span className="text-gray-400">Audio System Ready</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <i className="fas fa-headphones text-cdj-blue" />
-                  <span className="text-gray-400">Headphones Connected</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <i className="fas fa-wifi text-cdj-green" />
-                  <span className="text-gray-400">Online Mode</span>
-                </div>
+        {/* Connection Cables Visual */}
+        <div className="mt-8 flex justify-center">
+          <div className="text-xs text-gray-600 font-mono">
+            CDJ-A ═══════════ DJM-750MK2 ═══════════ CDJ-B
+          </div>
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-8 text-center">
+          <div className="pioneer-eq-section inline-block p-4">
+            <div className="text-xs text-gray-400 mb-2">MASTER OUTPUT</div>
+            <div className="flex items-center justify-center space-x-4 text-sm">
+              <div className="flex items-center space-x-2">
+                <i className="fas fa-headphones text-blue-400" />
+                <span className="text-gray-400">Monitoring</span>
               </div>
-              <div className="text-gray-400 font-mono">
-                CPU: <span className="text-cdj-green">12%</span> | 
-                Latency: <span className="text-cdj-blue">5ms</span>
+              <div className="flex items-center space-x-2">
+                <i className="fas fa-volume-up text-green-400" />
+                <span className="text-gray-400">Main Out</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <i className="fas fa-microphone text-orange-400" />
+                <span className="text-gray-400">Booth Out</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </main>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

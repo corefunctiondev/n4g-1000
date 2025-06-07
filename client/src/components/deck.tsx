@@ -80,223 +80,192 @@ export function Deck({ deckId, color }: DeckProps) {
   };
 
   return (
-    <Card 
-      className="bg-cdj-light border-cdj-border shadow-2xl"
+    <div 
+      className="pioneer-cdj p-6 w-full max-w-md mx-auto"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <CardContent className="p-6">
-        {/* Deck Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <div 
-              className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold text-black`}
-              style={{ backgroundColor: color }}
-            >
-              {deckId}
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">DECK {deckId}</h2>
-              <p className="text-sm text-gray-400">
-                {deck.track?.name || 'No Track Loaded'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${deck.isReady ? 'bg-cdj-green animate-pulse' : 'bg-gray-500'}`} />
-            <span className="text-xs text-gray-400">
+      {/* Top Section - Screen and Info Display */}
+      <div className="mb-6">
+        {/* Main LCD Screen */}
+        <div className="pioneer-screen p-4 mb-4">
+          <div className="flex justify-between items-start mb-2">
+            <div className="text-xs text-blue-400 font-mono">CDJ-3000</div>
+            <div className="text-xs text-green-400 font-mono">
               {deck.isReady ? 'READY' : 'LOADING'}
-            </span>
-          </div>
-        </div>
-
-        {/* Track Display */}
-        <div className="cdj-display rounded-lg p-4 mb-6 text-center">
-          <div className="text-2xl font-mono font-bold cdj-led mb-1">
-            {deck.track ? formatBPM(deck.track.bpm) : '---.-'}
-          </div>
-          <div className="text-xs opacity-75 mb-2">BPM</div>
-          <div className="flex justify-between text-xs">
-            <span>{formatTime(deck.currentTime)}</span>
-            <span>{deck.track ? formatTime(deck.track.duration - deck.currentTime) : '--:--'}</span>
-          </div>
-        </div>
-
-        {/* Waveform Display */}
-        <div className="mb-6">
-          <Waveform
-            track={deck.track}
-            currentTime={deck.currentTime}
-            width={300}
-            height={80}
-            color={color}
-            onSeek={seek}
-            className="w-full"
-          />
-        </div>
-
-        {/* File Upload */}
-        <div className="mb-6">
-          <label className={`block w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-all text-center ${
-            isDragOver 
-              ? 'border-cdj-blue bg-cdj-blue bg-opacity-10 scale-105' 
-              : 'border-cdj-border hover:border-cdj-blue'
-          }`}>
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <i className={`fas fa-upload text-2xl mb-2 ${isDragOver ? 'animate-bounce' : ''}`} style={{ color }} />
-            <div className="text-sm text-gray-400">
-              {isDragOver ? 'Drop your audio file here!' : 'Drop audio file or click to browse'}
             </div>
-            <div className="text-xs text-gray-500 mt-1">MP3, WAV, FLAC, OGG supported</div>
-          </label>
-        </div>
-
-        {/* Transport Controls */}
-        <div className="grid grid-cols-5 gap-3 mb-6">
-          <Button
-            onClick={cue}
-            className="cdj-button p-3 rounded-lg text-center"
-            style={{ color: '#ff6b00' }}
-          >
-            <i className="fas fa-step-backward mb-1" />
-            <div className="text-xs">CUE</div>
-          </Button>
-          
-          <Button
-            onClick={handlePlayPause}
-            className={`p-3 rounded-lg text-center font-bold ${
-              deck.isPlaying ? 'bg-cdj-green text-black' : 'cdj-button text-cdj-green'
-            }`}
-          >
-            <i className={`fas ${deck.isPlaying ? 'fa-pause' : 'fa-play'} mb-1`} />
-            <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
-          </Button>
-          
-          <Button
-            onClick={stop}
-            className="cdj-button p-3 rounded-lg text-center"
-            style={{ color: '#ff0040' }}
-          >
-            <i className="fas fa-stop mb-1" />
-            <div className="text-xs">STOP</div>
-          </Button>
-          
-          <Button className="cdj-button p-3 rounded-lg text-center text-cdj-green">
-            <i className="fas fa-link mb-1" />
-            <div className="text-xs">SYNC</div>
-          </Button>
-          
-          <Button className="cdj-button p-3 rounded-lg text-center text-cdj-orange">
-            <i className="fas fa-redo mb-1" />
-            <div className="text-xs">LOOP</div>
-          </Button>
-        </div>
-
-        {/* Hot Cue Pads */}
-        <div className="grid grid-cols-4 gap-2 mb-6">
-          {[1, 2, 3, 4].map((cueNum) => (
-            <Button
-              key={cueNum}
-              className="cdj-button rounded-lg p-4 text-center border border-cdj-border hover:bg-cdj-orange transition-all"
-            >
-              <div className="text-lg font-bold">{cueNum}</div>
-              <div className="text-xs text-gray-400">HOT CUE</div>
-            </Button>
-          ))}
-        </div>
-
-        {/* Tempo & Pitch Controls */}
-        <div className="bg-cdj-surface rounded-lg p-4 mb-6">
-          <div className="text-center mb-4">
-            <div className="text-2xl font-mono font-bold cdj-led" style={{ color }}>
-              {formatBPM(deck.track?.bpm || 120)}
-            </div>
-            <div className="text-xs text-gray-400">BPM</div>
           </div>
           
-          <div className="flex justify-center mb-4">
-            <Fader
-              value={deck.tempo}
-              min={-50}
-              max={50}
-              step={0.1}
-              onChange={setTempo}
-              length={128}
-              thickness={8}
-              className="mx-auto"
+          {/* Waveform Display */}
+          <div className="pioneer-waveform mb-3">
+            <Waveform
+              track={deck.track}
+              currentTime={deck.currentTime}
+              width={280}
+              height={60}
+              color={color}
+              onSeek={seek}
+              className="w-full"
             />
           </div>
           
-          <div className="text-center">
-            <div className="text-lg font-mono font-bold cdj-led" style={{ color }}>
-              {formatTempo(deck.tempo)}
+          {/* Track Info */}
+          <div className="text-white">
+            <div className="text-sm font-bold truncate mb-1">
+              {deck.track?.name || 'No Track Loaded'}
             </div>
-            <div className="text-xs text-gray-400">PITCH</div>
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>{formatTime(deck.currentTime)}</span>
+              <span className="pioneer-led" style={{ color }}>
+                {deck.track ? formatBPM(deck.track.bpm) : '---.-'} BPM
+              </span>
+              <span>{deck.track ? formatTime(deck.track.duration - deck.currentTime) : '--:--'}</span>
+            </div>
           </div>
         </div>
 
-        {/* EQ Controls */}
-        <div className="bg-cdj-surface rounded-lg p-4 mb-6">
-          <div className="text-center mb-3">
-            <div className="text-sm font-semibold text-gray-300">EQUALIZER</div>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
+        {/* Control Buttons Row */}
+        <div className="grid grid-cols-6 gap-2 mb-4">
+          <button className="pioneer-button py-2 px-1 text-xs">MENU</button>
+          <button className="pioneer-button py-2 px-1 text-xs">TAG</button>
+          <button className="pioneer-button py-2 px-1 text-xs">INFO</button>
+          <button className="pioneer-button py-2 px-1 text-xs">TIME</button>
+          <button className="pioneer-button py-2 px-1 text-xs">AUTO</button>
+          <button className="pioneer-button py-2 px-1 text-xs">TRACK</button>
+        </div>
+      </div>
+
+      {/* Center Section - Jog Wheel */}
+      <div className="flex justify-center mb-6">
+        <div className="pioneer-jog cursor-pointer hover:scale-105 transition-transform"></div>
+      </div>
+
+      {/* Transport Controls */}
+      <div className="grid grid-cols-4 gap-2 mb-6">
+        <button 
+          onClick={cue}
+          className="pioneer-button py-3 text-orange-400 hover:text-orange-300"
+        >
+          <div className="text-lg">⏮</div>
+          <div className="text-xs">CUE</div>
+        </button>
+        
+        <button 
+          onClick={handlePlayPause}
+          className={`pioneer-button py-3 ${deck.isPlaying ? 'active text-green-400' : 'text-green-400'}`}
+        >
+          <div className="text-lg">{deck.isPlaying ? '⏸' : '▶'}</div>
+          <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
+        </button>
+        
+        <button 
+          onClick={stop}
+          className="pioneer-button py-3 text-red-400 hover:text-red-300"
+        >
+          <div className="text-lg">⏹</div>
+          <div className="text-xs">STOP</div>
+        </button>
+        
+        <button className="pioneer-button py-3 text-blue-400 hover:text-blue-300">
+          <div className="text-lg">🔗</div>
+          <div className="text-xs">SYNC</div>
+        </button>
+      </div>
+
+      {/* Hot Cue Pads */}
+      <div className="grid grid-cols-4 gap-2 mb-6">
+        {[1, 2, 3, 4].map((cueNum) => (
+          <button
+            key={cueNum}
+            className="pioneer-button py-4 hover:bg-pink-500 hover:text-white transition-all"
+          >
+            <div className="text-lg font-bold">{cueNum}</div>
+            <div className="text-xs">HOT CUE</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Left Side Controls */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* EQ Section */}
+        <div className="pioneer-eq-section p-3">
+          <div className="text-xs text-center mb-2 text-gray-300">EQ</div>
+          <div className="space-y-3">
             <div className="text-center">
-              <Knob
-                value={deck.eq.high}
-                min={0}
-                max={100}
-                onChange={(value) => setEQ('high', value)}
-                size="md"
-                className="mx-auto mb-2"
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(deck.eq.high - 50) * 2.7}deg)` }}
+                onMouseDown={(e) => {
+                  // Add knob interaction logic
+                }}
               />
-              <div className="text-xs text-gray-400">HIGH</div>
+              <div className="text-xs text-gray-400">HI</div>
             </div>
             <div className="text-center">
-              <Knob
-                value={deck.eq.mid}
-                min={0}
-                max={100}
-                onChange={(value) => setEQ('mid', value)}
-                size="md"
-                className="mx-auto mb-2"
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(deck.eq.mid - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">MID</div>
             </div>
             <div className="text-center">
-              <Knob
-                value={deck.eq.low}
-                min={0}
-                max={100}
-                onChange={(value) => setEQ('low', value)}
-                size="md"
-                className="mx-auto mb-2"
+              <div 
+                className="pioneer-knob w-12 h-12 mx-auto mb-1 cursor-pointer"
+                style={{ transform: `rotate(${(deck.eq.low - 50) * 2.7}deg)` }}
               />
               <div className="text-xs text-gray-400">LOW</div>
             </div>
           </div>
         </div>
 
-        {/* Volume Fader */}
-        <div className="text-center">
-          <div className="text-sm font-semibold text-gray-300 mb-2">VOLUME</div>
-          <Fader
-            value={deck.volume * 100}
-            min={0}
-            max={100}
-            onChange={(value) => setVolume(value / 100)}
-            length={128}
-            thickness={8}
-            className="mx-auto"
-          />
+        {/* Tempo Control */}
+        <div className="pioneer-eq-section p-3">
+          <div className="text-xs text-center mb-2 text-gray-300">TEMPO</div>
+          <div className="text-center mb-3">
+            <div className="text-lg font-mono pioneer-led" style={{ color }}>
+              {formatTempo(deck.tempo)}
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <div className="pioneer-fader-track h-32 w-8 relative">
+              <div 
+                className="pioneer-fader-handle w-10 h-6 absolute -left-1"
+                style={{ 
+                  top: `${((50 - deck.tempo) / 100) * (128 - 24)}px`,
+                }}
+              />
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* File Upload Area */}
+      <div className="mb-4">
+        <label className={`block w-full p-3 border-2 border-dashed rounded-lg cursor-pointer transition-all text-center ${
+          isDragOver 
+            ? 'border-blue-400 bg-blue-400 bg-opacity-10 scale-105' 
+            : 'border-gray-600 hover:border-blue-400'
+        }`}>
+          <input
+            type="file"
+            accept="audio/*"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <i className={`fas fa-upload text-lg mb-1 ${isDragOver ? 'animate-bounce' : ''}`} style={{ color }} />
+          <div className="text-xs text-gray-400">
+            {isDragOver ? 'Drop your track here!' : 'Load Track'}
+          </div>
+        </label>
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="grid grid-cols-3 gap-2">
+        <button className="pioneer-button py-2 text-xs">LOOP</button>
+        <button className="pioneer-button py-2 text-xs">SLIP</button>
+        <button className="pioneer-button py-2 text-xs">BEAT</button>
+      </div>
+    </div>
   );
 }
