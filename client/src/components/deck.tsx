@@ -272,7 +272,10 @@ export function Deck({ deckId, color }: DeckProps) {
             <div className="text-xs">STOP</div>
           </button>
           
-          <button className="pioneer-button py-2 px-3 text-blue-400 hover:text-blue-300">
+          <button 
+            className="pioneer-button py-2 px-3 text-blue-400 hover:text-blue-300 hover:bg-blue-500"
+            onClick={handleSync}
+          >
             <div className="text-sm">🔗</div>
             <div className="text-xs">SYNC</div>
           </button>
@@ -280,15 +283,25 @@ export function Deck({ deckId, color }: DeckProps) {
 
         {/* Center - Hot Cue Pads */}
         <div className="flex gap-1">
-          {[1, 2, 3, 4].map((cueNum) => (
-            <button
-              key={cueNum}
-              className="pioneer-button py-2 px-2 hover:bg-pink-500 hover:text-white transition-all"
-            >
-              <div className="text-sm font-bold">{cueNum}</div>
-              <div className="text-xs">CUE</div>
-            </button>
-          ))}
+          {[0, 1, 2, 3].map((cueIndex) => {
+            const cueTime = deck.cuePoints[cueIndex];
+            const hasActiveCue = cueTime !== undefined;
+            return (
+              <button
+                key={cueIndex}
+                className={`pioneer-button py-2 px-2 transition-all ${
+                  hasActiveCue 
+                    ? 'bg-pink-500 text-white border-pink-400' 
+                    : 'hover:bg-pink-500 hover:text-white'
+                }`}
+                onClick={(e) => handleCueClick(cueIndex, e)}
+                title={`Cue ${cueIndex + 1}: ${hasActiveCue ? 'Click to jump, Shift+Click to delete' : 'Shift+Click to set'}`}
+              >
+                <div className="text-sm font-bold">{cueIndex + 1}</div>
+                <div className="text-xs">CUE</div>
+              </button>
+            );
+          })}
         </div>
 
         {/* Right Side - Tempo Control */}

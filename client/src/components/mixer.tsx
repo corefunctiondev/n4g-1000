@@ -19,6 +19,24 @@ export function Mixer() {
     },
   });
 
+  const [channelA, setChannelA] = useState({
+    gain: 75,
+    eq: { high: 50, mid: 50, low: 50 },
+    volume: 85,
+    pfl: false,
+    cue: false,
+  });
+
+  const [channelB, setChannelB] = useState({
+    gain: 75,
+    eq: { high: 50, mid: 50, low: 50 },
+    volume: 85,
+    pfl: false,
+    cue: false,
+  });
+
+  const [isDragging, setIsDragging] = useState<string | null>(null);
+
   const handleCrossfader = useCallback((value: number) => {
     setMixer(prev => ({ ...prev, crossfader: value }));
     // Apply crossfader logic here
@@ -43,6 +61,132 @@ export function Mixer() {
     }));
   }, []);
 
+  // Knob interaction handlers
+  const handleKnobMouseDown = useCallback((knobType: string, channel?: 'A' | 'B') => (event: React.MouseEvent) => {
+    setIsDragging(knobType);
+    const startY = event.clientY;
+    const startValue = getKnobValue(knobType, channel);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaY = startY - e.clientY;
+      const sensitivity = 0.5;
+      const newValue = Math.max(0, Math.min(100, startValue + deltaY * sensitivity));
+      updateKnobValue(knobType, newValue, channel);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
+
+  // Fader interaction handlers
+  const handleFaderMouseDown = useCallback((faderType: string, channel?: 'A' | 'B') => (event: React.MouseEvent) => {
+    setIsDragging(faderType);
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const y = e.clientY - rect.top;
+      const height = rect.height;
+      const percentage = Math.max(0, Math.min(100, ((height - y) / height) * 100));
+      updateFaderValue(faderType, percentage, channel);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
+
+  // Crossfader interaction
+  const handleCrossfaderMouseDown = useCallback((event: React.MouseEvent) => {
+    setIsDragging('crossfader');
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = e.clientX - rect.left;
+      const width = rect.width;
+      const percentage = Math.max(0, Math.min(100, (x / width) * 100));
+      handleCrossfader(percentage);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [handleCrossfader]);
+
+  // Helper functions to get and update values
+  const getKnobValue = (knobType: string, channel?: 'A' | 'B') => {
+    if (channel === 'A') {
+      if (knobType === 'gain') return channelA.gain;
+      if (knobType === 'high') return channelA.eq.high;
+      if (knobType === 'mid') return channelA.eq.mid;
+      if (knobType === 'low') return channelA.eq.low;
+    } else if (channel === 'B') {
+      if (knobType === 'gain') return channelB.gain;
+      if (knobType === 'high') return channelB.eq.high;
+      if (knobType === 'mid') return channelB.eq.mid;
+      if (knobType === 'low') return channelB.eq.low;
+    }
+    if (knobType === 'master') return mixer.masterVolume;
+    if (knobType === 'cue') return mixer.cueVolume;
+    return 50;
+  };
+
+  const updateKnobValue = (knobType: string, value: number, channel?: 'A' | 'B') => {
+    if (channel === 'A') {
+      if (knobType === 'gain') setChannelA(prev => ({ ...prev, gain: value }));
+      if (knobType === 'high') setChannelA(prev => ({ ...prev, eq: { ...prev.eq, high: value } }));
+      if (knobType === 'mid') setChannelA(prev => ({ ...prev, eq: { ...prev.eq, mid: value } }));
+      if (knobType === 'low') setChannelA(prev => ({ ...prev, eq: { ...prev.eq, low: value } }));
+    } else if (channel === 'B') {
+      if (knobType === 'gain') setChannelB(prev => ({ ...prev, gain: value }));
+      if (knobType === 'high') setChannelB(prev => ({ ...prev, eq: { ...prev.eq, high: value } }));
+      if (knobType === 'mid') setChannelB(prev => ({ ...prev, eq: { ...prev.eq, mid: value } }));
+      if (knobType === 'low') setChannelB(prev => ({ ...prev, eq: { ...prev.eq, low: value } }));
+    }
+    if (knobType === 'master') handleMasterVolume(value);
+    if (knobType === 'cue') handleCueVolume(value);
+  };
+
+  const updateFaderValue = (faderType: string, value: number, channel?: 'A' | 'B') => {
+    if (channel === 'A') {
+      setChannelA(prev => ({ ...prev, volume: value }));
+    } else if (channel === 'B') {
+      setChannelB(prev => ({ ...prev, volume: value }));
+    }
+  };
+
+  // Button handlers
+  const togglePFL = useCallback((channel: 'A' | 'B') => {
+    if (channel === 'A') {
+      setChannelA(prev => ({ ...prev, pfl: !prev.pfl }));
+    } else {
+      setChannelB(prev => ({ ...prev, pfl: !prev.pfl }));
+    }
+  }, []);
+
+  const toggleCue = useCallback((channel: 'A' | 'B') => {
+    if (channel === 'A') {
+      setChannelA(prev => ({ ...prev, cue: !prev.cue }));
+    } else {
+      setChannelB(prev => ({ ...prev, cue: !prev.cue }));
+    }
+  }, []);
+
   return (
     <div className="pioneer-mixer p-4 w-[400px] h-[320px] flex flex-col">
       {/* Top Section - Pioneer Branding */}
@@ -63,22 +207,31 @@ export function Mixer() {
           <div className="flex gap-2 justify-center mb-3">
             <div className="text-center">
               <div 
-                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'high-A' ? 'bg-blue-400' : ''
+                }`}
+                style={{ transform: `rotate(${(channelA.eq.high - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('high', 'A')}
               />
               <div className="text-xs text-gray-400">HI</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'mid-A' ? 'bg-blue-400' : ''
+                }`}
+                style={{ transform: `rotate(${(channelA.eq.mid - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('mid', 'A')}
               />
               <div className="text-xs text-gray-400">MID</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'low-A' ? 'bg-blue-400' : ''
+                }`}
+                style={{ transform: `rotate(${(channelA.eq.low - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('low', 'A')}
               />
               <div className="text-xs text-gray-400">LOW</div>
             </div>
@@ -86,17 +239,36 @@ export function Mixer() {
 
           {/* Channel Fader */}
           <div className="flex justify-center">
-            <div className="pioneer-fader-track h-16 w-6 relative">
-              <div className="pioneer-fader-handle w-8 h-4 absolute -left-1 top-4" />
+            <div 
+              className="pioneer-fader-track h-16 w-6 relative cursor-pointer"
+              onMouseDown={handleFaderMouseDown('volume', 'A')}
+            >
+              <div 
+                className={`pioneer-fader-handle w-8 h-4 absolute -left-1 transition-colors ${
+                  isDragging === 'volume-A' ? 'bg-blue-400' : ''
+                }`}
+                style={{ 
+                  top: `${((100 - channelA.volume) / 100) * (64 - 16)}px`,
+                }}
+              />
             </div>
           </div>
 
-          {/* PFL and CUE Buttons */}
-          <div className="space-y-2">
-            <button className="pioneer-button w-full py-2 text-xs text-blue-400">
+          <div className="flex gap-1 mt-2">
+            <button 
+              className={`pioneer-button py-1 px-2 text-xs transition-all ${
+                channelA.pfl ? 'bg-blue-500 text-white' : 'text-blue-400 hover:bg-blue-500 hover:text-white'
+              }`}
+              onClick={() => togglePFL('A')}
+            >
               PFL
             </button>
-            <button className="pioneer-button w-full py-2 text-xs text-orange-400">
+            <button 
+              className={`pioneer-button py-1 px-2 text-xs transition-all ${
+                channelA.cue ? 'bg-orange-500 text-white' : 'text-orange-400 hover:bg-orange-500 hover:text-white'
+              }`}
+              onClick={() => toggleCue('A')}
+            >
               CUE
             </button>
           </div>
@@ -112,22 +284,31 @@ export function Mixer() {
           <div className="flex gap-2 justify-center mb-3">
             <div className="text-center">
               <div 
-                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'high-B' ? 'bg-orange-400' : ''
+                }`}
+                style={{ transform: `rotate(${(channelB.eq.high - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('high', 'B')}
               />
               <div className="text-xs text-gray-400">HI</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'mid-B' ? 'bg-orange-400' : ''
+                }`}
+                style={{ transform: `rotate(${(channelB.eq.mid - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('mid', 'B')}
               />
               <div className="text-xs text-gray-400">MID</div>
             </div>
             <div className="text-center">
               <div 
-                className="pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer"
-                style={{ transform: `rotate(${(50 - 50) * 2.7}deg)` }}
+                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                  isDragging === 'low-B' ? 'bg-orange-400' : ''
+                }`}
+                style={{ transform: `rotate(${(channelB.eq.low - 50) * 2.7}deg)` }}
+                onMouseDown={handleKnobMouseDown('low', 'B')}
               />
               <div className="text-xs text-gray-400">LOW</div>
             </div>
@@ -135,17 +316,36 @@ export function Mixer() {
 
           {/* Channel Fader */}
           <div className="flex justify-center">
-            <div className="pioneer-fader-track h-16 w-6 relative">
-              <div className="pioneer-fader-handle w-8 h-4 absolute -left-1 top-4" />
+            <div 
+              className="pioneer-fader-track h-16 w-6 relative cursor-pointer"
+              onMouseDown={handleFaderMouseDown('volume', 'B')}
+            >
+              <div 
+                className={`pioneer-fader-handle w-8 h-4 absolute -left-1 transition-colors ${
+                  isDragging === 'volume-B' ? 'bg-orange-400' : ''
+                }`}
+                style={{ 
+                  top: `${((100 - channelB.volume) / 100) * (64 - 16)}px`,
+                }}
+              />
             </div>
           </div>
 
-          {/* PFL and CUE Buttons */}
-          <div className="space-y-2">
-            <button className="pioneer-button w-full py-2 text-xs text-orange-400">
+          <div className="flex gap-1 mt-2">
+            <button 
+              className={`pioneer-button py-1 px-2 text-xs transition-all ${
+                channelB.pfl ? 'bg-orange-500 text-white' : 'text-orange-400 hover:bg-orange-500 hover:text-white'
+              }`}
+              onClick={() => togglePFL('B')}
+            >
               PFL
             </button>
-            <button className="pioneer-button w-full py-2 text-xs text-blue-400">
+            <button 
+              className={`pioneer-button py-1 px-2 text-xs transition-all ${
+                channelB.cue ? 'bg-blue-500 text-white' : 'text-blue-400 hover:bg-blue-500 hover:text-white'
+              }`}
+              onClick={() => toggleCue('B')}
+            >
               CUE
             </button>
           </div>
