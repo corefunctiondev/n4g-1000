@@ -1,10 +1,6 @@
 import { useState, useCallback } from 'react';
 import { MixerState } from '@/types/audio';
 import { audioEngine } from '@/lib/audio-engine';
-import { Knob } from './knob';
-import { Fader } from './fader';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 export function Mixer() {
   const [mixer, setMixer] = useState<MixerState>({

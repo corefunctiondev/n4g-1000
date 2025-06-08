@@ -2,6 +2,7 @@ export class AudioEngine {
   private context: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private compressor: DynamicsCompressorNode | null = null;
+  private deckNodes: Map<string, any> = new Map();
 
   async initialize(): Promise<void> {
     try {
