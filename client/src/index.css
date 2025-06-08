@@ -81,7 +81,7 @@
   }
 }
 
-/* Pioneer CDJ Hardware Styling */
+/* Pioneer CDJ Hardware Styling with Responsive Scaling */
 .pioneer-cdj {
   background: linear-gradient(145deg, var(--cdj-body), var(--pioneer-dark-gray));
   border: 2px solid var(--pioneer-light-gray);
@@ -90,6 +90,20 @@
     0 8px 32px rgba(0, 0, 0, 0.8),
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
     inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive scaling container */
+.resizable-content {
+  --scale-factor: 1;
+  transform: scale(var(--scale-factor));
+  transform-origin: center;
+  transition: transform 0.1s ease-out;
+  width: 1700px;
+  height: 360px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
 }
 
 .pioneer-screen {

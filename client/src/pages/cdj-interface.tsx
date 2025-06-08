@@ -13,7 +13,31 @@ export default function CDJInterface() {
     // Set page title
     document.title = 'Virtual CDJ Pro - Professional DJ Interface';
     
-    // Content now fills container naturally with percentage widths
+    // Set up ResizeObserver to scale all internal elements
+    if (containerRef.current && contentRef.current) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          
+          // Calculate scale factor based on container size vs default size
+          const baseWidth = 1700;
+          const baseHeight = 360;
+          const scaleX = width / baseWidth;
+          const scaleY = height / baseHeight;
+          const scale = Math.min(scaleX, scaleY);
+          
+          if (contentRef.current) {
+            // Apply transform with both translation and scaling
+            contentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            contentRef.current.style.setProperty('--scale-factor', scale.toString());
+          }
+        }
+      });
+      
+      resizeObserver.observe(containerRef.current);
+      
+      return () => resizeObserver.disconnect();
+    }
   }, []);
 
   return (
@@ -75,9 +99,9 @@ export default function CDJInterface() {
           >
             <div 
               ref={contentRef}
-              className="w-full h-full flex p-1"
+              className="resizable-content flex p-1"
               style={{ 
-                transformOrigin: 'center',
+                transform: `translate(-50%, -50%) scale(var(--scale-factor, 1))`,
                 transition: 'transform 0.1s ease-out'
               }}
             >
