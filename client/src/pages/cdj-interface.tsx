@@ -19,17 +19,16 @@ export default function CDJInterface() {
         for (const entry of entries) {
           const { width, height } = entry.contentRect;
           
-          // Calculate scale factor to fill container completely
+          // Scale content to fill container exactly
           const baseWidth = 1700;
           const baseHeight = 360;
           const scaleX = width / baseWidth;
           const scaleY = height / baseHeight;
-          const scale = Math.max(scaleX, scaleY); // Use max to fill completely
           
           if (contentRef.current) {
-            // Apply transform with both translation and scaling
-            contentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
-            contentRef.current.style.setProperty('--scale-factor', scale.toString());
+            // Use different scaling for width and height to fill completely
+            contentRef.current.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
+            contentRef.current.style.setProperty('--scale-factor', Math.min(scaleX, scaleY).toString());
           }
         }
       });
