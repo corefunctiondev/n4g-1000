@@ -1,0 +1,61 @@
+“I want a horizontally scrolling waveform that splits the audio into three frequency bands — LOW, MID, HIGH — and draws each as a colored band (like stacked lanes) moving over time. It should resemble Pioneer CDJ-3000’s overview waveform, using flat bars or strips that change in length and color intensity to reflect amplitude and transient energy in each band.”
+
+⸻
+
+🧱 Technical Breakdown
+
+1. Horizontal Layout
+	•	Time flows left to right.
+	•	Center marker shows the current playback position.
+	•	Background grid lines indicate beats or bars (based on BPM).
+
+2. Frequency Split
+	•	The waveform is split into 3 bands:
+	•	LOW: Sub and bass (e.g., 20–250 Hz)
+	•	MID: Mids (e.g., 250 Hz–4 kHz)
+	•	HIGH: Treble (e.g., 4 kHz–20 kHz)
+
+Each band is rendered as a horizontal strip (like a frequency lane):
+	•	LOW = bottom strip
+	•	MID = middle strip
+	•	HIGH = top strip
+
+3. Color Coding
+	•	Each band uses a distinct color or tone (can be static or dynamic based on energy).
+	•	Common: LOW = green, MID = yellow/orange, HIGH = red/blue
+	•	On CDJs, it’s usually neon-style colors on black.
+
+4. Amplitude/Intensity Visualization
+	•	Each bar or rectangle in the band lane varies in height or intensity based on the band’s amplitude at that point in time.
+	•	Visually appears like vertical ticks in each band lane.
+	•	Update interval: ~30–60 fps or every X ms (depending on playback speed and UI framerate).
+
+5. Grid Overlay
+	•	Optional grid lines represent:
+	•	Beat subdivisions (e.g., every ¼ or ½ bar)
+	•	Cue points
+	•	Beat grid markers synced to BPM
+
+⸻
+
+🛠️ Development Implementation Notes
+
+Audio Analysis:
+	•	Use Short-Time Fourier Transform (STFT) or FFT to extract frequency content.
+	•	Group frequency bins into 3 bands.
+	•	Calculate RMS energy or peak within each band every X ms.
+
+Rendering:
+	•	Use a canvas or WebGL engine.
+	•	Render 3 separate horizontal lanes.
+	•	Draw vertical bars whose height or opacity is based on band energy.
+	•	Add scroll or position pointer synced to track progress.
+
+⸻
+
+✅ Keywords for Searching or Dev Brief:
+	•	“3-band audio waveform”
+	•	“Real-time frequency visualizer”
+	•	“DJ deck style waveform”
+	•	“Horizontal frequency band visualization”
+	•	“RGB waveform rendering”
