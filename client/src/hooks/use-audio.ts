@@ -59,7 +59,7 @@ export function useAudio(deckId: 'A' | 'B') {
       let currentTime = Math.max(0, Math.min(elapsed, deck.track.duration));
       
       // Ensure precision to 2 decimal places for smooth display
-      currentTime = Math.round(currentTime * 100) / 100;
+      currentTime = Math.round(currentTime * 10) / 10;
       
       // Handle looping
       if (deck.isLooping && currentTime >= deck.loopEnd) {
@@ -83,14 +83,25 @@ export function useAudio(deckId: 'A' | 'B') {
       
       setDeck(prev => ({ ...prev, currentTime }));
       
-      if (currentTime < deck.track.duration) {
+      if (deck.isPlaying && currentTime < deck.track.duration) {
         animationFrameRef.current = requestAnimationFrame(updateCurrentTime);
-      } else {
+      } else if (currentTime >= deck.track.duration) {
         // Track finished
         setDeck(prev => ({ ...prev, isPlaying: false, currentTime: 0 }));
       }
     }
   }, [deck.isPlaying, deck.track, deck.isLooping, deck.loopStart, deck.loopEnd]);
+
+  // Start time update loop when playing starts
+  useEffect(() => {
+    if (deck.isPlaying && deck.track && !animationFrameRef.current) {
+      updateCurrentTime();
+    }
+    if (!deck.isPlaying && animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = undefined;
+    }
+  }, [deck.isPlaying, deck.track, updateCurrentTime]);
 
   const loadTrack = useCallback(async (file: File) => {
     try {
@@ -204,7 +215,6 @@ export function useAudio(deckId: 'A' | 'B') {
       startTimeRef.current = audioEngine.getCurrentTime() - offset;
       
       setDeck(prev => ({ ...prev, isPlaying: true, isPaused: false }));
-      updateCurrentTime();
       
       console.log(`Playback started successfully on deck ${deckId}`);
       
