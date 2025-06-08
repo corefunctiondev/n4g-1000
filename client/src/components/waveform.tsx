@@ -66,48 +66,78 @@ export function Waveform({
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, width, height);
 
-    // Draw static waveform if available
+    // Draw CDJ-3000 style horizontal waveform
     if (waveformDataRef.current) {
       const waveformData = waveformDataRef.current;
-      const barWidth = width / waveformData.length;
+      const barWidth = Math.max(1, width / waveformData.length);
+      const centerY = height / 2;
       
-      // Draw three frequency bands (high, mid, low) like CDJ-3000
+      // Create the characteristic CDJ-3000 waveform appearance
       for (let i = 0; i < waveformData.length; i++) {
         const amplitude = waveformData[i];
         const x = i * barWidth;
         
-        // High frequencies (top 1/3) - cyan
-        const highHeight = (amplitude * height) / 3;
-        ctx.fillStyle = '#00ffff';
-        ctx.fillRect(x, 0, barWidth - 1, highHeight);
+        // Scale amplitude for better visibility
+        const scaledAmplitude = Math.min(amplitude * 3, 1);
+        const waveHeight = (scaledAmplitude * height) / 2;
         
-        // Mid frequencies (middle 1/3) - blue  
-        const midHeight = (amplitude * height) / 3;
-        ctx.fillStyle = '#0080ff';
-        ctx.fillRect(x, height / 3, barWidth - 1, midHeight);
+        // Draw waveform bars extending from center
+        const topY = centerY - waveHeight;
+        const bottomY = centerY + waveHeight;
         
-        // Low frequencies (bottom 1/3) - orange
-        const lowHeight = (amplitude * height) / 3;
-        ctx.fillStyle = '#ff8000';
-        ctx.fillRect(x, (2 * height) / 3, barWidth - 1, lowHeight);
+        // Create gradient effect for depth
+        const gradient = ctx.createLinearGradient(0, topY, 0, bottomY);
+        gradient.addColorStop(0, '#00d4ff'); // Bright cyan at peaks
+        gradient.addColorStop(0.3, '#0099cc'); // Mid blue
+        gradient.addColorStop(0.7, '#006699'); // Darker blue
+        gradient.addColorStop(1, '#003366'); // Deep blue at center
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, topY, Math.max(1, barWidth - 0.5), bottomY - topY);
+        
+        // Add highlight for extra definition
+        if (scaledAmplitude > 0.1) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+          ctx.fillRect(x, topY, Math.max(1, barWidth - 0.5), 2);
+        }
       }
     }
 
-    // Draw live frequency analysis if playing
+    // Draw live frequency analysis overlay if playing
     if (isPlaying && analyser) {
       const freqData = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(freqData);
       
-      // Overlay live frequency bars
-      const barWidth = width / freqData.length * 4; // Scale down for better visual
+      const centerY = height / 2;
+      const samplesPerBar = Math.floor(freqData.length / width);
       
-      for (let i = 0; i < freqData.length / 4; i++) {
-        const amplitude = freqData[i] / 255;
-        const x = i * barWidth;
+      // Overlay live frequency data with CDJ-3000 style
+      for (let i = 0; i < width; i++) {
+        const startIdx = i * samplesPerBar;
+        let avgAmplitude = 0;
         
-        // Live frequency overlay with transparency
-        ctx.fillStyle = `rgba(255, 255, 255, ${amplitude * 0.3})`;
-        ctx.fillRect(x, 0, barWidth - 1, height * amplitude);
+        // Average frequency data for this bar
+        for (let j = 0; j < samplesPerBar && startIdx + j < freqData.length; j++) {
+          avgAmplitude += freqData[startIdx + j];
+        }
+        avgAmplitude = (avgAmplitude / samplesPerBar) / 255;
+        
+        if (avgAmplitude > 0.02) { // Only show significant activity
+          const liveHeight = (avgAmplitude * height) / 2;
+          const topY = centerY - liveHeight;
+          const bottomY = centerY + liveHeight;
+          
+          // Live overlay with bright highlight
+          ctx.fillStyle = `rgba(0, 255, 255, ${avgAmplitude * 0.6})`;
+          ctx.fillRect(i, topY, 1, bottomY - topY);
+          
+          // Add bright peaks for strong signals
+          if (avgAmplitude > 0.7) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillRect(i, topY, 1, 2);
+            ctx.fillRect(i, bottomY - 2, 1, 2);
+          }
+        }
       }
     }
 
