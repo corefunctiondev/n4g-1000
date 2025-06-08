@@ -208,19 +208,19 @@ export function Mixer() {
         <div className="text-xs text-gray-400 font-mono">DJM-750MK2</div>
       </div>
 
-      {/* Channel Strips - Horizontal Layout */}
-      <div className="flex gap-2 mb-4 flex-1">
+      {/* Channel Strips - Compact Layout */}
+      <div className="flex gap-1 mb-2 flex-1">
         {/* Channel A */}
-        <div className="pioneer-eq-section p-2" style={{ width: '120px' }}>
-          <div className="text-center mb-2">
-            <div className="text-sm font-bold text-blue-400">CH A</div>
+        <div className="pioneer-eq-section p-1 flex-1">
+          <div className="text-center mb-1">
+            <div className="text-xs font-bold text-blue-400">CH A</div>
           </div>
           
-          {/* Horizontal EQ Controls */}
-          <div className="flex gap-2 justify-center mb-3">
+          {/* Compact EQ Controls */}
+          <div className="flex gap-1 justify-center mb-2">
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
                   isDragging === 'high-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.high - 50) * 2.7}deg)` }}
@@ -230,7 +230,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
                   isDragging === 'mid-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.mid - 50) * 2.7}deg)` }}
@@ -240,7 +240,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
                   isDragging === 'low-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.low - 50) * 2.7}deg)` }}
@@ -288,9 +288,9 @@ export function Mixer() {
         </div>
 
         {/* Center Section - Crossfader and Master */}
-        <div className="pioneer-eq-section p-2" style={{ width: '140px' }}>
-          <div className="text-center mb-2">
-            <div className="text-sm font-bold text-white">MASTER</div>
+        <div className="pioneer-eq-section p-1 flex-1">
+          <div className="text-center mb-1">
+            <div className="text-xs font-bold text-white">MASTER</div>
           </div>
 
           {/* Crossfader */}

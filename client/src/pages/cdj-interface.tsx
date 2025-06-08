@@ -81,18 +81,18 @@ export default function CDJInterface() {
                 transition: 'transform 0.1s ease-out'
               }}
             >
-              {/* Left CDJ (Deck A) - Takes 40% width */}
-              <div className="w-[40%] h-full">
+              {/* Left CDJ (Deck A) - Takes 38% width */}
+              <div className="w-[38%] h-full">
                 <Deck deckId="A" color="#00d4ff" />
               </div>
 
-              {/* Center Mixer - Takes 20% width */}
-              <div className="w-[20%] h-full">
+              {/* Center Mixer - Takes 24% width */}
+              <div className="w-[24%] h-full">
                 <Mixer />
               </div>
 
-              {/* Right CDJ (Deck B) - Takes 40% width */}
-              <div className="w-[40%] h-full">
+              {/* Right CDJ (Deck B) - Takes 38% width */}
+              <div className="w-[38%] h-full">
                 <Deck deckId="B" color="#ff6b00" />
               </div>
             </div>
