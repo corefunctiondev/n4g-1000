@@ -308,13 +308,31 @@ export function useAudio(deckId: 'A' | 'B') {
       pauseTimeRef.current = time;
       setDeck(prev => ({ ...prev, currentTime: time }));
       
-      if (deck.isPlaying) {
-        // Restart playback from new position
-        pause();
-        setTimeout(() => play(), 50);
+      if (deck.isPlaying && sourceRef.current && audioNodes.current) {
+        // Stop current source
+        try {
+          sourceRef.current.stop();
+          sourceRef.current.disconnect();
+        } catch (e) {
+          // Source may already be stopped
+        }
+        
+        // Create new source and start from seek position
+        const source = audioEngine.createAudioSource(deck.track.audioBuffer!);
+        source.connect(audioNodes.current.gainNode);
+        
+        // Apply current tempo
+        const playbackRate = 1 + (deck.tempo / 100);
+        source.playbackRate.setValueAtTime(playbackRate, audioEngine.getCurrentTime());
+        
+        source.start(0, time);
+        sourceRef.current = source;
+        startTimeRef.current = audioEngine.getCurrentTime() - time;
+        
+        console.log(`Seeked to ${time.toFixed(2)}s while playing`);
       }
     }
-  }, [deck.track, deck.isPlaying, pause, play]);
+  }, [deck.track, deck.isPlaying, deck.tempo]);
 
   const setCuePoint = useCallback((index: number) => {
     if (deck.track) {
