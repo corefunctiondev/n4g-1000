@@ -11,8 +11,22 @@ export default function CDJInterface() {
   const [isDraggingCrossfader, setIsDraggingCrossfader] = useState(false);
   const [deckAState, setDeckAState] = useState<any>(null);
   const [deckBState, setDeckBState] = useState<any>(null);
+  const [playbackOrder, setPlaybackOrder] = useState<('A' | 'B')[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Track playback order for smart sync
+  const handleDeckPlaybackChange = useCallback((deckId: 'A' | 'B', isPlaying: boolean) => {
+    setPlaybackOrder(prev => {
+      if (isPlaying) {
+        // Add deck to order if not already present
+        return prev.includes(deckId) ? prev : [...prev, deckId];
+      } else {
+        // Remove deck from order when stopped
+        return prev.filter(id => id !== deckId);
+      }
+    });
+  }, []);
 
   // Crossfader interaction
   const handleCrossfaderMouseDown = useCallback((event: React.MouseEvent) => {
@@ -109,6 +123,8 @@ export default function CDJInterface() {
                   color="#00d4ff" 
                   otherDeckState={deckBState}
                   onStateChange={setDeckAState}
+                  onPlaybackChange={handleDeckPlaybackChange}
+                  playbackOrder={playbackOrder}
                 />
               </div>
 
@@ -124,6 +140,8 @@ export default function CDJInterface() {
                   color="#ff6b00" 
                   otherDeckState={deckAState}
                   onStateChange={setDeckBState}
+                  onPlaybackChange={handleDeckPlaybackChange}
+                  playbackOrder={playbackOrder}
                 />
               </div>
             </div>

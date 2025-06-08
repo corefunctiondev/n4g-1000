@@ -11,9 +11,11 @@ interface DeckProps {
   color: string;
   otherDeckState?: any;
   onStateChange?: (state: any) => void;
+  onPlaybackChange?: (deckId: 'A' | 'B', isPlaying: boolean) => void;
+  playbackOrder?: ('A' | 'B')[];
 }
 
-export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps) {
+export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackChange, playbackOrder }: DeckProps) {
   const {
     deck,
     loadTrack,
@@ -44,6 +46,13 @@ export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps
       onStateChange(deck);
     }
   }, [deck, onStateChange]);
+
+  // Track playback changes for smart sync
+  useEffect(() => {
+    if (onPlaybackChange) {
+      onPlaybackChange(deckId, deck.isPlaying);
+    }
+  }, [deck.isPlaying, deckId, onPlaybackChange]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     console.log('File input changed:', event.target.files);
@@ -90,12 +99,31 @@ export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps
   }, [deck.isPlaying, play, pause]);
 
   const handleSync = useCallback(() => {
-    if (otherDeckState) {
-      sync(otherDeckState);
-    } else {
-      console.log(`No other deck state available for sync on deck ${deckId}`);
+    if (!playbackOrder || playbackOrder.length === 0) {
+      console.log(`No decks are currently playing - sync requires a playing deck as reference`);
+      return;
     }
-  }, [sync, otherDeckState, deckId]);
+    
+    // Find the first deck that started playing (master deck)
+    const masterDeckId = playbackOrder[0];
+    
+    if (masterDeckId === deckId) {
+      console.log(`Deck ${deckId} is the master deck - cannot sync to itself`);
+      return;
+    }
+    
+    // Get the master deck's state
+    const masterDeckState = masterDeckId === 'A' ? 
+      (deckId === 'B' ? otherDeckState : null) : 
+      (deckId === 'A' ? otherDeckState : null);
+    
+    if (masterDeckState && masterDeckState.track) {
+      sync(masterDeckState);
+      console.log(`Deck ${deckId} syncing to master deck ${masterDeckId} (${masterDeckState.track.bpm} BPM)`);
+    } else {
+      console.log(`Cannot sync - master deck ${masterDeckId} state not available`);
+    }
+  }, [sync, otherDeckState, deckId, playbackOrder]);
 
   // Tempo fader interaction
   const handleTempoMouseDown = useCallback((event: React.MouseEvent) => {
