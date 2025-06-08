@@ -19,16 +19,21 @@ export default function CDJInterface() {
         for (const entry of entries) {
           const { width, height } = entry.contentRect;
           
-          // Calculate scale to fit content exactly in container
-          const baseWidth = 1700;
-          const baseHeight = 360;
-          const scaleX = width / baseWidth;
-          const scaleY = height / baseHeight;
+          // Calculate scale to make content fill container exactly
+          // Natural dimensions: 2 CDJs (650px each) + mixer (400px) + gaps (6px * 2) = 1712px
+          const naturalContentWidth = 650 + 400 + 650 + 12; // CDJs + mixer + gaps
+          const naturalContentHeight = 280; // Component height
+          
+          const availableWidth = width - 16; // Account for padding (p-2 = 8px each side)
+          const availableHeight = height - 16;
+          
+          const scaleX = availableWidth / naturalContentWidth;
+          const scaleY = availableHeight / naturalContentHeight;
           const scale = Math.min(scaleX, scaleY);
           
           if (contentRef.current) {
             contentRef.current.style.transform = `scale(${scale})`;
-            contentRef.current.style.transformOrigin = 'top left';
+            contentRef.current.style.transformOrigin = 'center';
           }
         }
       });
@@ -85,7 +90,7 @@ export default function CDJInterface() {
         <div className="flex justify-center items-center">
           <div 
             ref={containerRef}
-            className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm resize overflow-hidden shadow-2xl"
+            className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm resize overflow-hidden shadow-2xl relative"
             style={{ 
               width: '1700px',
               height: '360px',
@@ -98,11 +103,9 @@ export default function CDJInterface() {
           >
             <div 
               ref={contentRef}
-              className="flex items-start justify-center gap-8"
+              className="w-full h-full flex items-center justify-center gap-6 p-2"
               style={{ 
-                width: '1700px',
-                height: '360px',
-                transformOrigin: 'top left',
+                transformOrigin: 'center',
                 transition: 'transform 0.1s ease-out'
               }}
             >
@@ -112,7 +115,7 @@ export default function CDJInterface() {
               </div>
 
               {/* Center Mixer */}
-              <div className="flex-shrink-0 mt-8">
+              <div className="flex-shrink-0">
                 <Mixer />
               </div>
 
