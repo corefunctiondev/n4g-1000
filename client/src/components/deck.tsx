@@ -98,7 +98,11 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     }
   }, [deck.isPlaying, play, pause]);
 
-  const handleSync = useCallback(() => {
+  const handleSync = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(`Sync button clicked on deck ${deckId}`);
+    
     if (!playbackOrder || playbackOrder.length === 0) {
       console.log(`No decks are currently playing - sync requires a playing deck as reference`);
       return;
@@ -202,6 +206,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      style={{ position: 'relative', zIndex: 1 }}
     >
       {/* Top Section - Screen and Info Display */}
       <div className="mb-2 flex-1">
@@ -286,8 +291,8 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         </div>
 
         {/* Consolidated Controls Row */}
-        <div className="flex gap-1 mb-2 justify-center">
-          <label className="pioneer-button py-1 px-2 text-xs cursor-pointer text-blue-400 hover:text-blue-300">
+        <div className="flex gap-1 mb-2 justify-center" style={{ zIndex: 10, position: 'relative' }}>
+          <label className="pioneer-button py-1 px-2 text-xs cursor-pointer text-blue-400 hover:text-blue-300" style={{ zIndex: 11 }}>
             LOAD TRACK
             <input
               type="file"
@@ -299,6 +304,14 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           <button 
             className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
             onClick={handleSync}
+            style={{ 
+              zIndex: 11, 
+              pointerEvents: 'auto',
+              position: 'relative',
+              userSelect: 'none',
+              touchAction: 'manipulation'
+            }}
+            type="button"
           >
             SYNC
           </button>
@@ -306,7 +319,20 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             className={`pioneer-button py-1 px-2 text-xs ${
               deck.isLooping ? 'bg-green-500 text-white' : 'text-green-400 hover:bg-green-500'
             }`}
-            onClick={toggleLoop}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Loop button clicked');
+              toggleLoop();
+            }}
+            style={{ 
+              zIndex: 11, 
+              pointerEvents: 'auto',
+              position: 'relative',
+              userSelect: 'none',
+              touchAction: 'manipulation'
+            }}
+            type="button"
           >
             LOOP
           </button>

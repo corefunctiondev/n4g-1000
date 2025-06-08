@@ -340,6 +340,7 @@ export function useAudio(deckId: 'A' | 'B') {
   }, []);
 
   const toggleLoop = useCallback(() => {
+    console.log('Toggle loop called');
     if (!deck.isLooping && deck.track) {
       // Set default 4-beat loop from current position
       const beatDuration = 60 / deck.track.bpm;
@@ -347,6 +348,7 @@ export function useAudio(deckId: 'A' | 'B') {
       const start = deck.currentTime;
       const end = Math.min(start + loopLength, deck.track.duration);
       
+      console.log(`Setting loop: ${start} - ${end}`);
       setDeck(prev => ({ 
         ...prev, 
         isLooping: true,
@@ -354,6 +356,7 @@ export function useAudio(deckId: 'A' | 'B') {
         loopEnd: end
       }));
     } else {
+      console.log('Disabling loop');
       setDeck(prev => ({ ...prev, isLooping: false }));
     }
   }, [deck.isLooping, deck.currentTime, deck.track]);
