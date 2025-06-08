@@ -245,30 +245,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               isPlaying={deck.isPlaying}
             />
             
-            {/* Interactive Seek Bar Overlay */}
-            <div className="absolute bottom-2 left-2 right-2 h-1 bg-gray-700 rounded-full overflow-hidden">
-              {deck.track && (
-                <>
-                  {/* Progress Bar */}
-                  <div 
-                    className="h-full bg-orange-400 transition-all duration-100"
-                    style={{ 
-                      width: `${(deck.currentTime / deck.track.duration) * 100}%` 
-                    }}
-                  />
-                  {/* Clickable Overlay */}
-                  <div 
-                    className="absolute top-0 left-0 w-full h-full cursor-pointer"
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const seekTime = (x / rect.width) * deck.track!.duration;
-                      seek(seekTime);
-                    }}
-                  />
-                </>
-              )}
-            </div>
+
             
             {/* Hot Cue Markers */}
             <div className="absolute bottom-0 left-0 right-0 h-2 flex">
