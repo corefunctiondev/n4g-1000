@@ -124,6 +124,43 @@ export class AudioEngine {
     return source;
   }
 
+  registerDeckNodes(deckId: string, nodes: any): void {
+    this.deckNodes.set(deckId, nodes);
+  }
+
+  getDeckNodes(deckId: string): any {
+    return this.deckNodes.get(deckId);
+  }
+
+  setCrossfader(value: number): void {
+    const deckA = this.deckNodes.get('A');
+    const deckB = this.deckNodes.get('B');
+    
+    if (deckA && deckB && this.context) {
+      const fadePosition = value / 100;
+      const volumeA = Math.cos(fadePosition * Math.PI / 2);
+      const volumeB = Math.sin(fadePosition * Math.PI / 2);
+      
+      deckA.gainNode.gain.setValueAtTime(volumeA, this.context.currentTime);
+      deckB.gainNode.gain.setValueAtTime(volumeB, this.context.currentTime);
+    }
+  }
+
+  setChannelEQ(deckId: string, band: 'high' | 'mid' | 'low', value: number): void {
+    const nodes = this.deckNodes.get(deckId);
+    if (nodes && this.context) {
+      const gain = (value - 50) * 0.3;
+      nodes.eqNodes[band].gain.setValueAtTime(gain, this.context.currentTime);
+    }
+  }
+
+  setChannelVolume(deckId: string, volume: number): void {
+    const nodes = this.deckNodes.get(deckId);
+    if (nodes && this.context) {
+      nodes.gainNode.gain.setValueAtTime(volume / 100, this.context.currentTime);
+    }
+  }
+
   setMasterVolume(volume: number): void {
     if (this.masterGain) {
       this.masterGain.gain.setValueAtTime(volume, this.context!.currentTime);

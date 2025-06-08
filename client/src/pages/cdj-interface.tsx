@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Deck } from '@/components/deck';
 import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
+import { audioEngine } from '@/lib/audio-engine';
 
 export default function CDJInterface() {
   const [isRecording, setIsRecording] = useState(false);
@@ -23,6 +24,9 @@ export default function CDJInterface() {
       const width = rect.width;
       const percentage = Math.max(0, Math.min(100, (x / width) * 100));
       setCrossfaderValue(percentage);
+      
+      // Apply crossfader to audio engine
+      audioEngine.setCrossfader(percentage);
     };
     
     const handleMouseUp = (e: MouseEvent) => {

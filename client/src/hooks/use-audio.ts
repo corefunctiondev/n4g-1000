@@ -95,7 +95,10 @@ export function useAudio(deckId: 'A' | 'B') {
       // Initialize audio nodes for this track
       audioNodes.current = audioEngine.createDeckNodes();
       audioNodes.current.gainNode.connect(audioEngine.getMasterGain()!);
-      console.log(`Audio nodes initialized for deck ${deckId}`);
+      
+      // Register nodes with audio engine for crossfader/mixer control
+      audioEngine.registerDeckNodes(deckId, audioNodes.current);
+      console.log(`Audio nodes initialized and registered for deck ${deckId}`);
 
       setDeck(prev => ({
         ...prev,
@@ -243,11 +246,14 @@ export function useAudio(deckId: 'A' | 'B') {
         audioEngine.getCurrentTime()
       );
     }
+    // Also update via audio engine for mixer control
+    audioEngine.setChannelEQ(deckId, band, value);
+    
     setDeck(prev => ({
       ...prev,
       eq: { ...prev.eq, [band]: value }
     }));
-  }, []);
+  }, [deckId]);
 
   const seek = useCallback((time: number) => {
     if (deck.track && time >= 0 && time <= deck.track.duration) {

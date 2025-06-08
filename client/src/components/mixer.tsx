@@ -154,14 +154,32 @@ export function Mixer() {
   const updateKnobValue = (knobType: string, value: number, channel?: 'A' | 'B') => {
     if (channel === 'A') {
       if (knobType === 'gain') setChannelA(prev => ({ ...prev, gain: value }));
-      if (knobType === 'high') setChannelA(prev => ({ ...prev, eq: { ...prev.eq, high: value } }));
-      if (knobType === 'mid') setChannelA(prev => ({ ...prev, eq: { ...prev.eq, mid: value } }));
-      if (knobType === 'low') setChannelA(prev => ({ ...prev, eq: { ...prev.eq, low: value } }));
+      if (knobType === 'high') {
+        audioEngine.setChannelEQ('A', 'high', value);
+        setChannelA(prev => ({ ...prev, eq: { ...prev.eq, high: value } }));
+      }
+      if (knobType === 'mid') {
+        audioEngine.setChannelEQ('A', 'mid', value);
+        setChannelA(prev => ({ ...prev, eq: { ...prev.eq, mid: value } }));
+      }
+      if (knobType === 'low') {
+        audioEngine.setChannelEQ('A', 'low', value);
+        setChannelA(prev => ({ ...prev, eq: { ...prev.eq, low: value } }));
+      }
     } else if (channel === 'B') {
       if (knobType === 'gain') setChannelB(prev => ({ ...prev, gain: value }));
-      if (knobType === 'high') setChannelB(prev => ({ ...prev, eq: { ...prev.eq, high: value } }));
-      if (knobType === 'mid') setChannelB(prev => ({ ...prev, eq: { ...prev.eq, mid: value } }));
-      if (knobType === 'low') setChannelB(prev => ({ ...prev, eq: { ...prev.eq, low: value } }));
+      if (knobType === 'high') {
+        audioEngine.setChannelEQ('B', 'high', value);
+        setChannelB(prev => ({ ...prev, eq: { ...prev.eq, high: value } }));
+      }
+      if (knobType === 'mid') {
+        audioEngine.setChannelEQ('B', 'mid', value);
+        setChannelB(prev => ({ ...prev, eq: { ...prev.eq, mid: value } }));
+      }
+      if (knobType === 'low') {
+        audioEngine.setChannelEQ('B', 'low', value);
+        setChannelB(prev => ({ ...prev, eq: { ...prev.eq, low: value } }));
+      }
     }
     if (knobType === 'master') handleMasterVolume(value);
     if (knobType === 'cue') handleCueVolume(value);
@@ -171,8 +189,10 @@ export function Mixer() {
     if (faderType === 'master') {
       handleMasterVolume(value);
     } else if (channel === 'A') {
+      audioEngine.setChannelVolume('A', value);
       setChannelA(prev => ({ ...prev, volume: value }));
     } else if (channel === 'B') {
+      audioEngine.setChannelVolume('B', value);
       setChannelB(prev => ({ ...prev, volume: value }));
     }
   };
