@@ -50,7 +50,7 @@ export function Waveform({
     }
   }, [track, width]);
 
-  // Real-time frequency visualization
+  // Real-time scrolling waveform visualization
   const drawWaveform = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -66,41 +66,71 @@ export function Waveform({
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, width, height);
 
-    // Draw CDJ-3000 style horizontal waveform
-    if (waveformDataRef.current) {
+    // Draw scrolling CDJ-3000 style waveform
+    if (waveformDataRef.current && track) {
       const waveformData = waveformDataRef.current;
-      const barWidth = Math.max(1, width / waveformData.length);
       const centerY = height / 2;
+      const totalDuration = track.duration;
+      const pixelsPerSecond = width / 8; // Show 8 seconds worth of waveform
       
-      // Create the characteristic CDJ-3000 waveform appearance
-      for (let i = 0; i < waveformData.length; i++) {
-        const amplitude = waveformData[i];
-        const x = i * barWidth;
+      // Calculate visible time window (4 seconds before and after current position)
+      const windowStart = Math.max(0, currentTime - 4);
+      const windowEnd = Math.min(totalDuration, currentTime + 4);
+      const windowDuration = windowEnd - windowStart;
+      
+      // Calculate data indices for this time window
+      const samplesPerSecond = waveformData.length / totalDuration;
+      const startIndex = Math.floor(windowStart * samplesPerSecond);
+      const endIndex = Math.floor(windowEnd * samplesPerSecond);
+      
+      // Draw waveform for visible window
+      const visibleSamples = endIndex - startIndex;
+      const barWidth = Math.max(0.5, width / visibleSamples);
+      
+      for (let i = 0; i < visibleSamples && startIndex + i < waveformData.length; i++) {
+        const amplitude = waveformData[startIndex + i];
+        const timePosition = windowStart + (i / visibleSamples) * windowDuration;
+        const x = ((timePosition - windowStart) / windowDuration) * width;
         
         // Scale amplitude for better visibility
-        const scaledAmplitude = Math.min(amplitude * 3, 1);
-        const waveHeight = (scaledAmplitude * height) / 2;
+        const scaledAmplitude = Math.min(amplitude * 4, 1);
+        const waveHeight = (scaledAmplitude * height) / 2.5;
+        
+        // Color based on proximity to playhead
+        const distanceFromPlayhead = Math.abs(timePosition - currentTime);
+        let opacity = 1;
+        let color = '#006699';
+        
+        if (distanceFromPlayhead < 0.5) {
+          // Bright area around playhead
+          color = '#00d4ff';
+          opacity = 1;
+        } else if (distanceFromPlayhead < 2) {
+          // Medium brightness
+          color = '#0099cc';
+          opacity = 0.8;
+        } else {
+          // Dimmer for distant areas
+          color = '#006699';
+          opacity = 0.6;
+        }
         
         // Draw waveform bars extending from center
         const topY = centerY - waveHeight;
         const bottomY = centerY + waveHeight;
         
-        // Create gradient effect for depth
-        const gradient = ctx.createLinearGradient(0, topY, 0, bottomY);
-        gradient.addColorStop(0, '#00d4ff'); // Bright cyan at peaks
-        gradient.addColorStop(0.3, '#0099cc'); // Mid blue
-        gradient.addColorStop(0.7, '#006699'); // Darker blue
-        gradient.addColorStop(1, '#003366'); // Deep blue at center
+        ctx.fillStyle = color;
+        ctx.globalAlpha = opacity;
+        ctx.fillRect(x, topY, Math.max(1, barWidth), bottomY - topY);
         
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, topY, Math.max(1, barWidth - 0.5), bottomY - topY);
-        
-        // Add highlight for extra definition
-        if (scaledAmplitude > 0.1) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-          ctx.fillRect(x, topY, Math.max(1, barWidth - 0.5), 2);
+        // Add highlight for peaks
+        if (scaledAmplitude > 0.3 && distanceFromPlayhead < 1) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+          ctx.fillRect(x, topY, Math.max(1, barWidth), 2);
         }
       }
+      
+      ctx.globalAlpha = 1; // Reset alpha
     }
 
     // Draw live frequency analysis overlay if playing
@@ -141,50 +171,72 @@ export function Waveform({
       }
     }
 
-    // Draw playhead position
-    if (track && track.duration > 0) {
-      const playheadX = (currentTime / track.duration) * width;
-      
-      // Playhead line
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(playheadX, 0);
-      ctx.lineTo(playheadX, height);
-      ctx.stroke();
-      
-      // Playhead triangle
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.moveTo(playheadX - 5, 0);
-      ctx.lineTo(playheadX + 5, 0);
-      ctx.lineTo(playheadX, 10);
-      ctx.closePath();
-      ctx.fill();
-    }
+    // Draw fixed center playhead (CDJ-3000 style)
+    const playheadX = width / 2;
+    
+    // Playhead line - bright white and prominent
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(playheadX, 0);
+    ctx.lineTo(playheadX, height);
+    ctx.stroke();
+    
+    // Playhead triangle at top
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(playheadX - 6, 0);
+    ctx.lineTo(playheadX + 6, 0);
+    ctx.lineTo(playheadX, 12);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Playhead triangle at bottom
+    ctx.beginPath();
+    ctx.moveTo(playheadX - 6, height);
+    ctx.lineTo(playheadX + 6, height);
+    ctx.lineTo(playheadX, height - 12);
+    ctx.closePath();
+    ctx.fill();
 
-    // Beat grid overlay
+    // Scrolling beat grid overlay
     if (track && track.bpm > 0) {
       const beatInterval = 60 / track.bpm; // seconds per beat
-      const pixelsPerSecond = width / (track.duration || 1);
-      const beatWidth = beatInterval * pixelsPerSecond;
+      const windowStart = Math.max(0, currentTime - 4);
+      const windowEnd = Math.min(track.duration, currentTime + 4);
       
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 1;
       
-      for (let beat = 0; beat * beatWidth < width; beat++) {
-        const x = beat * beatWidth;
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
+      // Draw beat lines within the visible window
+      const firstBeat = Math.floor(windowStart / beatInterval);
+      const lastBeat = Math.ceil(windowEnd / beatInterval);
+      
+      for (let beat = firstBeat; beat <= lastBeat; beat++) {
+        const beatTime = beat * beatInterval;
+        if (beatTime >= windowStart && beatTime <= windowEnd) {
+          const x = ((beatTime - windowStart) / (windowEnd - windowStart)) * width;
+          
+          // Highlight beats closer to playhead
+          const distanceFromPlayhead = Math.abs(beatTime - currentTime);
+          if (distanceFromPlayhead < 0.1) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = 2;
+          } else {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.lineWidth = 1;
+          }
+          
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
       }
     }
 
-    // Continue animation if playing
-    if (isPlaying) {
-      animationRef.current = requestAnimationFrame(drawWaveform);
-    }
+    // Continue animation continuously for live updates
+    animationRef.current = requestAnimationFrame(drawWaveform);
   }, [width, height, currentTime, track, isPlaying, analyser]);
 
   useEffect(() => {
