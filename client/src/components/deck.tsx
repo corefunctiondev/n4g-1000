@@ -196,16 +196,16 @@ export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps
             </div>
           </div>
           
-          {/* 3-Band Waveform Display - Wider and Shorter */}
-          <div className="pioneer-waveform mb-2 relative flex-1">
+          {/* Extended Waveform Display - Fill Available Space */}
+          <div className="pioneer-waveform mb-2 relative" style={{ height: '140px' }}>
             <Waveform
               track={deck.track}
               currentTime={deck.currentTime}
               width={580}
-              height={60}
+              height={140}
               color={color}
               onSeek={seek}
-              className="w-full"
+              className="w-full h-full"
               analyser={getAnalyser()}
               isPlaying={deck.isPlaying}
             />
