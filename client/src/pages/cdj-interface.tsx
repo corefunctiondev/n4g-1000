@@ -13,35 +13,7 @@ export default function CDJInterface() {
     // Set page title
     document.title = 'Virtual CDJ Pro - Professional DJ Interface';
     
-    // Set up ResizeObserver to handle container scaling
-    if (containerRef.current && contentRef.current) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          const { width, height } = entry.contentRect;
-          
-          // Calculate scale to make content fill container exactly
-          // Natural dimensions: 2 CDJs (650px each) + mixer (400px) + gaps (6px * 2) = 1712px
-          const naturalContentWidth = 650 + 400 + 650 + 12; // CDJs + mixer + gaps
-          const naturalContentHeight = 280; // Component height
-          
-          const availableWidth = width - 16; // Account for padding (p-2 = 8px each side)
-          const availableHeight = height - 16;
-          
-          const scaleX = availableWidth / naturalContentWidth;
-          const scaleY = availableHeight / naturalContentHeight;
-          const scale = Math.min(scaleX, scaleY);
-          
-          if (contentRef.current) {
-            contentRef.current.style.transform = `scale(${scale})`;
-            contentRef.current.style.transformOrigin = 'center';
-          }
-        }
-      });
-      
-      resizeObserver.observe(containerRef.current);
-      
-      return () => resizeObserver.disconnect();
-    }
+    // Content now fills container naturally with percentage widths
   }, []);
 
   return (
@@ -103,24 +75,24 @@ export default function CDJInterface() {
           >
             <div 
               ref={contentRef}
-              className="w-full h-full flex items-center justify-center gap-6 p-2"
+              className="w-full h-full flex p-1"
               style={{ 
                 transformOrigin: 'center',
                 transition: 'transform 0.1s ease-out'
               }}
             >
-              {/* Left CDJ (Deck A) */}
-              <div className="flex-shrink-0">
+              {/* Left CDJ (Deck A) - Takes 40% width */}
+              <div className="w-[40%] h-full">
                 <Deck deckId="A" color="#00d4ff" />
               </div>
 
-              {/* Center Mixer */}
-              <div className="flex-shrink-0">
+              {/* Center Mixer - Takes 20% width */}
+              <div className="w-[20%] h-full">
                 <Mixer />
               </div>
 
-              {/* Right CDJ (Deck B) */}
-              <div className="flex-shrink-0">
+              {/* Right CDJ (Deck B) - Takes 40% width */}
+              <div className="w-[40%] h-full">
                 <Deck deckId="B" color="#ff6b00" />
               </div>
             </div>
