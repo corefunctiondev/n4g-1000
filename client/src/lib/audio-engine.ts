@@ -69,6 +69,12 @@ export class AudioEngine {
     const gainNode = this.context.createGain();
     const analyser = this.context.createAnalyser();
     
+    // Configure analyser for high-resolution real-time analysis
+    analyser.fftSize = 4096;  // Higher resolution for better frequency separation
+    analyser.smoothingTimeConstant = 0.1;  // Less smoothing for more responsive updates
+    analyser.minDecibels = -100;
+    analyser.maxDecibels = -10;
+    
     // Create EQ nodes
     const highShelf = this.context.createBiquadFilter();
     const midPeaking = this.context.createBiquadFilter();

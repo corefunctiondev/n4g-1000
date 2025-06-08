@@ -50,7 +50,7 @@ export function Waveform({
     }
   }, [track, width]);
 
-  // Real-time scrolling waveform visualization
+  // Real-time scrolling waveform visualization with higher update rate
   const drawWaveform = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -62,9 +62,19 @@ export function Waveform({
     canvas.width = width;
     canvas.height = height;
 
-    // Clear canvas
+    // Clear canvas with CDJ-style background
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, width, height);
+    
+    // Add subtle grid lines for professional look
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < width; i += 20) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
+      ctx.stroke();
+    }
 
     // Draw scrolling CDJ-3000 style waveform
     if (waveformDataRef.current && track) {
@@ -133,39 +143,120 @@ export function Waveform({
       ctx.globalAlpha = 1; // Reset alpha
     }
 
-    // Draw live frequency analysis overlay if playing
+    // Draw real-time frequency bands with RMS amplitude calculation
     if (isPlaying && analyser) {
       const freqData = new Uint8Array(analyser.frequencyBinCount);
+      const timeData = new Uint8Array(analyser.fftSize);
+      
       analyser.getByteFrequencyData(freqData);
+      analyser.getByteTimeDomainData(timeData);
       
       const centerY = height / 2;
-      const samplesPerBar = Math.floor(freqData.length / width);
       
-      // Overlay live frequency data with CDJ-3000 style
-      for (let i = 0; i < width; i++) {
-        const startIdx = i * samplesPerBar;
-        let avgAmplitude = 0;
-        
-        // Average frequency data for this bar
-        for (let j = 0; j < samplesPerBar && startIdx + j < freqData.length; j++) {
-          avgAmplitude += freqData[startIdx + j];
+      // Calculate RMS amplitude for overall energy
+      let rmsSum = 0;
+      for (let i = 0; i < timeData.length; i++) {
+        const sample = (timeData[i] - 128) / 128;
+        rmsSum += sample * sample;
+      }
+      const rmsAmplitude = Math.sqrt(rmsSum / timeData.length);
+      
+      // Define frequency ranges optimized for CDJ-3000 analysis
+      const sampleRate = 44100;
+      const freqPerBin = sampleRate / 2 / freqData.length;
+      
+      // Frequency band ranges (Hz)
+      const bassRange = { start: 20, end: 250 };
+      const midRange = { start: 250, end: 4000 };
+      const highRange = { start: 4000, end: 20000 };
+      
+      // Convert to bin indices
+      const bassStart = Math.floor(bassRange.start / freqPerBin);
+      const bassEnd = Math.floor(bassRange.end / freqPerBin);
+      const midStart = bassEnd;
+      const midEnd = Math.floor(midRange.end / freqPerBin);
+      const highStart = midEnd;
+      const highEnd = Math.min(freqData.length, Math.floor(highRange.end / freqPerBin));
+      
+      // Calculate peak and RMS for each frequency band
+      let bassRMS = 0, midRMS = 0, highRMS = 0;
+      let bassPeak = 0, midPeak = 0, highPeak = 0;
+      
+      // Bass analysis
+      for (let i = bassStart; i < bassEnd; i++) {
+        const value = freqData[i] / 255;
+        bassRMS += value * value;
+        bassPeak = Math.max(bassPeak, value);
+      }
+      bassRMS = Math.sqrt(bassRMS / (bassEnd - bassStart));
+      
+      // Mid analysis
+      for (let i = midStart; i < midEnd; i++) {
+        const value = freqData[i] / 255;
+        midRMS += value * value;
+        midPeak = Math.max(midPeak, value);
+      }
+      midRMS = Math.sqrt(midRMS / (midEnd - midStart));
+      
+      // High analysis
+      for (let i = highStart; i < highEnd; i++) {
+        const value = freqData[i] / 255;
+        highRMS += value * value;
+        highPeak = Math.max(highPeak, value);
+      }
+      highRMS = Math.sqrt(highRMS / (highEnd - highStart));
+      
+      // Draw frequency bands with enhanced visual separation
+      const bandSpacing = 4;
+      const barWidth = 1;
+      
+      for (let x = 0; x < width; x += barWidth) {
+        // Bass (LOW) - Orange/Red
+        if (bassRMS > 0.005) {
+          const bassHeight = Math.min(bassRMS * height * 3, height / 3);
+          const bassIntensity = Math.min(bassPeak * 2, 1);
+          
+          ctx.fillStyle = `rgba(255, ${Math.floor(100 + bassIntensity * 100)}, 0, ${bassIntensity})`;
+          ctx.fillRect(x, centerY + bandSpacing, barWidth, bassHeight);
+          ctx.fillRect(x, centerY - bandSpacing - bassHeight, barWidth, bassHeight);
+          
+          // Peak indicators
+          if (bassPeak > 0.8) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(x, centerY + bandSpacing, barWidth, 2);
+            ctx.fillRect(x, centerY - bandSpacing - 2, barWidth, 2);
+          }
         }
-        avgAmplitude = (avgAmplitude / samplesPerBar) / 255;
         
-        if (avgAmplitude > 0.02) { // Only show significant activity
-          const liveHeight = (avgAmplitude * height) / 2;
-          const topY = centerY - liveHeight;
-          const bottomY = centerY + liveHeight;
+        // Mids (MID) - Blue
+        if (midRMS > 0.005) {
+          const midHeight = Math.min(midRMS * height * 2.5, height / 3);
+          const midIntensity = Math.min(midPeak * 2, 1);
           
-          // Live overlay with bright highlight
-          ctx.fillStyle = `rgba(0, 255, 255, ${avgAmplitude * 0.6})`;
-          ctx.fillRect(i, topY, 1, bottomY - topY);
+          ctx.fillStyle = `rgba(0, ${Math.floor(150 + midIntensity * 100)}, 255, ${midIntensity})`;
+          ctx.fillRect(x, centerY + bandSpacing * 2, barWidth, midHeight);
+          ctx.fillRect(x, centerY - bandSpacing * 2 - midHeight, barWidth, midHeight);
           
-          // Add bright peaks for strong signals
-          if (avgAmplitude > 0.7) {
+          if (midPeak > 0.8) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fillRect(i, topY, 1, 2);
-            ctx.fillRect(i, bottomY - 2, 1, 2);
+            ctx.fillRect(x, centerY + bandSpacing * 2, barWidth, 2);
+            ctx.fillRect(x, centerY - bandSpacing * 2 - 2, barWidth, 2);
+          }
+        }
+        
+        // Highs (HIGH) - Cyan/Bright Blue
+        if (highRMS > 0.005) {
+          const highHeight = Math.min(highRMS * height * 2, height / 3);
+          const highIntensity = Math.min(highPeak * 2, 1);
+          
+          ctx.fillStyle = `rgba(0, 255, ${Math.floor(200 + highIntensity * 55)}, ${highIntensity})`;
+          ctx.fillRect(x, centerY + bandSpacing * 3, barWidth, highHeight);
+          ctx.fillRect(x, centerY - bandSpacing * 3 - highHeight, barWidth, highHeight);
+          
+          if (highPeak > 0.8) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fillRect(x, centerY + bandSpacing * 3, barWidth, 2);
+            ctx.fillRect(x, centerY - bandSpacing * 3 - 2, barWidth, 2);
           }
         }
       }
