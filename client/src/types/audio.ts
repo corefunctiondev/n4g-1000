@@ -4,6 +4,7 @@ export interface AudioTrack {
   name: string;
   duration: number;
   bpm: number;
+  originalBpm?: number;
   waveformData: Float32Array | null;
 }
 

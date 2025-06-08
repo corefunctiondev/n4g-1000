@@ -114,6 +114,7 @@ export function useAudio(deckId: 'A' | 'B') {
         name: file.name,
         duration: audioBuffer.duration,
         bpm,
+        originalBpm: bpm, // Store original BPM for sync calculations
         waveformData: audioBuffer.getChannelData(0),
       };
 
@@ -269,15 +270,19 @@ export function useAudio(deckId: 'A' | 'B') {
       );
     }
     
-    // Calculate new BPM based on tempo change
-    const originalBPM = deck.track?.bpm || 120;
+    // Calculate new BPM based on tempo change using original BPM
+    const originalBPM = deck.track?.originalBpm || deck.track?.bpm || 120;
     const newBPM = Math.round(originalBPM * playbackRate);
     
     setDeck(prev => ({ 
       ...prev, 
       tempo,
-      // Update the track's displayed BPM
-      track: prev.track ? { ...prev.track, bpm: newBPM } : null
+      // Update the track's displayed BPM while preserving original
+      track: prev.track ? { 
+        ...prev.track, 
+        bpm: newBPM,
+        originalBpm: prev.track.originalBpm || prev.track.bpm
+      } : null
     }));
   }, [deck.isPlaying, deck.track]);
 
@@ -363,30 +368,31 @@ export function useAudio(deckId: 'A' | 'B') {
   }, [deck.track, deck.currentTime, seek]);
 
   const sync = useCallback((targetDeck?: any) => {
-    if (!deck.track) return;
-    
-    // If no target deck provided, try to find the other deck's state
-    if (!targetDeck) {
-      console.log(`Sync requires target deck data for deck ${deckId}`);
+    if (!deck.track) {
+      console.log(`No track loaded on deck ${deckId} for sync`);
       return;
     }
     
-    if (!targetDeck.track) {
+    if (!targetDeck || !targetDeck.track) {
       console.log(`Target deck has no track loaded for sync`);
       return;
     }
     
-    // Calculate tempo adjustment needed to match target BPM
-    const currentOriginalBPM = deck.track.bpm / (1 + (deck.tempo / 100)); // Get original BPM
-    const targetCurrentBPM = targetDeck.track.bpm; // Target's current BPM (with tempo applied)
+    // Use original BPM for accurate sync calculations
+    const currentOriginalBPM = deck.track.originalBpm || deck.track.bpm;
+    const targetCurrentBPM = targetDeck.track.bpm; // Target's current BPM (includes tempo)
     
+    // Calculate tempo adjustment needed to match target's current BPM
     const tempoAdjustment = ((targetCurrentBPM / currentOriginalBPM) - 1) * 100;
     
-    // Apply the tempo adjustment
-    setTempo(tempoAdjustment);
+    // Clamp tempo adjustment to reasonable range
+    const clampedTempo = Math.max(-50, Math.min(50, tempoAdjustment));
     
-    console.log(`Deck ${deckId} synced: ${Math.round(currentOriginalBPM)} -> ${Math.round(targetCurrentBPM)} BPM (${tempoAdjustment.toFixed(1)}% tempo)`);
-  }, [deckId, deck.track, deck.tempo, setTempo]);
+    // Apply the tempo adjustment
+    setTempo(clampedTempo);
+    
+    console.log(`Deck ${deckId} synced: ${Math.round(currentOriginalBPM)} -> ${Math.round(targetCurrentBPM)} BPM (${clampedTempo.toFixed(1)}% tempo)`);
+  }, [deckId, deck.track, setTempo]);
 
   return {
     deck,
