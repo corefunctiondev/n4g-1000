@@ -42,6 +42,8 @@ export function Waveform({
         const context = analyser.context as AudioContext;
         if (!waveformAnalyzerRef.current) {
           waveformAnalyzerRef.current = new WaveformAnalyzer(context);
+          // Connect the analyzer to the existing analyser node for live data
+          waveformAnalyzerRef.current.connectToSource(analyser);
         }
         
         // Analyze audio buffer to generate frequency band data like Rekordbox
@@ -61,7 +63,7 @@ export function Waveform({
   }, [track, analyser]);
 
   // Real-time scrolling waveform visualization with higher update rate
-  const drawWaveform = useCallback(() => {
+  const drawWaveform = useCallback((forceRedraw = false) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -452,18 +454,37 @@ export function Waveform({
 
 
     // Continue animation continuously for live updates
-    animationRef.current = requestAnimationFrame(drawWaveform);
-  }, [width, height, currentTime, track, isPlaying, analyser]);
+    if (isPlaying) {
+      animationRef.current = requestAnimationFrame(drawWaveform);
+    }
+  }, [width, height, track, isPlaying, analyser, waveformAnalyzerRef, currentTime]);
 
   useEffect(() => {
-    drawWaveform();
+    // Start/stop animation based on play state
+    if (isPlaying) {
+      const animate = () => {
+        drawWaveform();
+      };
+      animate();
+    } else {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      // Draw static frame when not playing
+      drawWaveform();
+    }
     
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [drawWaveform]);
+  }, [isPlaying]);
+
+  // Redraw when track changes or seeking occurs
+  useEffect(() => {
+    drawWaveform();
+  }, [track, currentTime]);
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!track || !onSeek) return;

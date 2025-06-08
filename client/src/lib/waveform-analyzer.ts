@@ -25,6 +25,11 @@ export class WaveformAnalyzer {
     return this.analyser;
   }
 
+  // Connect the analyzer to an audio source for live analysis
+  connectToSource(source: AudioNode): void {
+    source.connect(this.analyser);
+  }
+
   // Analyze audio buffer and generate waveform data with frequency bands
   async analyzeAudioBuffer(audioBuffer: AudioBuffer, pixelsPerSecond: number = 100): Promise<{
     low: Float32Array;
