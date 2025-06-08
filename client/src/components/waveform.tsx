@@ -36,6 +36,11 @@ export function Waveform({
   } | null>(null);
   const waveformAnalyzerRef = useRef<WaveformAnalyzer | null>(null);
 
+  // Update currentTime ref when prop changes
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
   // Generate FFT-based frequency band waveform data when track loads
   useEffect(() => {
     if (track?.audioBuffer && analyser) {
@@ -81,8 +86,8 @@ export function Waveform({
     
     // Draw professional beat grid based on BPM
     if (track && track.bpm > 0) {
-      const windowStart = Math.max(0, currentTime - 4);
-      const windowEnd = Math.min(track.duration, currentTime + 4);
+      const windowStart = Math.max(0, currentTimeRef.current - 4);
+      const windowEnd = Math.min(track.duration, currentTimeRef.current + 4);
       const beatInterval = 60 / track.bpm;
       
       // Major grid lines (bars) 
@@ -131,8 +136,8 @@ export function Waveform({
       const totalDuration = track.duration;
       
       // Calculate visible time window (4 seconds before and after current position)  
-      const windowStart = Math.max(0, currentTime - 4);
-      const windowEnd = Math.min(totalDuration, currentTime + 4);
+      const windowStart = Math.max(0, currentTimeRef.current - 4);
+      const windowEnd = Math.min(totalDuration, currentTimeRef.current + 4);
       const windowDuration = windowEnd - windowStart;
       
       // Main waveform area with 3 distinct frequency rows
@@ -157,7 +162,7 @@ export function Waveform({
         const x = ((timePosition - windowStart) / windowDuration) * width;
         
         // Calculate distance from playhead for brightness effect
-        const distanceFromPlayhead = Math.abs(timePosition - currentTime);
+        const distanceFromPlayhead = Math.abs(timePosition - currentTimeRef.current);
         const brightness = distanceFromPlayhead < 1 ? 1 : Math.max(0.4, 1 - distanceFromPlayhead / 4);
         
         // Get real FFT energy values for each frequency band
@@ -414,8 +419,8 @@ export function Waveform({
 
     // Draw cue points and loop markers
     if (track) {
-      const windowStart = Math.max(0, currentTime - 4);
-      const windowEnd = Math.min(track.duration, currentTime + 4);
+      const windowStart = Math.max(0, currentTimeRef.current - 4);
+      const windowEnd = Math.min(track.duration, currentTimeRef.current + 4);
       
       // Hot cue points with Rekordbox colors
       const hotCues = [
@@ -458,7 +463,7 @@ export function Waveform({
     if (isPlaying) {
       animationRef.current = requestAnimationFrame(() => drawWaveform(false));
     }
-  }, [width, height, track, isPlaying, analyser, waveformAnalyzerRef, currentTime]);
+  }, [width, height, track, isPlaying, analyser, waveformAnalyzerRef]);
 
   // Initial render and when track changes
   useEffect(() => {
