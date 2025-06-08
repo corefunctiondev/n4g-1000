@@ -13,41 +13,7 @@ export default function CDJInterface() {
     // Set page title
     document.title = 'Virtual CDJ Pro - Professional DJ Interface';
     
-    // Set up intelligent ResizeObserver with aspect ratio constraints
-    if (containerRef.current && contentRef.current) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          const { width, height } = entry.contentRect;
-          
-          // Calculate optimal scale maintaining DJ interface proportions
-          const baseWidth = 1700;
-          const baseHeight = 360;
-          const baseAspectRatio = baseWidth / baseHeight;
-          const containerAspectRatio = width / height;
-          
-          let scale;
-          if (containerAspectRatio > baseAspectRatio) {
-            // Container is wider than optimal - scale by height
-            scale = height / baseHeight;
-          } else {
-            // Container is taller than optimal - scale by width
-            scale = width / baseWidth;
-          }
-          
-          // Ensure scale doesn't exceed reasonable bounds
-          scale = Math.max(0.3, Math.min(scale, 2.0));
-          
-          if (contentRef.current) {
-            contentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
-            contentRef.current.style.setProperty('--scale-factor', scale.toString());
-          }
-        }
-      });
-      
-      resizeObserver.observe(containerRef.current);
-      
-      return () => resizeObserver.disconnect();
-    }
+    // Simple responsive scaling - no complex calculations needed
   }, []);
 
   return (
@@ -92,30 +58,17 @@ export default function CDJInterface() {
           </div>
         </div>
 
-        {/* Responsive DJ Setup Container */}
-        <div className="flex justify-center items-center">
+        {/* DJ Setup Container - Properly Sized */}
+        <div className="flex justify-center items-center min-h-[500px]">
           <div 
-            ref={containerRef}
-            className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm resize overflow-hidden shadow-2xl relative"
+            className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm shadow-2xl w-full max-w-6xl mx-4"
             style={{ 
-              width: 'min(95vw, 1400px)',
-              height: 'min(80vh, 400px)',
-              minWidth: '800px',
-              minHeight: '200px',
-              maxWidth: '2000px',
-              maxHeight: '600px',
-              resize: 'both',
-              aspectRatio: '3.5 / 1'
+              aspectRatio: '16 / 5',
+              minHeight: '400px',
+              height: 'min(70vh, 500px)'
             }}
           >
-            <div 
-              ref={contentRef}
-              className="resizable-content flex"
-              style={{ 
-                transform: `translate(-50%, -50%) scale(var(--scale-factor, 1))`,
-                transition: 'transform 0.1s ease-out'
-              }}
-            >
+            <div className="w-full h-full flex p-2">
               {/* Left CDJ (Deck A) - Takes 38% width */}
               <div className="w-[38%] h-full">
                 <Deck deckId="A" color="#00d4ff" />

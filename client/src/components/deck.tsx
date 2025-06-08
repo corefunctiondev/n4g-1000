@@ -156,13 +156,13 @@ export function Deck({ deckId, color }: DeckProps) {
 
   return (
     <div 
-      className="pioneer-cdj p-4 flex-1 h-full"
+      className="pioneer-cdj p-2 flex-1 h-full flex flex-col"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {/* Top Section - Screen and Info Display */}
-      <div className="mb-3 flex-1">
+      <div className="mb-2 flex-1">
         {/* Main LCD Screen */}
         <div className="pioneer-screen p-3 mb-3 h-full flex flex-col">
           <div className="flex justify-between items-start mb-2">
