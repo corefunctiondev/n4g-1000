@@ -13,21 +13,31 @@ export default function CDJInterface() {
     // Set page title
     document.title = 'Virtual CDJ Pro - Professional DJ Interface';
     
-    // Set up ResizeObserver to scale all internal elements
+    // Set up intelligent ResizeObserver with aspect ratio constraints
     if (containerRef.current && contentRef.current) {
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           const { width, height } = entry.contentRect;
           
-          // Scale content proportionally to fill container without stretching
+          // Calculate optimal scale maintaining DJ interface proportions
           const baseWidth = 1700;
           const baseHeight = 360;
-          const scaleX = width / baseWidth;
-          const scaleY = height / baseHeight;
-          const scale = Math.min(scaleX, scaleY); // Maintain aspect ratio
+          const baseAspectRatio = baseWidth / baseHeight;
+          const containerAspectRatio = width / height;
+          
+          let scale;
+          if (containerAspectRatio > baseAspectRatio) {
+            // Container is wider than optimal - scale by height
+            scale = height / baseHeight;
+          } else {
+            // Container is taller than optimal - scale by width
+            scale = width / baseWidth;
+          }
+          
+          // Ensure scale doesn't exceed reasonable bounds
+          scale = Math.max(0.3, Math.min(scale, 2.0));
           
           if (contentRef.current) {
-            // Use uniform scaling to prevent stretching
             contentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
             contentRef.current.style.setProperty('--scale-factor', scale.toString());
           }
@@ -82,19 +92,20 @@ export default function CDJInterface() {
           </div>
         </div>
 
-        {/* Resizable DJ Setup Container - No Dead Space */}
+        {/* Responsive DJ Setup Container */}
         <div className="flex justify-center items-center">
           <div 
             ref={containerRef}
             className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm resize overflow-hidden shadow-2xl relative"
             style={{ 
-              width: '90vw',
-              height: '70vh',
-              minWidth: '850px',
-              minHeight: '400px',
-              maxWidth: '95vw',
-              maxHeight: '85vh',
-              resize: 'both'
+              width: 'min(95vw, 1400px)',
+              height: 'min(80vh, 400px)',
+              minWidth: '800px',
+              minHeight: '200px',
+              maxWidth: '2000px',
+              maxHeight: '600px',
+              resize: 'both',
+              aspectRatio: '3.5 / 1'
             }}
           >
             <div 
