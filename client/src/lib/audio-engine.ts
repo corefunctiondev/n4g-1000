@@ -136,13 +136,17 @@ export class AudioEngine {
     const deckA = this.deckNodes.get('A');
     const deckB = this.deckNodes.get('B');
     
-    if (deckA && deckB && this.context) {
+    if (this.context) {
       const fadePosition = value / 100;
       const volumeA = Math.cos(fadePosition * Math.PI / 2);
       const volumeB = Math.sin(fadePosition * Math.PI / 2);
       
-      deckA.gainNode.gain.setValueAtTime(volumeA, this.context.currentTime);
-      deckB.gainNode.gain.setValueAtTime(volumeB, this.context.currentTime);
+      if (deckA) {
+        deckA.gainNode.gain.setValueAtTime(volumeA, this.context.currentTime);
+      }
+      if (deckB) {
+        deckB.gainNode.gain.setValueAtTime(volumeB, this.context.currentTime);
+      }
     }
   }
 

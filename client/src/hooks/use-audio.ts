@@ -53,7 +53,27 @@ export function useAudio(deckId: 'A' | 'B') {
   const updateCurrentTime = useCallback(() => {
     if (deck.isPlaying && audioNodes.current && deck.track) {
       const elapsed = audioEngine.getCurrentTime() - startTimeRef.current + pauseTimeRef.current;
-      const currentTime = Math.min(elapsed, deck.track.duration);
+      let currentTime = Math.min(elapsed, deck.track.duration);
+      
+      // Handle looping
+      if (deck.isLooping && currentTime >= deck.loopEnd) {
+        // Jump back to loop start
+        const loopOffset = deck.loopStart;
+        pauseTimeRef.current = loopOffset;
+        startTimeRef.current = audioEngine.getCurrentTime();
+        currentTime = loopOffset;
+        
+        // Restart audio source from loop point
+        if (sourceRef.current) {
+          sourceRef.current.stop();
+          sourceRef.current.disconnect();
+        }
+        
+        const source = audioEngine.createAudioSource(deck.track.audioBuffer!);
+        source.connect(audioNodes.current.gainNode);
+        source.start(0, loopOffset);
+        sourceRef.current = source;
+      }
       
       setDeck(prev => ({ ...prev, currentTime }));
       
@@ -64,7 +84,7 @@ export function useAudio(deckId: 'A' | 'B') {
         setDeck(prev => ({ ...prev, isPlaying: false, currentTime: 0 }));
       }
     }
-  }, [deck.isPlaying, deck.track]);
+  }, [deck.isPlaying, deck.track, deck.isLooping, deck.loopStart, deck.loopEnd]);
 
   const loadTrack = useCallback(async (file: File) => {
     try {
@@ -292,8 +312,23 @@ export function useAudio(deckId: 'A' | 'B') {
   }, []);
 
   const toggleLoop = useCallback(() => {
-    setDeck(prev => ({ ...prev, isLooping: !prev.isLooping }));
-  }, []);
+    if (!deck.isLooping && deck.track) {
+      // Set default 4-beat loop from current position
+      const beatDuration = 60 / deck.track.bpm;
+      const loopLength = beatDuration * 4; // 4 beats
+      const start = deck.currentTime;
+      const end = Math.min(start + loopLength, deck.track.duration);
+      
+      setDeck(prev => ({ 
+        ...prev, 
+        isLooping: true,
+        loopStart: start,
+        loopEnd: end
+      }));
+    } else {
+      setDeck(prev => ({ ...prev, isLooping: false }));
+    }
+  }, [deck.isLooping, deck.currentTime, deck.track]);
 
   const beatJump = useCallback((beats: number) => {
     if (deck.track) {
@@ -305,9 +340,17 @@ export function useAudio(deckId: 'A' | 'B') {
   }, [deck.track, deck.currentTime, seek]);
 
   const sync = useCallback(() => {
-    // Sync to master tempo - would connect to other deck in real implementation
-    console.log(`Syncing deck ${deckId} to master tempo`);
-  }, [deckId]);
+    // Get BPM from the other deck for sync
+    const otherDeckId = deckId === 'A' ? 'B' : 'A';
+    const otherDeck = audioEngine.getDeckNodes(otherDeckId);
+    
+    if (otherDeck && deck.track) {
+      // Simple sync implementation - match tempo to create beatmatched mix
+      console.log(`Syncing deck ${deckId} to deck ${otherDeckId}`);
+      // In a full implementation, this would analyze the other deck's BPM and adjust tempo
+      setTempo(0); // Reset to original tempo as basic sync
+    }
+  }, [deckId, deck.track, setTempo]);
 
   return {
     deck,

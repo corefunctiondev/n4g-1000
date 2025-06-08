@@ -356,9 +356,26 @@ export function Deck({ deckId, color }: DeckProps) {
 
       {/* Bottom Controls - Compact */}
       <div className="grid grid-cols-3 gap-1">
-        <button className="pioneer-button py-1 text-xs">LOOP</button>
-        <button className="pioneer-button py-1 text-xs">SLIP</button>
-        <button className="pioneer-button py-1 text-xs">BEAT</button>
+        <button 
+          className={`pioneer-button py-1 text-xs ${
+            deck.isLooping ? 'bg-green-500 text-white' : 'text-green-400 hover:bg-green-500'
+          }`}
+          onClick={toggleLoop}
+        >
+          LOOP
+        </button>
+        <button 
+          className="pioneer-button py-1 text-xs text-blue-400 hover:bg-blue-500"
+          onClick={() => beatJump(-1)}
+        >
+          SLIP
+        </button>
+        <button 
+          className="pioneer-button py-1 text-xs text-orange-400 hover:bg-orange-500"
+          onClick={() => beatJump(1)}
+        >
+          BEAT
+        </button>
       </div>
     </div>
   );
