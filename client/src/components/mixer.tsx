@@ -270,34 +270,7 @@ export function Mixer() {
 
         </div>
 
-        {/* Center Section - Crossfader and Master */}
-        <div className="pioneer-eq-section p-1 flex-1">
-          <div className="text-center mb-1">
-            <div className="text-xs font-bold text-white">MASTER</div>
-          </div>
 
-          {/* Crossfader */}
-          <div className="mb-2">
-            <div className="text-center mb-1">
-              <div className="text-xs text-gray-400">CROSSFADER</div>
-            </div>
-            <div className="flex justify-center">
-              <div 
-                className="pioneer-fader-track w-24 h-6 relative cursor-pointer"
-                onMouseDown={handleCrossfaderMouseDown}
-              >
-                <div 
-                  className={`pioneer-fader-handle w-4 h-8 absolute -top-1 transition-colors ${
-                    isDragging === 'crossfader' ? 'bg-purple-400' : ''
-                  }`}
-                  style={{ left: `${(mixer.crossfader / 100) * (96 - 16)}px` }}
-                />
-              </div>
-            </div>
-          </div>
-
-
-        </div>
 
         {/* Channel B */}
         <div className="pioneer-eq-section p-1 flex-1">

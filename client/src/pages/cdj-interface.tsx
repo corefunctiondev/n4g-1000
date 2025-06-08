@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Deck } from '@/components/deck';
 import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,8 +6,35 @@ import { Card, CardContent } from '@/components/ui/card';
 export default function CDJInterface() {
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [crossfaderValue, setCrossfaderValue] = useState(50);
+  const [isDraggingCrossfader, setIsDraggingCrossfader] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Crossfader interaction
+  const handleCrossfaderMouseDown = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    setIsDraggingCrossfader(true);
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
+      const x = e.clientX - rect.left;
+      const width = rect.width;
+      const percentage = Math.max(0, Math.min(100, (x / width) * 100));
+      setCrossfaderValue(percentage);
+    };
+    
+    const handleMouseUp = (e: MouseEvent) => {
+      e.preventDefault();
+      setIsDraggingCrossfader(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
 
   useEffect(() => {
     // Set page title
@@ -69,19 +96,46 @@ export default function CDJInterface() {
             }}
           >
             <div className="w-full h-full flex p-2">
-              {/* Left CDJ (Deck A) - Takes 38% width */}
-              <div className="w-[38%] h-full">
+              {/* Left CDJ (Deck A) - Takes 45% width */}
+              <div className="w-[45%] h-full">
                 <Deck deckId="A" color="#00d4ff" />
               </div>
 
-              {/* Center Mixer - Takes 24% width */}
-              <div className="w-[24%] h-full">
+              {/* Center Mixer - Takes 10% width */}
+              <div className="w-[10%] h-full">
                 <Mixer />
               </div>
 
-              {/* Right CDJ (Deck B) - Takes 38% width */}
-              <div className="w-[38%] h-full">
+              {/* Right CDJ (Deck B) - Takes 45% width */}
+              <div className="w-[45%] h-full">
                 <Deck deckId="B" color="#ff6b00" />
+              </div>
+            </div>
+          </div>
+          
+          {/* External Crossfader Section */}
+          <div className="flex justify-center mt-4">
+            <div className="pioneer-eq-section p-4 rounded-lg">
+              <div className="text-center mb-2">
+                <div className="text-sm font-bold text-white">DJM-750MK2</div>
+                <div className="text-xs text-gray-400">CROSSFADER</div>
+              </div>
+              <div className="flex justify-center">
+                <div 
+                  className="pioneer-fader-track w-32 h-6 relative cursor-pointer"
+                  onMouseDown={handleCrossfaderMouseDown}
+                >
+                  <div 
+                    className={`pioneer-fader-handle w-4 h-8 absolute -top-1 transition-colors ${
+                      isDraggingCrossfader ? 'bg-purple-400' : 'bg-gray-300'
+                    }`}
+                    style={{ left: `${(crossfaderValue / 100) * (128 - 16)}px` }}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>A</span>
+                <span>B</span>
               </div>
             </div>
           </div>
