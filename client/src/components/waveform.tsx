@@ -27,6 +27,7 @@ export function Waveform({
 }: WaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
+  const currentTimeRef = useRef(currentTime);
   const waveformDataRef = useRef<{
     low: Float32Array;
     mid: Float32Array;
@@ -453,38 +454,16 @@ export function Waveform({
 
 
 
-    // Continue animation continuously for live updates
+    // Continue animation loop when playing
     if (isPlaying) {
-      animationRef.current = requestAnimationFrame(drawWaveform);
+      animationRef.current = requestAnimationFrame(() => drawWaveform(false));
     }
   }, [width, height, track, isPlaying, analyser, waveformAnalyzerRef, currentTime]);
 
+  // Initial render and when track changes
   useEffect(() => {
-    // Start/stop animation based on play state
-    if (isPlaying) {
-      const animate = () => {
-        drawWaveform();
-      };
-      animate();
-    } else {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      // Draw static frame when not playing
-      drawWaveform();
-    }
-    
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [isPlaying]);
-
-  // Redraw when track changes or seeking occurs
-  useEffect(() => {
-    drawWaveform();
-  }, [track, currentTime]);
+    drawWaveform(false);
+  }, [track, width, height]);
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!track || !onSeek) return;
