@@ -55,7 +55,7 @@ export function useAudio(deckId: 'A' | 'B') {
 
   const updateCurrentTime = useCallback(() => {
     if (deck.isPlaying && audioNodes.current && deck.track) {
-      const elapsed = audioEngine.getCurrentTime() - startTimeRef.current + pauseTimeRef.current;
+      const elapsed = audioEngine.getCurrentTime() - startTimeRef.current;
       let currentTime = Math.min(elapsed, deck.track.duration);
       
       // Handle looping
@@ -198,7 +198,7 @@ export function useAudio(deckId: 'A' | 'B') {
       
       source.start(0, offset);
       sourceRef.current = source;
-      startTimeRef.current = audioEngine.getCurrentTime();
+      startTimeRef.current = audioEngine.getCurrentTime() - offset;
       
       setDeck(prev => ({ ...prev, isPlaying: true, isPaused: false }));
       updateCurrentTime();
