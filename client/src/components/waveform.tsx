@@ -62,18 +62,54 @@ export function Waveform({
     canvas.width = width;
     canvas.height = height;
 
-    // Clear canvas with CDJ-style background
-    ctx.fillStyle = '#0a0a0a';
+    // Clear canvas with authentic CDJ-3000 background
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, width, height);
     
-    // Add subtle grid lines for professional look
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.lineWidth = 0.5;
-    for (let i = 0; i < width; i += 20) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, height);
-      ctx.stroke();
+    // Draw professional beat grid based on BPM
+    if (track && track.bpm > 0) {
+      const windowStart = Math.max(0, currentTime - 4);
+      const windowEnd = Math.min(track.duration, currentTime + 4);
+      const beatInterval = 60 / track.bpm;
+      
+      // Major grid lines (bars) 
+      const beatsPerBar = 4;
+      const barInterval = beatInterval * beatsPerBar;
+      
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1;
+      
+      const firstBar = Math.floor(windowStart / barInterval);
+      const lastBar = Math.ceil(windowEnd / barInterval);
+      
+      for (let bar = firstBar; bar <= lastBar; bar++) {
+        const barTime = bar * barInterval;
+        if (barTime >= windowStart && barTime <= windowEnd) {
+          const x = ((barTime - windowStart) / (windowEnd - windowStart)) * width;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+      }
+      
+      // Minor grid lines (beats)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 0.5;
+      
+      const firstBeat = Math.floor(windowStart / beatInterval);
+      const lastBeat = Math.ceil(windowEnd / beatInterval);
+      
+      for (let beat = firstBeat; beat <= lastBeat; beat++) {
+        const beatTime = beat * beatInterval;
+        if (beatTime >= windowStart && beatTime <= windowEnd && beatTime % barInterval !== 0) {
+          const x = ((beatTime - windowStart) / (windowEnd - windowStart)) * width;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+      }
     }
 
     // Draw 3-lane CDJ-3000 style frequency band waveform
@@ -86,11 +122,11 @@ export function Waveform({
       const windowEnd = Math.min(totalDuration, currentTime + 4);
       const windowDuration = windowEnd - windowStart;
       
-      // Define the 3 horizontal lanes like CDJ-3000
+      // Define the 3 horizontal lanes with authentic CDJ-3000 colors
       const laneHeight = height / 3;
-      const highLane = { y: 0, height: laneHeight, color: '#00ffff', label: 'HIGH' };
-      const midLane = { y: laneHeight, height: laneHeight, color: '#ffaa00', label: 'MID' };
-      const lowLane = { y: laneHeight * 2, height: laneHeight, color: '#00ff80', label: 'LOW' };
+      const highLane = { y: 0, height: laneHeight, color: '#0080ff', label: 'HIGH' };      // Blue
+      const midLane = { y: laneHeight, height: laneHeight, color: '#ff8000', label: 'MID' }; // Orange  
+      const lowLane = { y: laneHeight * 2, height: laneHeight, color: '#ffff00', label: 'LOW' }; // Yellow/White
       
       // Calculate data indices for this time window
       const samplesPerSecond = waveformData.length / totalDuration;
@@ -113,34 +149,69 @@ export function Waveform({
         // Simulate frequency band amplitudes based on the audio data
         const scaledAmp = Math.min(amplitude * 2, 1);
         
-        // HIGH lane (top) - more responsive to higher frequencies
-        const highAmp = scaledAmp * (0.6 + Math.sin(i * 0.1) * 0.2);
-        if (highAmp > 0.05) {
-          const barHeight = Math.min(highAmp * laneHeight * 0.9, laneHeight * 0.9);
+        // HIGH lane (top) - Blue for high frequencies
+        const highAmp = scaledAmp * (0.7 + Math.sin(i * 0.12) * 0.25);
+        if (highAmp > 0.03) {
+          const barHeight = Math.min(highAmp * laneHeight * 0.95, laneHeight * 0.95);
           const laneCenter = highLane.y + laneHeight / 2;
+          const intensity = Math.min(highAmp * 2, 1);
           
-          ctx.fillStyle = `rgba(0, 255, 255, ${brightness * Math.min(highAmp * 1.5, 1)})`;
+          // Create gradient for depth
+          const gradient = ctx.createLinearGradient(0, laneCenter - barHeight/2, 0, laneCenter + barHeight/2);
+          gradient.addColorStop(0, `rgba(0, 128, 255, ${brightness * intensity})`);
+          gradient.addColorStop(0.5, `rgba(0, 160, 255, ${brightness * intensity * 0.8})`);
+          gradient.addColorStop(1, `rgba(0, 100, 200, ${brightness * intensity * 0.6})`);
+          
+          ctx.fillStyle = gradient;
           ctx.fillRect(x, laneCenter - barHeight/2, barWidth, barHeight);
+          
+          // Add peak highlight
+          if (intensity > 0.7) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.4})`;
+            ctx.fillRect(x, laneCenter - barHeight/2, barWidth, 2);
+          }
         }
         
-        // MID lane (middle) - balanced response
-        const midAmp = scaledAmp * (0.8 + Math.cos(i * 0.15) * 0.15);
-        if (midAmp > 0.05) {
-          const barHeight = Math.min(midAmp * laneHeight * 0.9, laneHeight * 0.9);
+        // MID lane (middle) - Orange for mid frequencies
+        const midAmp = scaledAmp * (0.85 + Math.cos(i * 0.18) * 0.15);
+        if (midAmp > 0.03) {
+          const barHeight = Math.min(midAmp * laneHeight * 0.95, laneHeight * 0.95);
           const laneCenter = midLane.y + laneHeight / 2;
+          const intensity = Math.min(midAmp * 2, 1);
           
-          ctx.fillStyle = `rgba(255, 170, 0, ${brightness * Math.min(midAmp * 1.5, 1)})`;
+          const gradient = ctx.createLinearGradient(0, laneCenter - barHeight/2, 0, laneCenter + barHeight/2);
+          gradient.addColorStop(0, `rgba(255, 128, 0, ${brightness * intensity})`);
+          gradient.addColorStop(0.5, `rgba(255, 150, 0, ${brightness * intensity * 0.8})`);
+          gradient.addColorStop(1, `rgba(200, 100, 0, ${brightness * intensity * 0.6})`);
+          
+          ctx.fillStyle = gradient;
           ctx.fillRect(x, laneCenter - barHeight/2, barWidth, barHeight);
+          
+          if (intensity > 0.7) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.4})`;
+            ctx.fillRect(x, laneCenter - barHeight/2, barWidth, 2);
+          }
         }
         
-        // LOW lane (bottom) - more responsive to bass
-        const lowAmp = scaledAmp * (0.9 + Math.sin(i * 0.05) * 0.1);
-        if (lowAmp > 0.05) {
-          const barHeight = Math.min(lowAmp * laneHeight * 0.9, laneHeight * 0.9);
+        // LOW lane (bottom) - Yellow/White for bass frequencies
+        const lowAmp = scaledAmp * (0.95 + Math.sin(i * 0.08) * 0.05);
+        if (lowAmp > 0.03) {
+          const barHeight = Math.min(lowAmp * laneHeight * 0.95, laneHeight * 0.95);
           const laneCenter = lowLane.y + laneHeight / 2;
+          const intensity = Math.min(lowAmp * 2, 1);
           
-          ctx.fillStyle = `rgba(0, 255, 128, ${brightness * Math.min(lowAmp * 1.5, 1)})`;
+          const gradient = ctx.createLinearGradient(0, laneCenter - barHeight/2, 0, laneCenter + barHeight/2);
+          gradient.addColorStop(0, `rgba(255, 255, 0, ${brightness * intensity})`);
+          gradient.addColorStop(0.3, `rgba(255, 255, 100, ${brightness * intensity * 0.9})`);
+          gradient.addColorStop(1, `rgba(200, 200, 0, ${brightness * intensity * 0.7})`);
+          
+          ctx.fillStyle = gradient;
           ctx.fillRect(x, laneCenter - barHeight/2, barWidth, barHeight);
+          
+          if (intensity > 0.7) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.5})`;
+            ctx.fillRect(x, laneCenter - barHeight/2, barWidth, 2);
+          }
         }
       }
       
@@ -214,57 +285,112 @@ export function Waveform({
       const playheadX = width / 2;
       const overlayWidth = 40; // Width of live overlay effect
       
-      // HIGH lane live overlay
-      if (highRMS > 0.01) {
-        const highIntensity = Math.min(highRMS * 3, 1);
-        const overlayHeight = highIntensity * laneHeight * 0.8;
+      // HIGH lane live overlay - Blue
+      if (highRMS > 0.008) {
+        const highIntensity = Math.min(highRMS * 4, 1);
+        const overlayHeight = highIntensity * laneHeight * 0.9;
         const laneCenter = laneHeight / 2;
         
-        ctx.fillStyle = `rgba(0, 255, 255, ${highIntensity * 0.7})`;
+        // Pulsing effect based on frequency content
+        const pulse = Math.sin(Date.now() * 0.01) * 0.2 + 0.8;
+        
+        ctx.fillStyle = `rgba(0, 128, 255, ${highIntensity * 0.8 * pulse})`;
         ctx.fillRect(playheadX - overlayWidth/2, laneCenter - overlayHeight/2, overlayWidth, overlayHeight);
         
-        // Peak flash effect
-        if (highRMS > 0.5) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fillRect(playheadX - 2, 0, 4, laneHeight);
+        // Intense peak flash
+        if (highRMS > 0.6) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.9 * pulse})`;
+          ctx.fillRect(playheadX - 3, 0, 6, laneHeight);
         }
       }
       
-      // MID lane live overlay
-      if (midRMS > 0.01) {
-        const midIntensity = Math.min(midRMS * 3, 1);
-        const overlayHeight = midIntensity * laneHeight * 0.8;
+      // MID lane live overlay - Orange
+      if (midRMS > 0.008) {
+        const midIntensity = Math.min(midRMS * 4, 1);
+        const overlayHeight = midIntensity * laneHeight * 0.9;
         const laneCenter = laneHeight + laneHeight / 2;
         
-        ctx.fillStyle = `rgba(255, 170, 0, ${midIntensity * 0.7})`;
+        const pulse = Math.sin(Date.now() * 0.008) * 0.2 + 0.8;
+        
+        ctx.fillStyle = `rgba(255, 128, 0, ${midIntensity * 0.8 * pulse})`;
         ctx.fillRect(playheadX - overlayWidth/2, laneCenter - overlayHeight/2, overlayWidth, overlayHeight);
         
-        if (midRMS > 0.5) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fillRect(playheadX - 2, laneHeight, 4, laneHeight);
+        if (midRMS > 0.6) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.9 * pulse})`;
+          ctx.fillRect(playheadX - 3, laneHeight, 6, laneHeight);
         }
       }
       
-      // LOW lane live overlay
-      if (bassRMS > 0.01) {
-        const bassIntensity = Math.min(bassRMS * 3, 1);
-        const overlayHeight = bassIntensity * laneHeight * 0.8;
+      // LOW lane live overlay - Yellow/White
+      if (bassRMS > 0.008) {
+        const bassIntensity = Math.min(bassRMS * 4, 1);
+        const overlayHeight = bassIntensity * laneHeight * 0.9;
         const laneCenter = laneHeight * 2 + laneHeight / 2;
         
-        ctx.fillStyle = `rgba(0, 255, 128, ${bassIntensity * 0.7})`;
+        const pulse = Math.sin(Date.now() * 0.005) * 0.3 + 0.7;
+        
+        ctx.fillStyle = `rgba(255, 255, 0, ${bassIntensity * 0.9 * pulse})`;
         ctx.fillRect(playheadX - overlayWidth/2, laneCenter - overlayHeight/2, overlayWidth, overlayHeight);
         
-        if (bassRMS > 0.5) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fillRect(playheadX - 2, laneHeight * 2, 4, laneHeight);
+        if (bassRMS > 0.6) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${1.0 * pulse})`;
+          ctx.fillRect(playheadX - 3, laneHeight * 2, 6, laneHeight);
         }
       }
+    }
+
+    // Draw cue points and markers
+    if (track) {
+      const windowStart = Math.max(0, currentTime - 4);
+      const windowEnd = Math.min(track.duration, currentTime + 4);
+      
+      // Hot cue points (simulate some cue points for demo)
+      const hotCues = [
+        { time: 30, color: '#ff0000', label: '1' },
+        { time: 60, color: '#00ff00', label: '2' },
+        { time: 120, color: '#0000ff', label: '3' },
+        { time: 180, color: '#ffff00', label: '4' }
+      ];
+      
+      hotCues.forEach(cue => {
+        if (cue.time >= windowStart && cue.time <= windowEnd) {
+          const x = ((cue.time - windowStart) / (windowEnd - windowStart)) * width;
+          
+          // Cue point marker line
+          ctx.strokeStyle = cue.color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+          
+          // Cue point circle at top
+          ctx.fillStyle = cue.color;
+          ctx.beginPath();
+          ctx.arc(x, 15, 8, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Cue number label
+          ctx.fillStyle = '#000000';
+          ctx.font = 'bold 10px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(cue.label, x, 19);
+        }
+      });
     }
 
     // Draw fixed center playhead (CDJ-3000 style)
     const playheadX = width / 2;
     
-    // Playhead line - bright white and prominent
+    // Playhead shadow for depth
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(playheadX + 1, 0);
+    ctx.lineTo(playheadX + 1, height);
+    ctx.stroke();
+    
+    // Main playhead line - bright white and prominent
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -272,58 +398,41 @@ export function Waveform({
     ctx.lineTo(playheadX, height);
     ctx.stroke();
     
-    // Playhead triangle at top
-    ctx.fillStyle = '#ffffff';
+    // Playhead triangle at top with shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.beginPath();
-    ctx.moveTo(playheadX - 6, 0);
-    ctx.lineTo(playheadX + 6, 0);
-    ctx.lineTo(playheadX, 12);
+    ctx.moveTo(playheadX - 7, 1);
+    ctx.lineTo(playheadX + 7, 1);
+    ctx.lineTo(playheadX + 1, 13);
     ctx.closePath();
     ctx.fill();
     
-    // Playhead triangle at bottom
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.moveTo(playheadX - 6, height);
-    ctx.lineTo(playheadX + 6, height);
-    ctx.lineTo(playheadX, height - 12);
+    ctx.moveTo(playheadX - 8, 0);
+    ctx.lineTo(playheadX + 8, 0);
+    ctx.lineTo(playheadX, 14);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Playhead triangle at bottom with shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.moveTo(playheadX - 7, height - 1);
+    ctx.lineTo(playheadX + 7, height - 1);
+    ctx.lineTo(playheadX + 1, height - 13);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(playheadX - 8, height);
+    ctx.lineTo(playheadX + 8, height);
+    ctx.lineTo(playheadX, height - 14);
     ctx.closePath();
     ctx.fill();
 
-    // Scrolling beat grid overlay
-    if (track && track.bpm > 0) {
-      const beatInterval = 60 / track.bpm; // seconds per beat
-      const windowStart = Math.max(0, currentTime - 4);
-      const windowEnd = Math.min(track.duration, currentTime + 4);
-      
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1;
-      
-      // Draw beat lines within the visible window
-      const firstBeat = Math.floor(windowStart / beatInterval);
-      const lastBeat = Math.ceil(windowEnd / beatInterval);
-      
-      for (let beat = firstBeat; beat <= lastBeat; beat++) {
-        const beatTime = beat * beatInterval;
-        if (beatTime >= windowStart && beatTime <= windowEnd) {
-          const x = ((beatTime - windowStart) / (windowEnd - windowStart)) * width;
-          
-          // Highlight beats closer to playhead
-          const distanceFromPlayhead = Math.abs(beatTime - currentTime);
-          if (distanceFromPlayhead < 0.1) {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.lineWidth = 2;
-          } else {
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.lineWidth = 1;
-          }
-          
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, height);
-          ctx.stroke();
-        }
-      }
-    }
+
 
     // Continue animation continuously for live updates
     animationRef.current = requestAnimationFrame(drawWaveform);
