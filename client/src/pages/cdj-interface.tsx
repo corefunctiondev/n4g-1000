@@ -54,24 +54,30 @@ export default function CDJInterface() {
           </div>
         </div>
 
-        {/* Main DJ Setup - Responsive Layout */}
-        <div 
-          className="flex flex-col xl:flex-row items-center xl:items-start justify-center gap-2 sm:gap-4 lg:gap-8"
-          style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'center' }}
-        >
-          {/* Left CDJ (Deck A) */}
-          <div className="origin-center">
-            <Deck deckId="A" color="#00d4ff" />
-          </div>
+        {/* Main DJ Setup - Scalable Layout */}
+        <div className="flex justify-center items-center min-h-[400px] overflow-hidden">
+          <div 
+            className="flex items-start justify-center gap-8"
+            style={{ 
+              transform: `scale(${zoomLevel / 100})`, 
+              transformOrigin: 'center',
+              transition: 'transform 0.2s ease-in-out'
+            }}
+          >
+            {/* Left CDJ (Deck A) */}
+            <div className="flex-shrink-0">
+              <Deck deckId="A" color="#00d4ff" />
+            </div>
 
-          {/* Center Mixer */}
-          <div className="xl:mt-16 origin-center">
-            <Mixer />
-          </div>
+            {/* Center Mixer */}
+            <div className="flex-shrink-0 mt-16">
+              <Mixer />
+            </div>
 
-          {/* Right CDJ (Deck B) */}
-          <div className="origin-center">
-            <Deck deckId="B" color="#ff6b00" />
+            {/* Right CDJ (Deck B) */}
+            <div className="flex-shrink-0">
+              <Deck deckId="B" color="#ff6b00" />
+            </div>
           </div>
         </div>
 
