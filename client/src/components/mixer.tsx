@@ -216,8 +216,8 @@ export function Mixer() {
             <div className="text-xs font-bold text-blue-400">CH A</div>
           </div>
           
-          {/* Compact EQ Controls */}
-          <div className="flex gap-1 justify-center mb-2">
+          {/* Vertical EQ Controls */}
+          <div className="flex flex-col items-center gap-1 mb-2">
             <div className="text-center">
               <div 
                 className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
@@ -340,16 +340,16 @@ export function Mixer() {
         </div>
 
         {/* Channel B */}
-        <div className="pioneer-eq-section p-2" style={{ width: '120px' }}>
-          <div className="text-center mb-2">
-            <div className="text-sm font-bold text-orange-400">CH B</div>
+        <div className="pioneer-eq-section p-1 flex-1">
+          <div className="text-center mb-1">
+            <div className="text-xs font-bold text-orange-400">CH B</div>
           </div>
           
-          {/* Horizontal EQ Controls */}
-          <div className="flex gap-2 justify-center mb-3">
+          {/* Vertical EQ Controls */}
+          <div className="flex flex-col items-center gap-1 mb-2">
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
                   isDragging === 'high-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.high - 50) * 2.7}deg)` }}
@@ -359,7 +359,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
                   isDragging === 'mid-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.mid - 50) * 2.7}deg)` }}
@@ -369,7 +369,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto mb-1 cursor-pointer transition-colors ${
+                className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
                   isDragging === 'low-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.low - 50) * 2.7}deg)` }}
