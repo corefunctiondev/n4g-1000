@@ -62,9 +62,17 @@ export function Waveform({
     canvas.width = width;
     canvas.height = height;
 
-    // Clear canvas
+    // Clear canvas with dark background
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, width, height);
+    
+    // Draw center line for debugging
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
 
     // Draw static waveform if available
     if (waveformDataRef.current) {
@@ -77,13 +85,17 @@ export function Waveform({
         const x = i * barWidth;
         
         // Symmetric waveform display from center outward
-        const waveHeight = (amplitude * height) / 2;
+        const maxWaveHeight = height * 0.45; // Use 90% of height (45% each side)
+        const waveHeight = amplitude * maxWaveHeight;
         const centerY = height / 2;
+        
+        // Top half (extending upward from center)
         ctx.fillStyle = color || '#00ffff';
-        // Top half
         ctx.fillRect(x, centerY - waveHeight, barWidth - 1, waveHeight);
-        // Bottom half (mirror)
-        ctx.fillRect(x, centerY, barWidth - 1, waveHeight);
+        
+        // Bottom half (extending downward from center) - make it visible
+        ctx.fillStyle = color || '#00ffff';
+        ctx.fillRect(x, centerY + 1, barWidth - 1, waveHeight);
       }
     }
 
