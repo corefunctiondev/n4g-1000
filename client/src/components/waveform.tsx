@@ -85,24 +85,17 @@ export function Waveform({
         const x = i * barWidth;
         
         // Symmetric waveform display from center outward
-        const maxWaveHeight = height * 0.49; // Use 98% of height (49% each side)
-        const minHeight = 3; // Minimum bar height for visibility
-        const waveHeight = Math.max(amplitude * maxWaveHeight, minHeight);
+        const maxWaveHeight = height * 0.45; // Use 90% of height (45% each side)
+        const waveHeight = amplitude * maxWaveHeight;
         const centerY = height / 2;
         
-        // Create gradient effect for better visual
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, color || '#00ffff');
-        gradient.addColorStop(0.5, color || '#00ffff');
-        gradient.addColorStop(1, color || '#00ffff');
-        
         // Top half (extending upward from center)
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, centerY - waveHeight, barWidth - 0.5, waveHeight);
+        ctx.fillStyle = color || '#00ffff';
+        ctx.fillRect(x, centerY - waveHeight, barWidth - 1, waveHeight);
         
-        // Bottom half (extending downward from center)
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, centerY + 0.5, barWidth - 0.5, waveHeight);
+        // Bottom half (extending downward from center) - make it visible
+        ctx.fillStyle = color || '#00ffff';
+        ctx.fillRect(x, centerY + 1, barWidth - 1, waveHeight);
       }
     }
 
