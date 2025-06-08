@@ -29,6 +29,7 @@ export function Deck({ deckId, color }: DeckProps) {
     toggleLoop,
     beatJump,
     sync,
+    getAnalyser,
   } = useAudio(deckId);
 
   const [isDragOver, setIsDragOver] = useState(false);
@@ -191,6 +192,8 @@ export function Deck({ deckId, color }: DeckProps) {
               color={color}
               onSeek={seek}
               className="w-full"
+              analyser={getAnalyser()}
+              isPlaying={deck.isPlaying}
             />
             
             {/* Frequency Band Labels */}
