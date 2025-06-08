@@ -259,15 +259,27 @@ export function useAudio(deckId: 'A' | 'B') {
   }, []);
 
   const setTempo = useCallback((tempo: number) => {
+    const playbackRate = 1 + (tempo / 100);
+    
+    // Apply tempo change to current source if playing
     if (sourceRef.current && deck.isPlaying) {
-      const playbackRate = 1 + (tempo / 100);
       sourceRef.current.playbackRate.setValueAtTime(
         playbackRate,
         audioEngine.getCurrentTime()
       );
     }
-    setDeck(prev => ({ ...prev, tempo }));
-  }, [deck.isPlaying]);
+    
+    // Calculate new BPM based on tempo change
+    const originalBPM = deck.track?.bpm || 120;
+    const newBPM = Math.round(originalBPM * playbackRate);
+    
+    setDeck(prev => ({ 
+      ...prev, 
+      tempo,
+      // Update the track's displayed BPM
+      track: prev.track ? { ...prev.track, bpm: newBPM } : null
+    }));
+  }, [deck.isPlaying, deck.track]);
 
   const setEQ = useCallback((band: 'high' | 'mid' | 'low', value: number) => {
     if (audioNodes.current) {
@@ -350,18 +362,31 @@ export function useAudio(deckId: 'A' | 'B') {
     }
   }, [deck.track, deck.currentTime, seek]);
 
-  const sync = useCallback(() => {
-    // Get BPM from the other deck for sync
-    const otherDeckId = deckId === 'A' ? 'B' : 'A';
-    const otherDeck = audioEngine.getDeckNodes(otherDeckId);
+  const sync = useCallback((targetDeck?: any) => {
+    if (!deck.track) return;
     
-    if (otherDeck && deck.track) {
-      // Simple sync implementation - match tempo to create beatmatched mix
-      console.log(`Syncing deck ${deckId} to deck ${otherDeckId}`);
-      // In a full implementation, this would analyze the other deck's BPM and adjust tempo
-      setTempo(0); // Reset to original tempo as basic sync
+    // If no target deck provided, try to find the other deck's state
+    if (!targetDeck) {
+      console.log(`Sync requires target deck data for deck ${deckId}`);
+      return;
     }
-  }, [deckId, deck.track, setTempo]);
+    
+    if (!targetDeck.track) {
+      console.log(`Target deck has no track loaded for sync`);
+      return;
+    }
+    
+    // Calculate tempo adjustment needed to match target BPM
+    const currentOriginalBPM = deck.track.bpm / (1 + (deck.tempo / 100)); // Get original BPM
+    const targetCurrentBPM = targetDeck.track.bpm; // Target's current BPM (with tempo applied)
+    
+    const tempoAdjustment = ((targetCurrentBPM / currentOriginalBPM) - 1) * 100;
+    
+    // Apply the tempo adjustment
+    setTempo(tempoAdjustment);
+    
+    console.log(`Deck ${deckId} synced: ${Math.round(currentOriginalBPM)} -> ${Math.round(targetCurrentBPM)} BPM (${tempoAdjustment.toFixed(1)}% tempo)`);
+  }, [deckId, deck.track, deck.tempo, setTempo]);
 
   return {
     deck,

@@ -9,6 +9,8 @@ export default function CDJInterface() {
   const [zoomLevel, setZoomLevel] = useState(100);
   const [crossfaderValue, setCrossfaderValue] = useState(50);
   const [isDraggingCrossfader, setIsDraggingCrossfader] = useState(false);
+  const [deckAState, setDeckAState] = useState<any>(null);
+  const [deckBState, setDeckBState] = useState<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -102,7 +104,12 @@ export default function CDJInterface() {
             <div className="w-full h-full flex p-2">
               {/* Left CDJ (Deck A) - Takes 45% width */}
               <div className="w-[45%] h-full">
-                <Deck deckId="A" color="#00d4ff" />
+                <Deck 
+                  deckId="A" 
+                  color="#00d4ff" 
+                  otherDeckState={deckBState}
+                  onStateChange={setDeckAState}
+                />
               </div>
 
               {/* Center Mixer - Takes 10% width */}
@@ -112,7 +119,12 @@ export default function CDJInterface() {
 
               {/* Right CDJ (Deck B) - Takes 45% width */}
               <div className="w-[45%] h-full">
-                <Deck deckId="B" color="#ff6b00" />
+                <Deck 
+                  deckId="B" 
+                  color="#ff6b00" 
+                  otherDeckState={deckAState}
+                  onStateChange={setDeckBState}
+                />
               </div>
             </div>
           </div>

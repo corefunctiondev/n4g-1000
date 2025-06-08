@@ -9,9 +9,11 @@ import { Card, CardContent } from '@/components/ui/card';
 interface DeckProps {
   deckId: 'A' | 'B';
   color: string;
+  otherDeckState?: any;
+  onStateChange?: (state: any) => void;
 }
 
-export function Deck({ deckId, color }: DeckProps) {
+export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps) {
   const {
     deck,
     loadTrack,
