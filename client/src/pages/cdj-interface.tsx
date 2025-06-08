@@ -19,12 +19,12 @@ export default function CDJInterface() {
         for (const entry of entries) {
           const { width, height } = entry.contentRect;
           
-          // Calculate scale factor based on container size vs default size
+          // Calculate scale factor to fill container completely
           const baseWidth = 1700;
           const baseHeight = 360;
           const scaleX = width / baseWidth;
           const scaleY = height / baseHeight;
-          const scale = Math.min(scaleX, scaleY);
+          const scale = Math.max(scaleX, scaleY); // Use max to fill completely
           
           if (contentRef.current) {
             // Apply transform with both translation and scaling
@@ -99,7 +99,7 @@ export default function CDJInterface() {
           >
             <div 
               ref={contentRef}
-              className="resizable-content flex p-1"
+              className="resizable-content flex"
               style={{ 
                 transform: `translate(-50%, -50%) scale(var(--scale-factor, 1))`,
                 transition: 'transform 0.1s ease-out'
