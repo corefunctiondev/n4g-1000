@@ -92,6 +92,11 @@ export function useAudio(deckId: 'A' | 'B') {
         waveformData: audioBuffer.getChannelData(0),
       };
 
+      // Initialize audio nodes for this track
+      audioNodes.current = audioEngine.createDeckNodes();
+      audioNodes.current.gainNode.connect(audioEngine.getMasterGain()!);
+      console.log(`Audio nodes initialized for deck ${deckId}`);
+
       setDeck(prev => ({
         ...prev,
         track,
@@ -109,10 +114,33 @@ export function useAudio(deckId: 'A' | 'B') {
   }, [deckId]);
 
   const play = useCallback(async () => {
-    if (!deck.track?.audioBuffer || !audioNodes.current) return;
+    console.log(`Attempting to play track on deck ${deckId}`);
+    console.log('Track available:', !!deck.track);
+    console.log('Audio buffer available:', !!deck.track?.audioBuffer);
+    console.log('Audio nodes available:', !!audioNodes.current);
+
+    if (!deck.track?.audioBuffer) {
+      console.error(`No audio buffer available for deck ${deckId}`);
+      return;
+    }
+
+    if (!audioNodes.current) {
+      console.error(`No audio nodes available for deck ${deckId}, initializing...`);
+      // Try to initialize audio nodes if missing
+      try {
+        await audioEngine.initialize();
+        audioNodes.current = audioEngine.createDeckNodes();
+        audioNodes.current.gainNode.connect(audioEngine.getMasterGain()!);
+        console.log(`Audio nodes initialized for deck ${deckId}`);
+      } catch (error) {
+        console.error(`Failed to initialize audio nodes for deck ${deckId}:`, error);
+        return;
+      }
+    }
 
     try {
       await audioEngine.resumeContext();
+      console.log(`Audio context resumed for deck ${deckId}`);
 
       // Stop current source if playing
       if (sourceRef.current) {
@@ -123,9 +151,11 @@ export function useAudio(deckId: 'A' | 'B') {
       // Create new source
       const source = audioEngine.createAudioSource(deck.track.audioBuffer);
       source.connect(audioNodes.current.gainNode);
+      console.log(`Audio source created and connected for deck ${deckId}`);
       
       // Calculate start offset
       const offset = deck.isPaused ? pauseTimeRef.current : 0;
+      console.log(`Starting playback with offset: ${offset}s`);
       
       // Apply tempo adjustment
       const playbackRate = 1 + (deck.tempo / 100);
@@ -137,6 +167,8 @@ export function useAudio(deckId: 'A' | 'B') {
       
       setDeck(prev => ({ ...prev, isPlaying: true, isPaused: false }));
       updateCurrentTime();
+      
+      console.log(`Playback started successfully on deck ${deckId}`);
       
     } catch (error) {
       console.error(`Failed to play track on deck ${deckId}:`, error);
