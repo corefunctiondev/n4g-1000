@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useAudio } from '@/hooks/use-audio';
 import { Waveform } from './waveform';
 import { Knob } from './knob';
@@ -37,6 +37,13 @@ export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps
   const [isDragOver, setIsDragOver] = useState(false);
   const [isDraggingTempo, setIsDraggingTempo] = useState(false);
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
+
+  // Share deck state with parent component for sync functionality
+  useEffect(() => {
+    if (onStateChange) {
+      onStateChange(deck);
+    }
+  }, [deck, onStateChange]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     console.log('File input changed:', event.target.files);
@@ -82,6 +89,14 @@ export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps
     }
   }, [deck.isPlaying, play, pause]);
 
+  const handleSync = useCallback(() => {
+    if (otherDeckState) {
+      sync(otherDeckState);
+    } else {
+      console.log(`No other deck state available for sync on deck ${deckId}`);
+    }
+  }, [sync, otherDeckState, deckId]);
+
   // Tempo fader interaction
   const handleTempoMouseDown = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
@@ -119,10 +134,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps
     }
   }, [setCuePoint, jumpToCue]);
 
-  // Sync button
-  const handleSync = useCallback(() => {
-    sync();
-  }, [sync]);
+
 
   // Beat jump buttons
   const handleBeatJump = useCallback((beats: number) => {
