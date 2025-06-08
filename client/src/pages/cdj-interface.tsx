@@ -19,15 +19,16 @@ export default function CDJInterface() {
         for (const entry of entries) {
           const { width, height } = entry.contentRect;
           
-          // Calculate scale based on container size
-          const baseWidth = 1700;
-          const baseHeight = 420;
+          // Calculate scale to fit content exactly in container
+          const baseWidth = 1750;
+          const baseHeight = 380;
           const scaleX = width / baseWidth;
           const scaleY = height / baseHeight;
           const scale = Math.min(scaleX, scaleY);
           
           if (contentRef.current) {
             contentRef.current.style.transform = `scale(${scale})`;
+            contentRef.current.style.transformOrigin = 'top left';
           }
         }
       });
@@ -80,16 +81,16 @@ export default function CDJInterface() {
           </div>
         </div>
 
-        {/* Resizable DJ Setup Container */}
-        <div className="flex justify-center items-center p-4">
+        {/* Resizable DJ Setup Container - No Dead Space */}
+        <div className="flex justify-center items-center">
           <div 
             ref={containerRef}
-            className="border-4 border-gray-500 rounded-xl bg-gray-900/50 backdrop-blur-sm resize overflow-hidden shadow-2xl"
+            className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm resize overflow-hidden shadow-2xl"
             style={{ 
-              width: '1700px',
-              height: '420px',
-              minWidth: '850px',
-              minHeight: '210px',
+              width: '1750px',
+              height: '380px',
+              minWidth: '875px',
+              minHeight: '190px',
               maxWidth: '95vw',
               maxHeight: '80vh',
               resize: 'both'
@@ -97,11 +98,11 @@ export default function CDJInterface() {
           >
             <div 
               ref={contentRef}
-              className="flex items-start justify-center gap-8 p-4"
+              className="flex items-start justify-center gap-8"
               style={{ 
-                width: '1700px',
-                height: '420px',
-                transformOrigin: 'center',
+                width: '1750px',
+                height: '380px',
+                transformOrigin: 'top left',
                 transition: 'transform 0.1s ease-out'
               }}
             >
@@ -111,7 +112,7 @@ export default function CDJInterface() {
               </div>
 
               {/* Center Mixer */}
-              <div className="flex-shrink-0 mt-12">
+              <div className="flex-shrink-0 mt-8">
                 <Mixer />
               </div>
 
