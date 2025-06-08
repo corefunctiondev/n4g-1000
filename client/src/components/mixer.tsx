@@ -267,24 +267,7 @@ export function Mixer() {
             </div>
           </div>
 
-          <div className="flex gap-1">
-            <button 
-              className={`pioneer-button py-1 px-1 text-xs transition-all ${
-                channelA.pfl ? 'bg-blue-500 text-white' : 'text-blue-400 hover:bg-blue-500'
-              }`}
-              onClick={() => togglePFL('A')}
-            >
-              PFL
-            </button>
-            <button 
-              className={`pioneer-button py-1 px-1 text-xs transition-all ${
-                channelA.cue ? 'bg-orange-500 text-white' : 'text-orange-400 hover:bg-orange-500'
-              }`}
-              onClick={() => toggleCue('A')}
-            >
-              CUE
-            </button>
-          </div>
+
         </div>
 
         {/* Center Section - Crossfader and Master */}
@@ -313,30 +296,7 @@ export function Mixer() {
             </div>
           </div>
 
-          {/* Master Volume Knobs - Compact */}
-          <div className="flex justify-center gap-1">
-            <div className="text-center">
-              <div 
-                className={`pioneer-knob w-6 h-6 mx-auto mb-1 cursor-pointer transition-colors ${
-                  isDragging === 'master' ? 'bg-green-400' : ''
-                }`}
-                style={{ transform: `rotate(${(mixer.masterVolume - 50) * 2.7}deg)` }}
-                onMouseDown={handleKnobMouseDown('master')}
-              />
-              <div className="text-xs text-gray-400">MASTER</div>
-            </div>
-            
-            <div className="text-center">
-              <div 
-                className={`pioneer-knob w-5 h-5 mx-auto mb-1 cursor-pointer transition-colors ${
-                  isDragging === 'cue' ? 'bg-orange-400' : ''
-                }`}
-                style={{ transform: `rotate(${(mixer.cueVolume - 50) * 2.7}deg)` }}
-                onMouseDown={handleKnobMouseDown('cue')}
-              />
-              <div className="text-xs text-gray-400">CUE</div>
-            </div>
-          </div>
+
         </div>
 
         {/* Channel B */}
@@ -396,24 +356,7 @@ export function Mixer() {
             </div>
           </div>
 
-          <div className="flex gap-1">
-            <button 
-              className={`pioneer-button py-1 px-1 text-xs transition-all ${
-                channelB.pfl ? 'bg-orange-500 text-white' : 'text-orange-400 hover:bg-orange-500'
-              }`}
-              onClick={() => togglePFL('B')}
-            >
-              PFL
-            </button>
-            <button 
-              className={`pioneer-button py-1 px-1 text-xs transition-all ${
-                channelB.cue ? 'bg-blue-500 text-white' : 'text-blue-400 hover:bg-blue-500'
-              }`}
-              onClick={() => toggleCue('B')}
-            >
-              CUE
-            </button>
-          </div>
+
         </div>
       </div>
 
