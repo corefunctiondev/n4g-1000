@@ -3,6 +3,8 @@ export class AudioEngine {
   private masterGain: GainNode | null = null;
   private compressor: DynamicsCompressorNode | null = null;
   private deckNodes: Map<string, any> = new Map();
+  private crossfaderGainA: GainNode | null = null;
+  private crossfaderGainB: GainNode | null = null;
 
   async initialize(): Promise<void> {
     try {
@@ -12,6 +14,10 @@ export class AudioEngine {
       this.masterGain = this.context.createGain();
       this.compressor = this.context.createDynamicsCompressor();
       
+      // Create crossfader gain nodes for each deck
+      this.crossfaderGainA = this.context.createGain();
+      this.crossfaderGainB = this.context.createGain();
+      
       // Set up compressor
       this.compressor.threshold.setValueAtTime(-24, this.context.currentTime);
       this.compressor.knee.setValueAtTime(30, this.context.currentTime);
@@ -19,9 +25,15 @@ export class AudioEngine {
       this.compressor.attack.setValueAtTime(0.003, this.context.currentTime);
       this.compressor.release.setValueAtTime(0.25, this.context.currentTime);
       
-      // Connect master chain
+      // Connect master chain: crossfader gains → master → compressor → output
+      this.crossfaderGainA.connect(this.masterGain);
+      this.crossfaderGainB.connect(this.masterGain);
       this.masterGain.connect(this.compressor);
       this.compressor.connect(this.context.destination);
+      
+      // Initialize crossfader to center position
+      this.crossfaderGainA.gain.setValueAtTime(0.707, this.context.currentTime); // ~50%
+      this.crossfaderGainB.gain.setValueAtTime(0.707, this.context.currentTime); // ~50%
       
       console.log('Audio engine initialized');
     } catch (error) {
@@ -93,12 +105,11 @@ export class AudioEngine {
     analyser.fftSize = 2048;
     analyser.smoothingTimeConstant = 0.8;
 
-    // Connect the chain
+    // Connect the chain (deck will connect to crossfader gain, not directly to master)
     gainNode.connect(lowShelf);
     lowShelf.connect(midPeaking);
     midPeaking.connect(highShelf);
     highShelf.connect(analyser);
-    analyser.connect(this.masterGain!);
 
     return {
       source: null,
@@ -126,6 +137,13 @@ export class AudioEngine {
 
   registerDeckNodes(deckId: string, nodes: any): void {
     this.deckNodes.set(deckId, nodes);
+    
+    // Connect each deck to its dedicated crossfader gain node
+    if (deckId === 'A' && this.crossfaderGainA) {
+      nodes.analyser.connect(this.crossfaderGainA);
+    } else if (deckId === 'B' && this.crossfaderGainB) {
+      nodes.analyser.connect(this.crossfaderGainB);
+    }
   }
 
   getDeckNodes(deckId: string): any {
@@ -133,20 +151,13 @@ export class AudioEngine {
   }
 
   setCrossfader(value: number): void {
-    const deckA = this.deckNodes.get('A');
-    const deckB = this.deckNodes.get('B');
-    
-    if (this.context) {
+    if (this.context && this.crossfaderGainA && this.crossfaderGainB) {
       const fadePosition = value / 100;
       const volumeA = Math.cos(fadePosition * Math.PI / 2);
       const volumeB = Math.sin(fadePosition * Math.PI / 2);
       
-      if (deckA) {
-        deckA.gainNode.gain.setValueAtTime(volumeA, this.context.currentTime);
-      }
-      if (deckB) {
-        deckB.gainNode.gain.setValueAtTime(volumeB, this.context.currentTime);
-      }
+      this.crossfaderGainA.gain.setValueAtTime(volumeA, this.context.currentTime);
+      this.crossfaderGainB.gain.setValueAtTime(volumeB, this.context.currentTime);
     }
   }
 

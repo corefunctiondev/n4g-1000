@@ -114,9 +114,8 @@ export function useAudio(deckId: 'A' | 'B') {
 
       // Initialize audio nodes for this track
       audioNodes.current = audioEngine.createDeckNodes();
-      audioNodes.current.gainNode.connect(audioEngine.getMasterGain()!);
       
-      // Register nodes with audio engine for crossfader/mixer control
+      // Register nodes with audio engine for crossfader/mixer control (this handles the connection)
       audioEngine.registerDeckNodes(deckId, audioNodes.current);
       console.log(`Audio nodes initialized and registered for deck ${deckId}`);
 
@@ -153,7 +152,7 @@ export function useAudio(deckId: 'A' | 'B') {
       try {
         await audioEngine.initialize();
         audioNodes.current = audioEngine.createDeckNodes();
-        audioNodes.current.gainNode.connect(audioEngine.getMasterGain()!);
+        audioEngine.registerDeckNodes(deckId, audioNodes.current);
         console.log(`Audio nodes initialized for deck ${deckId}`);
       } catch (error) {
         console.error(`Failed to initialize audio nodes for deck ${deckId}:`, error);
