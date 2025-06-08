@@ -419,54 +419,7 @@ export function Mixer() {
 
 
 
-      {/* Effects Section */}
-      <div className="pioneer-eq-section p-4 mb-6">
-        <div className="text-center mb-3">
-          <div className="text-xs font-semibold text-gray-300">SOUND COLOR FX</div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <button 
-            onClick={() => toggleEffect('filter')}
-            className={`pioneer-button py-2 text-xs transition-all ${
-              mixer.effects.filter ? 'active text-blue-400' : 'text-gray-400'
-            }`}
-          >
-            FILTER
-          </button>
-          <button 
-            onClick={() => toggleEffect('reverb')}
-            className={`pioneer-button py-2 text-xs transition-all ${
-              mixer.effects.reverb ? 'active text-green-400' : 'text-gray-400'
-            }`}
-          >
-            SPACE
-          </button>
-        </div>
 
-        <div className="text-center">
-          <div className="pioneer-knob w-10 h-10 mx-auto mb-1" />
-          <div className="text-xs text-gray-400">PARAMETER</div>
-        </div>
-      </div>
-
-      {/* Headphone Section */}
-      <div className="pioneer-eq-section p-4">
-        <div className="text-center mb-3">
-          <div className="text-xs font-semibold text-gray-300">HEADPHONES</div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-center">
-            <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
-            <div className="text-xs text-gray-400">MIX</div>
-          </div>
-          <div className="text-center">
-            <div className="pioneer-knob w-8 h-8 mx-auto mb-1" />
-            <div className="text-xs text-gray-400">LEVEL</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

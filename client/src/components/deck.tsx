@@ -246,15 +246,10 @@ export function Deck({ deckId, color }: DeckProps) {
           </div>
         </div>
 
-        {/* Control Buttons Row */}
-        <div className="grid grid-cols-6 gap-2 mb-4">
-          <button className="pioneer-button py-2 px-1 text-xs">MENU</button>
-          <button className="pioneer-button py-2 px-1 text-xs">TAG</button>
-          <button className="pioneer-button py-2 px-1 text-xs">INFO</button>
-          <button className="pioneer-button py-2 px-1 text-xs">TIME</button>
-          <button className="pioneer-button py-2 px-1 text-xs">AUTO</button>
-          <label className="pioneer-button py-2 px-1 text-xs cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500">
-            LOAD
+        {/* Essential Controls Row */}
+        <div className="flex gap-2 mb-4 justify-center">
+          <label className="pioneer-button py-2 px-3 text-xs cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500">
+            LOAD TRACK
             <input
               type="file"
               accept="audio/*"
@@ -262,67 +257,42 @@ export function Deck({ deckId, color }: DeckProps) {
               className="hidden"
             />
           </label>
+          <button 
+            className="pioneer-button py-2 px-3 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500"
+            onClick={handleSync}
+          >
+            SYNC
+          </button>
+          <button 
+            className={`pioneer-button py-2 px-3 text-xs ${
+              deck.isLooping ? 'bg-green-500 text-white' : 'text-green-400 hover:bg-green-500 hover:text-white'
+            }`}
+            onClick={toggleLoop}
+          >
+            LOOP
+          </button>
         </div>
       </div>
 
       {/* Bottom Controls Section - Compact Layout */}
       <div className="flex items-center justify-between gap-4">
-        {/* Left Side - Transport Controls */}
-        <div className="flex gap-2">
-          <button 
-            onClick={cue}
-            className="pioneer-button py-2 px-3 text-orange-400 hover:text-orange-300"
-          >
-            <div className="text-sm">⏮</div>
-            <div className="text-xs">CUE</div>
-          </button>
-          
+        {/* Essential Transport Controls */}
+        <div className="flex gap-3">
           <button 
             onClick={handlePlayPause}
-            className={`pioneer-button py-2 px-3 ${deck.isPlaying ? 'active text-green-400' : 'text-green-400'}`}
+            className={`pioneer-button py-3 px-4 ${deck.isPlaying ? 'active text-green-400' : 'text-green-400'}`}
           >
-            <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
+            <div className="text-lg">{deck.isPlaying ? '⏸' : '▶'}</div>
             <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
           </button>
           
           <button 
             onClick={stop}
-            className="pioneer-button py-2 px-3 text-red-400 hover:text-red-300"
+            className="pioneer-button py-3 px-4 text-red-400 hover:text-red-300"
           >
-            <div className="text-sm">⏹</div>
+            <div className="text-lg">⏹</div>
             <div className="text-xs">STOP</div>
           </button>
-          
-          <button 
-            className="pioneer-button py-2 px-3 text-blue-400 hover:text-blue-300 hover:bg-blue-500"
-            onClick={handleSync}
-          >
-            <div className="text-sm">🔗</div>
-            <div className="text-xs">SYNC</div>
-          </button>
-        </div>
-
-        {/* Center - Hot Cue Pads */}
-        <div className="flex gap-1">
-          {[0, 1, 2, 3].map((cueIndex) => {
-            const cueTime = deck.cuePoints[cueIndex];
-            const hasActiveCue = cueTime !== undefined;
-            return (
-              <button
-                key={cueIndex}
-                className={`pioneer-button py-2 px-2 transition-all ${
-                  hasActiveCue 
-                    ? 'bg-pink-500 text-white border-pink-400' 
-                    : 'hover:bg-pink-500 hover:text-white'
-                }`}
-                onClick={(e) => handleCueClick(cueIndex, e)}
-                title={`Cue ${cueIndex + 1}: ${hasActiveCue ? 'Click to jump, Shift+Click to delete' : 'Shift+Click to set'}`}
-              >
-                <div className="text-sm font-bold">{cueIndex + 1}</div>
-                <div className="text-xs">CUE</div>
-              </button>
-            );
-          })}
         </div>
 
         {/* Right Side - Tempo Control */}
