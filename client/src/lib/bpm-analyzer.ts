@@ -18,32 +18,33 @@ export class BPMAnalyzer {
       const channelData = audioBuffer.getChannelData(0);
       const sampleRate = audioBuffer.sampleRate;
       
-      // Analyze first 30 seconds for performance
-      const analysisLength = Math.min(channelData.length, sampleRate * 30);
+      // Use longer analysis for better accuracy
+      const analysisLength = Math.min(channelData.length, sampleRate * 60);
       const analysisData = channelData.slice(0, analysisLength);
       
-      console.log(`Analyzing ${analysisLength} samples at ${sampleRate}Hz`);
+      // Multiple analysis methods for better accuracy
+      const autocorrelationBPM = this.analyzeAutocorrelation(analysisData, sampleRate);
+      const peakBPM = this.analyzePeaks(analysisData);
+      const spectralBPM = this.analyzeSpectral(analysisData, sampleRate);
       
-      // Enhanced onset detection
-      const onsets = this.detectOnsets(analysisData, sampleRate);
-      console.log(`Detected ${onsets.length} onsets`);
+      console.log(`BPM methods: Autocorr=${autocorrelationBPM}, Peaks=${peakBPM}, Spectral=${spectralBPM}`);
       
-      if (onsets.length < 8) {
-        console.log('Not enough onsets detected, using fallback');
-        return 120.0;
+      // Choose most reliable result
+      const candidates = [autocorrelationBPM, peakBPM, spectralBPM].filter(bpm => bpm > 60 && bpm < 200);
+      
+      if (candidates.length === 0) {
+        return 128.0; // Common electronic music BPM
       }
       
-      // Calculate intervals between onsets
-      const intervals = this.calculateIntervals(onsets);
+      // Return median of valid candidates
+      candidates.sort((a, b) => a - b);
+      const finalBPM = candidates[Math.floor(candidates.length / 2)];
       
-      // Find most common interval (tempo)
-      const bpm = this.findTempoFromIntervals(intervals, sampleRate);
-      
-      console.log(`Calculated BPM: ${bpm}`);
-      return Math.round(bpm * 10) / 10;
+      console.log(`Final BPM: ${finalBPM}`);
+      return Math.round(finalBPM * 10) / 10;
     } catch (error) {
       console.error('BPM analysis failed:', error);
-      return 120.0;
+      return 128.0;
     }
   }
 

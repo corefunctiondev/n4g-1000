@@ -30,8 +30,11 @@ export function useAudio(deckId: 'A' | 'B') {
     const initializeAudio = async () => {
       try {
         await audioEngine.initialize();
+        // Create unique audio nodes for this deck instance
         audioNodes.current = audioEngine.createDeckNodes();
+        audioEngine.registerDeckNodes(deckId, audioNodes.current);
         setDeck(prev => ({ ...prev, isReady: true }));
+        console.log(`Deck ${deckId} initialized with independent audio nodes`);
       } catch (error) {
         console.error(`Failed to initialize deck ${deckId}:`, error);
       }
@@ -90,8 +93,10 @@ export function useAudio(deckId: 'A' | 'B') {
     try {
       console.log(`Starting to load track on deck ${deckId}:`, file.name);
       
-      // Initialize audio engine
-      await audioEngine.initialize();
+      // Ensure audio engine is initialized but don't reinitialize if already done
+      if (!audioEngine.getContext()) {
+        await audioEngine.initialize();
+      }
       await audioEngine.resumeContext();
       
       console.log(`Audio engine ready, decoding file...`);
@@ -112,12 +117,14 @@ export function useAudio(deckId: 'A' | 'B') {
         waveformData: audioBuffer.getChannelData(0),
       };
 
-      // Initialize audio nodes for this track
-      audioNodes.current = audioEngine.createDeckNodes();
-      
-      // Register nodes with audio engine for crossfader/mixer control (this handles the connection)
-      audioEngine.registerDeckNodes(deckId, audioNodes.current);
-      console.log(`Audio nodes initialized and registered for deck ${deckId}`);
+      // Only create new audio nodes if we don't already have them
+      if (!audioNodes.current) {
+        audioNodes.current = audioEngine.createDeckNodes();
+        audioEngine.registerDeckNodes(deckId, audioNodes.current);
+        console.log(`New audio nodes created and registered for deck ${deckId}`);
+      } else {
+        console.log(`Using existing audio nodes for deck ${deckId}`);
+      }
 
       setDeck(prev => ({
         ...prev,
@@ -164,13 +171,18 @@ export function useAudio(deckId: 'A' | 'B') {
       await audioEngine.resumeContext();
       console.log(`Audio context resumed for deck ${deckId}`);
 
-      // Stop current source if playing
+      // Stop current source if playing (only for this specific deck)
       if (sourceRef.current) {
-        sourceRef.current.stop();
-        sourceRef.current.disconnect();
+        try {
+          sourceRef.current.stop();
+          sourceRef.current.disconnect();
+        } catch (e) {
+          // Source may already be stopped
+        }
+        sourceRef.current = null;
       }
 
-      // Create new source
+      // Create new source for this deck only
       const source = audioEngine.createAudioSource(deck.track.audioBuffer);
       source.connect(audioNodes.current.gainNode);
       console.log(`Audio source created and connected for deck ${deckId}`);

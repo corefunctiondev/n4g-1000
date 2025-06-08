@@ -136,13 +136,25 @@ export class AudioEngine {
   }
 
   registerDeckNodes(deckId: string, nodes: any): void {
+    // Disconnect any existing connections for this deck
+    const existingNodes = this.deckNodes.get(deckId);
+    if (existingNodes) {
+      try {
+        existingNodes.analyser.disconnect();
+      } catch (e) {
+        // Ignore disconnect errors
+      }
+    }
+    
     this.deckNodes.set(deckId, nodes);
     
     // Connect each deck to its dedicated crossfader gain node
     if (deckId === 'A' && this.crossfaderGainA) {
       nodes.analyser.connect(this.crossfaderGainA);
+      console.log('Deck A connected to crossfader A');
     } else if (deckId === 'B' && this.crossfaderGainB) {
       nodes.analyser.connect(this.crossfaderGainB);
+      console.log('Deck B connected to crossfader B');
     }
   }
 
