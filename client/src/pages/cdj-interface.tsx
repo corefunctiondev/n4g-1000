@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Deck } from '@/components/deck';
 import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,10 +6,36 @@ import { Card, CardContent } from '@/components/ui/card';
 export default function CDJInterface() {
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Set page title
     document.title = 'Virtual CDJ Pro - Professional DJ Interface';
+    
+    // Set up ResizeObserver to handle container scaling
+    if (containerRef.current && contentRef.current) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          
+          // Calculate scale based on container size
+          const baseWidth = 1700;
+          const baseHeight = 420;
+          const scaleX = width / baseWidth;
+          const scaleY = height / baseHeight;
+          const scale = Math.min(scaleX, scaleY);
+          
+          if (contentRef.current) {
+            contentRef.current.style.transform = `scale(${scale})`;
+          }
+        }
+      });
+      
+      resizeObserver.observe(containerRef.current);
+      
+      return () => resizeObserver.disconnect();
+    }
   }, []);
 
   return (
@@ -57,6 +83,7 @@ export default function CDJInterface() {
         {/* Resizable DJ Setup Container */}
         <div className="flex justify-center items-center p-4">
           <div 
+            ref={containerRef}
             className="border-4 border-gray-500 rounded-xl bg-gray-900/50 backdrop-blur-sm resize overflow-hidden shadow-2xl"
             style={{ 
               width: '1700px',
@@ -69,9 +96,11 @@ export default function CDJInterface() {
             }}
           >
             <div 
-              className="w-full h-full flex items-start justify-center gap-8 p-4"
+              ref={contentRef}
+              className="flex items-start justify-center gap-8 p-4"
               style={{ 
-                transform: 'scale(var(--container-scale, 1))',
+                width: '1700px',
+                height: '420px',
                 transformOrigin: 'center',
                 transition: 'transform 0.1s ease-out'
               }}
