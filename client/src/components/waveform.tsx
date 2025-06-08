@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { AudioTrack } from '@/types/audio';
+import { WaveformAnalyzer } from '@/lib/waveform-analyzer';
 
 interface WaveformProps {
   track: AudioTrack | null;
@@ -26,29 +27,38 @@ export function Waveform({
 }: WaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
-  const waveformDataRef = useRef<Float32Array | null>(null);
+  const waveformDataRef = useRef<{
+    low: Float32Array;
+    mid: Float32Array;
+    high: Float32Array;
+    combined: Float32Array;
+  } | null>(null);
+  const waveformAnalyzerRef = useRef<WaveformAnalyzer | null>(null);
 
-  // Generate static waveform data when track loads
+  // Generate FFT-based frequency band waveform data when track loads
   useEffect(() => {
-    if (track?.waveformData) {
-      const samples = track.waveformData;
-      const samplesPerPixel = Math.floor(samples.length / width);
-      const waveformData = new Float32Array(width);
-      
-      for (let i = 0; i < width; i++) {
-        let sum = 0;
-        const start = i * samplesPerPixel;
-        const end = Math.min(start + samplesPerPixel, samples.length);
-        
-        for (let j = start; j < end; j++) {
-          sum += Math.abs(samples[j]);
+    if (track?.audioBuffer && analyser) {
+      const initializeAnalyzer = async () => {
+        const context = analyser.context as AudioContext;
+        if (!waveformAnalyzerRef.current) {
+          waveformAnalyzerRef.current = new WaveformAnalyzer(context);
         }
-        waveformData[i] = sum / (end - start);
-      }
+        
+        // Analyze audio buffer to generate frequency band data like Rekordbox
+        const pixelsPerSecond = 200; // High resolution for detailed waveform
+        if (track.audioBuffer) {
+          const waveformData = await waveformAnalyzerRef.current.analyzeAudioBuffer(
+            track.audioBuffer, 
+            pixelsPerSecond
+          );
+          
+          waveformDataRef.current = waveformData;
+        }
+      };
       
-      waveformDataRef.current = waveformData;
+      initializeAnalyzer();
     }
-  }, [track, width]);
+  }, [track, analyser]);
 
   // Real-time scrolling waveform visualization with higher update rate
   const drawWaveform = useCallback(() => {
@@ -112,9 +122,9 @@ export function Waveform({
       }
     }
 
-    // Draw single-strip CDJ-3000 style waveform with stacked frequency bands
+    // Draw CDJ-3000 style waveform with real FFT frequency bands
     if (waveformDataRef.current && track) {
-      const waveformData = waveformDataRef.current;
+      const { low, mid, high } = waveformDataRef.current;
       const totalDuration = track.duration;
       
       // Calculate visible time window (4 seconds before and after current position)
@@ -127,55 +137,76 @@ export function Waveform({
       const stripY = height * 0.3; // Center the strip vertically
       const bandHeight = stripHeight / 3; // Each frequency band is 1/3 of strip
       
-      // Calculate data indices for this time window
-      const samplesPerSecond = waveformData.length / totalDuration;
+      // Calculate data indices for this time window based on high-resolution analysis
+      const pixelsPerSecond = 200; // Match the analysis resolution
+      const samplesPerSecond = pixelsPerSecond;
       const startIndex = Math.floor(windowStart * samplesPerSecond);
       const endIndex = Math.floor(windowEnd * samplesPerSecond);
       
-      // Draw waveform strip
+      // Draw frequency-separated waveform strip
       const visibleSamples = endIndex - startIndex;
       const barWidth = Math.max(1, width / visibleSamples);
       
-      for (let i = 0; i < visibleSamples && startIndex + i < waveformData.length; i++) {
-        const amplitude = waveformData[startIndex + i];
+      for (let i = 0; i < visibleSamples; i++) {
+        const dataIndex = startIndex + i;
+        if (dataIndex >= high.length) break;
+        
         const timePosition = windowStart + (i / visibleSamples) * windowDuration;
         const x = ((timePosition - windowStart) / windowDuration) * width;
         
-        // Calculate distance from playhead for brightness
+        // Calculate distance from playhead for brightness effect
         const distanceFromPlayhead = Math.abs(timePosition - currentTime);
         const brightness = distanceFromPlayhead < 1 ? 1 : Math.max(0.3, 1 - distanceFromPlayhead / 4);
         
-        // Simulate frequency band amplitudes based on the audio data
-        const scaledAmp = Math.min(amplitude * 1.5, 1);
+        // Get real FFT energy values for each frequency band
+        const highEnergy = high[dataIndex] || 0;
+        const midEnergy = mid[dataIndex] || 0;
+        const lowEnergy = low[dataIndex] || 0;
         
-        // HIGH frequencies (top of strip) - Cyan/Blue
-        const highAmp = scaledAmp * (0.6 + Math.sin(i * 0.15) * 0.3);
-        if (highAmp > 0.02) {
-          const barHeight = Math.min(highAmp * bandHeight, bandHeight);
+        // HIGH frequencies (top of strip) - Cyan/Blue like authentic CDJ
+        if (highEnergy > 0.01) {
+          const barHeight = Math.min(highEnergy * bandHeight * 1.2, bandHeight);
           const y = stripY;
+          const intensity = Math.min(highEnergy * 1.5, 1);
           
-          ctx.fillStyle = `rgba(0, 255, 255, ${brightness * Math.min(highAmp * 2, 1)})`;
+          ctx.fillStyle = `rgba(0, 255, 255, ${brightness * intensity})`;
           ctx.fillRect(x, y, barWidth, barHeight);
+          
+          // Peak highlights for strong highs
+          if (highEnergy > 0.7) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.6})`;
+            ctx.fillRect(x, y, barWidth, 2);
+          }
         }
         
-        // MID frequencies (middle of strip) - Orange
-        const midAmp = scaledAmp * (0.8 + Math.cos(i * 0.12) * 0.2);
-        if (midAmp > 0.02) {
-          const barHeight = Math.min(midAmp * bandHeight, bandHeight);
+        // MID frequencies (middle of strip) - Orange like authentic CDJ
+        if (midEnergy > 0.01) {
+          const barHeight = Math.min(midEnergy * bandHeight * 1.2, bandHeight);
           const y = stripY + bandHeight;
+          const intensity = Math.min(midEnergy * 1.5, 1);
           
-          ctx.fillStyle = `rgba(255, 140, 0, ${brightness * Math.min(midAmp * 2, 1)})`;
+          ctx.fillStyle = `rgba(255, 140, 0, ${brightness * intensity})`;
           ctx.fillRect(x, y, barWidth, barHeight);
+          
+          if (midEnergy > 0.7) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.6})`;
+            ctx.fillRect(x, y, barWidth, 2);
+          }
         }
         
-        // LOW frequencies (bottom of strip) - Green/Yellow
-        const lowAmp = scaledAmp * (0.9 + Math.sin(i * 0.08) * 0.1);
-        if (lowAmp > 0.02) {
-          const barHeight = Math.min(lowAmp * bandHeight, bandHeight);
+        // LOW frequencies (bottom of strip) - Green like authentic CDJ
+        if (lowEnergy > 0.01) {
+          const barHeight = Math.min(lowEnergy * bandHeight * 1.2, bandHeight);
           const y = stripY + bandHeight * 2;
+          const intensity = Math.min(lowEnergy * 1.5, 1);
           
-          ctx.fillStyle = `rgba(0, 255, 100, ${brightness * Math.min(lowAmp * 2, 1)})`;
+          ctx.fillStyle = `rgba(0, 255, 100, ${brightness * intensity})`;
           ctx.fillRect(x, y, barWidth, barHeight);
+          
+          if (lowEnergy > 0.7) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.6})`;
+            ctx.fillRect(x, y, barWidth, 2);
+          }
         }
       }
       
