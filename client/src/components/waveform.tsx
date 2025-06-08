@@ -76,10 +76,14 @@ export function Waveform({
         const amplitude = waveformData[i];
         const x = i * barWidth;
         
-        // Single waveform display using the full height
-        const waveHeight = amplitude * height;
+        // Symmetric waveform display from center outward
+        const waveHeight = (amplitude * height) / 2;
+        const centerY = height / 2;
         ctx.fillStyle = color || '#00ffff';
-        ctx.fillRect(x, height - waveHeight, barWidth - 1, waveHeight);
+        // Top half
+        ctx.fillRect(x, centerY - waveHeight, barWidth - 1, waveHeight);
+        // Bottom half (mirror)
+        ctx.fillRect(x, centerY, barWidth - 1, waveHeight);
       }
     }
 
