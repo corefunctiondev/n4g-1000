@@ -19,16 +19,17 @@ export default function CDJInterface() {
         for (const entry of entries) {
           const { width, height } = entry.contentRect;
           
-          // Scale content to fill container exactly
+          // Scale content proportionally to fill container without stretching
           const baseWidth = 1700;
           const baseHeight = 360;
           const scaleX = width / baseWidth;
           const scaleY = height / baseHeight;
+          const scale = Math.min(scaleX, scaleY); // Maintain aspect ratio
           
           if (contentRef.current) {
-            // Use different scaling for width and height to fill completely
-            contentRef.current.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
-            contentRef.current.style.setProperty('--scale-factor', Math.min(scaleX, scaleY).toString());
+            // Use uniform scaling to prevent stretching
+            contentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            contentRef.current.style.setProperty('--scale-factor', scale.toString());
           }
         }
       });
