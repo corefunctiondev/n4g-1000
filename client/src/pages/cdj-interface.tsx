@@ -59,13 +59,13 @@ export default function CDJInterface() {
         </div>
 
         {/* DJ Setup Container - Properly Sized */}
-        <div className="flex justify-center items-center min-h-[500px]">
+        <div className="flex justify-center items-center min-h-[600px]">
           <div 
             className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm shadow-2xl w-full max-w-6xl mx-4"
             style={{ 
-              aspectRatio: '16 / 5',
-              minHeight: '400px',
-              height: 'min(70vh, 500px)'
+              aspectRatio: '14 / 5',
+              minHeight: '550px',
+              height: 'min(80vh, 600px)'
             }}
           >
             <div className="w-full h-full flex p-2">

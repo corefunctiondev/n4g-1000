@@ -275,12 +275,12 @@ export function Deck({ deckId, color }: DeckProps) {
       </div>
 
       {/* Bottom Controls Section - Ultra Compact */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 mb-2">
         {/* Play/Stop Controls */}
         <div className="flex gap-1">
           <button 
             onClick={handlePlayPause}
-            className={`pioneer-button py-2 px-3 text-xs ${deck.isPlaying ? 'text-green-400' : 'text-green-400'}`}
+            className={`pioneer-button py-1 px-2 text-xs ${deck.isPlaying ? 'text-green-400' : 'text-green-400'}`}
           >
             <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
             <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
@@ -288,7 +288,7 @@ export function Deck({ deckId, color }: DeckProps) {
           
           <button 
             onClick={stop}
-            className="pioneer-button py-2 px-3 text-xs text-red-400"
+            className="pioneer-button py-1 px-2 text-xs text-red-400"
           >
             <div className="text-sm">⏹</div>
             <div className="text-xs">STOP</div>
@@ -305,7 +305,7 @@ export function Deck({ deckId, color }: DeckProps) {
           </div>
           <div className="flex justify-center">
             <div 
-              className="pioneer-fader-track h-12 w-4 relative cursor-pointer"
+              className="pioneer-fader-track h-10 w-4 relative cursor-pointer"
               onMouseDown={handleTempoMouseDown}
             >
               <div 
@@ -313,7 +313,7 @@ export function Deck({ deckId, color }: DeckProps) {
                   isDraggingTempo ? 'bg-blue-400' : ''
                 }`}
                 style={{ 
-                  top: `${((tempoRange - deck.tempo) / (tempoRange * 2)) * (48 - 12)}px`,
+                  top: `${((tempoRange - deck.tempo) / (tempoRange * 2)) * (40 - 12)}px`,
                 }}
               />
             </div>
@@ -335,11 +335,11 @@ export function Deck({ deckId, color }: DeckProps) {
         </div>
       </div>
 
-      {/* File Upload Area */}
-      <div className="mb-4">
-        <label className={`block w-full p-3 border-2 border-dashed rounded-lg cursor-pointer transition-all text-center ${
+      {/* File Upload Area - Compact */}
+      <div className="mb-2">
+        <label className={`block w-full p-2 border-2 border-dashed rounded-lg cursor-pointer transition-all text-center ${
           isDragOver 
-            ? 'border-blue-400 bg-blue-400 bg-opacity-10 scale-105' 
+            ? 'border-blue-400 bg-blue-400 bg-opacity-10' 
             : 'border-gray-600 hover:border-blue-400'
         }`}>
           <input
@@ -348,18 +348,17 @@ export function Deck({ deckId, color }: DeckProps) {
             onChange={handleFileUpload}
             className="hidden"
           />
-          <i className={`fas fa-upload text-lg mb-1 ${isDragOver ? 'animate-bounce' : ''}`} style={{ color }} />
           <div className="text-xs text-gray-400">
             {isDragOver ? 'Drop your track here!' : 'Load Track'}
           </div>
         </label>
       </div>
 
-      {/* Bottom Controls */}
-      <div className="grid grid-cols-3 gap-2">
-        <button className="pioneer-button py-2 text-xs">LOOP</button>
-        <button className="pioneer-button py-2 text-xs">SLIP</button>
-        <button className="pioneer-button py-2 text-xs">BEAT</button>
+      {/* Bottom Controls - Compact */}
+      <div className="grid grid-cols-3 gap-1">
+        <button className="pioneer-button py-1 text-xs">LOOP</button>
+        <button className="pioneer-button py-1 text-xs">SLIP</button>
+        <button className="pioneer-button py-1 text-xs">BEAT</button>
       </div>
     </div>
   );
