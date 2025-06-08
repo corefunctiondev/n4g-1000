@@ -188,8 +188,10 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const remainingSeconds = seconds % 60;
+    const wholeSeconds = Math.floor(remainingSeconds);
+    const decimals = Math.floor((remainingSeconds - wholeSeconds) * 10);
+    return `${minutes.toString().padStart(2, '0')}:${wholeSeconds.toString().padStart(2, '0')}.${decimals}`;
   };
 
   const formatBPM = (bpm: number): string => {

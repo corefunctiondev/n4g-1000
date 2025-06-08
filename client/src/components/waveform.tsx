@@ -117,26 +117,32 @@ export function Waveform({
       }
     }
 
-    // Draw playhead position
+    // Draw playhead position with high precision
     if (track && track.duration > 0) {
-      const playheadX = (currentTime / track.duration) * width;
+      const playheadX = Math.round((currentTime / track.duration) * width * 100) / 100;
       
-      // Playhead line
+      // Playhead line with enhanced visibility
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 2;
       ctx.beginPath();
       ctx.moveTo(playheadX, 0);
       ctx.lineTo(playheadX, height);
       ctx.stroke();
+      ctx.shadowBlur = 0;
       
-      // Playhead triangle
+      // Playhead triangle with better contrast
       ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(playheadX - 5, 0);
-      ctx.lineTo(playheadX + 5, 0);
-      ctx.lineTo(playheadX, 10);
+      ctx.moveTo(playheadX - 6, 0);
+      ctx.lineTo(playheadX + 6, 0);
+      ctx.lineTo(playheadX, 12);
       ctx.closePath();
       ctx.fill();
+      ctx.stroke();
     }
 
     // Beat grid overlay
