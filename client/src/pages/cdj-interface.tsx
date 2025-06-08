@@ -54,29 +54,42 @@ export default function CDJInterface() {
           </div>
         </div>
 
-        {/* Main DJ Setup - Scalable Layout */}
-        <div className="flex justify-center items-center min-h-[400px] overflow-hidden">
+        {/* Resizable DJ Setup Container */}
+        <div className="flex justify-center items-center p-4">
           <div 
-            className="flex items-start justify-center gap-8"
+            className="border-4 border-gray-500 rounded-xl bg-gray-900/50 backdrop-blur-sm resize overflow-hidden shadow-2xl"
             style={{ 
-              transform: `scale(${zoomLevel / 100})`, 
-              transformOrigin: 'center',
-              transition: 'transform 0.2s ease-in-out'
+              width: '1700px',
+              height: '420px',
+              minWidth: '850px',
+              minHeight: '210px',
+              maxWidth: '95vw',
+              maxHeight: '80vh',
+              resize: 'both'
             }}
           >
-            {/* Left CDJ (Deck A) */}
-            <div className="flex-shrink-0">
-              <Deck deckId="A" color="#00d4ff" />
-            </div>
+            <div 
+              className="w-full h-full flex items-start justify-center gap-8 p-4"
+              style={{ 
+                transform: 'scale(var(--container-scale, 1))',
+                transformOrigin: 'center',
+                transition: 'transform 0.1s ease-out'
+              }}
+            >
+              {/* Left CDJ (Deck A) */}
+              <div className="flex-shrink-0">
+                <Deck deckId="A" color="#00d4ff" />
+              </div>
 
-            {/* Center Mixer */}
-            <div className="flex-shrink-0 mt-16">
-              <Mixer />
-            </div>
+              {/* Center Mixer */}
+              <div className="flex-shrink-0 mt-12">
+                <Mixer />
+              </div>
 
-            {/* Right CDJ (Deck B) */}
-            <div className="flex-shrink-0">
-              <Deck deckId="B" color="#ff6b00" />
+              {/* Right CDJ (Deck B) */}
+              <div className="flex-shrink-0">
+                <Deck deckId="B" color="#ff6b00" />
+              </div>
             </div>
           </div>
         </div>
