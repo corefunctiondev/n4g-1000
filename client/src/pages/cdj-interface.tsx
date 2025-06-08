@@ -113,30 +113,31 @@ export default function CDJInterface() {
             </div>
           </div>
           
-          {/* External Crossfader Section */}
-          <div className="flex justify-center mt-4">
-            <div className="pioneer-eq-section p-4 rounded-lg">
-              <div className="text-center mb-2">
-                <div className="text-sm font-bold text-white">DJM-750MK2</div>
-                <div className="text-xs text-gray-400">CROSSFADER</div>
-              </div>
-              <div className="flex justify-center">
+          </div>
+          
+        {/* External Crossfader Section - Below Container */}
+        <div className="flex justify-center mt-4">
+          <div className="pioneer-eq-section p-4 rounded-lg">
+            <div className="text-center mb-2">
+              <div className="text-sm font-bold text-white">DJM-750MK2</div>
+              <div className="text-xs text-gray-400">CROSSFADER</div>
+            </div>
+            <div className="flex justify-center">
+              <div 
+                className="pioneer-fader-track w-32 h-6 relative cursor-pointer"
+                onMouseDown={handleCrossfaderMouseDown}
+              >
                 <div 
-                  className="pioneer-fader-track w-32 h-6 relative cursor-pointer"
-                  onMouseDown={handleCrossfaderMouseDown}
-                >
-                  <div 
-                    className={`pioneer-fader-handle w-4 h-8 absolute -top-1 transition-colors ${
-                      isDraggingCrossfader ? 'bg-purple-400' : 'bg-gray-300'
-                    }`}
-                    style={{ left: `${(crossfaderValue / 100) * (128 - 16)}px` }}
-                  />
-                </div>
+                  className={`pioneer-fader-handle w-4 h-8 absolute -top-1 transition-colors ${
+                    isDraggingCrossfader ? 'bg-purple-400' : 'bg-gray-300'
+                  }`}
+                  style={{ left: `${(crossfaderValue / 100) * (128 - 16)}px` }}
+                />
               </div>
-              <div className="flex justify-between text-xs text-gray-400 mt-1">
-                <span>A</span>
-                <span>B</span>
-              </div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>A</span>
+              <span>B</span>
             </div>
           </div>
         </div>
