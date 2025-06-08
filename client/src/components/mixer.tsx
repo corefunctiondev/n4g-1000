@@ -200,7 +200,7 @@ export function Mixer() {
 
   return (
     <div 
-      className="pioneer-mixer p-4 w-[400px] h-[320px] flex flex-col"
+      className="pioneer-mixer p-4 w-[400px] h-[280px] flex flex-col"
     >
       {/* Top Section - Pioneer Branding */}
       <div className="text-center mb-3">

@@ -156,7 +156,7 @@ export function Deck({ deckId, color }: DeckProps) {
 
   return (
     <div 
-      className="pioneer-cdj p-4 w-[650px] h-[320px]"
+      className="pioneer-cdj p-4 w-[650px] h-[280px]"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}

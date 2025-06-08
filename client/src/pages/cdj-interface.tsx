@@ -20,8 +20,8 @@ export default function CDJInterface() {
           const { width, height } = entry.contentRect;
           
           // Calculate scale to fit content exactly in container
-          const baseWidth = 1800;
-          const baseHeight = 420;
+          const baseWidth = 1700;
+          const baseHeight = 360;
           const scaleX = width / baseWidth;
           const scaleY = height / baseHeight;
           const scale = Math.min(scaleX, scaleY);
@@ -87,10 +87,10 @@ export default function CDJInterface() {
             ref={containerRef}
             className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm resize overflow-hidden shadow-2xl"
             style={{ 
-              width: '1800px',
-              height: '420px',
-              minWidth: '900px',
-              minHeight: '210px',
+              width: '1700px',
+              height: '360px',
+              minWidth: '850px',
+              minHeight: '180px',
               maxWidth: '95vw',
               maxHeight: '80vh',
               resize: 'both'
@@ -100,8 +100,8 @@ export default function CDJInterface() {
               ref={contentRef}
               className="flex items-start justify-center gap-8"
               style={{ 
-                width: '1800px',
-                height: '420px',
+                width: '1700px',
+                height: '360px',
                 transformOrigin: 'top left',
                 transition: 'transform 0.1s ease-out'
               }}
