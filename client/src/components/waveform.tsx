@@ -223,97 +223,57 @@ export function Waveform({
       ctx.fillText('LOW', 4, stripY + bandHeight * 2 + 12);
     }
 
-    // Draw real-time frequency analysis overlay for the waveform strip
-    if (isPlaying && analyser) {
-      const freqData = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(freqData);
-      
+    // Draw real-time frequency analysis overlay using the FFT analyzer
+    if (isPlaying && analyser && waveformAnalyzerRef.current) {
       const stripHeight = height * 0.4;
       const stripY = height * 0.3;
       const bandHeight = stripHeight / 3;
       
-      // Define frequency ranges optimized for CDJ-3000 analysis
-      const sampleRate = 44100;
-      const freqPerBin = sampleRate / 2 / freqData.length;
-      
-      // Frequency band ranges (Hz)
-      const bassRange = { start: 20, end: 250 };
-      const midRange = { start: 250, end: 4000 };
-      const highRange = { start: 4000, end: 20000 };
-      
-      // Convert to bin indices
-      const bassStart = Math.floor(bassRange.start / freqPerBin);
-      const bassEnd = Math.floor(bassRange.end / freqPerBin);
-      const midStart = bassEnd;
-      const midEnd = Math.floor(midRange.end / freqPerBin);
-      const highStart = midEnd;
-      const highEnd = Math.min(freqData.length, Math.floor(highRange.end / freqPerBin));
-      
-      // Calculate RMS for each frequency band
-      let bassRMS = 0, midRMS = 0, highRMS = 0;
-      
-      // Bass analysis
-      for (let i = bassStart; i < bassEnd; i++) {
-        const value = freqData[i] / 255;
-        bassRMS += value * value;
-      }
-      bassRMS = Math.sqrt(bassRMS / (bassEnd - bassStart));
-      
-      // Mid analysis
-      for (let i = midStart; i < midEnd; i++) {
-        const value = freqData[i] / 255;
-        midRMS += value * value;
-      }
-      midRMS = Math.sqrt(midRMS / (midEnd - midStart));
-      
-      // High analysis
-      for (let i = highStart; i < highEnd; i++) {
-        const value = freqData[i] / 255;
-        highRMS += value * value;
-      }
-      highRMS = Math.sqrt(highRMS / (highEnd - highStart));
+      // Get live frequency data from the analyzer
+      const liveData = waveformAnalyzerRef.current.getLiveFrequencyData();
+      const { lowEnergy, midEnergy, highEnergy } = liveData;
       
       // Add live overlay effects within the waveform strip at playhead position
       const playheadX = width / 2;
       const overlayWidth = 30;
       
       // HIGH band live overlay - Cyan
-      if (highRMS > 0.01) {
-        const highIntensity = Math.min(highRMS * 5, 1);
+      if (highEnergy > 0.01) {
+        const highIntensity = Math.min(highEnergy * 5, 1);
         const overlayHeight = highIntensity * bandHeight;
         
         ctx.fillStyle = `rgba(0, 255, 255, ${highIntensity * 0.8})`;
         ctx.fillRect(playheadX - overlayWidth/2, stripY, overlayWidth, overlayHeight);
         
-        if (highRMS > 0.7) {
+        if (highEnergy > 0.7) {
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
           ctx.fillRect(playheadX - 2, stripY, 4, overlayHeight);
         }
       }
       
       // MID band live overlay - Orange
-      if (midRMS > 0.01) {
-        const midIntensity = Math.min(midRMS * 5, 1);
+      if (midEnergy > 0.01) {
+        const midIntensity = Math.min(midEnergy * 5, 1);
         const overlayHeight = midIntensity * bandHeight;
         
         ctx.fillStyle = `rgba(255, 140, 0, ${midIntensity * 0.8})`;
         ctx.fillRect(playheadX - overlayWidth/2, stripY + bandHeight, overlayWidth, overlayHeight);
         
-        if (midRMS > 0.7) {
+        if (midEnergy > 0.7) {
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
           ctx.fillRect(playheadX - 2, stripY + bandHeight, 4, overlayHeight);
         }
       }
       
       // LOW band live overlay - Green
-      if (bassRMS > 0.01) {
-        const bassIntensity = Math.min(bassRMS * 5, 1);
+      if (lowEnergy > 0.01) {
+        const bassIntensity = Math.min(lowEnergy * 5, 1);
         const overlayHeight = bassIntensity * bandHeight;
         
         ctx.fillStyle = `rgba(0, 255, 100, ${bassIntensity * 0.8})`;
         ctx.fillRect(playheadX - overlayWidth/2, stripY + bandHeight * 2, overlayWidth, overlayHeight);
         
-        if (bassRMS > 0.7) {
+        if (lowEnergy > 0.7) {
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
           ctx.fillRect(playheadX - 2, stripY + bandHeight * 2, 4, overlayHeight);
         }
