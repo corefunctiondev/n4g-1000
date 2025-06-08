@@ -315,27 +315,6 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           >
             SYNC
           </button>
-          <button 
-            className={`pioneer-button py-1 px-2 text-xs ${
-              deck.isLooping ? 'bg-green-500 text-white' : 'text-green-400 hover:bg-green-500'
-            }`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('Loop button clicked');
-              toggleLoop();
-            }}
-            style={{ 
-              zIndex: 11, 
-              pointerEvents: 'auto',
-              position: 'relative',
-              userSelect: 'none',
-              touchAction: 'manipulation'
-            }}
-            type="button"
-          >
-            LOOP
-          </button>
         </div>
       </div>
 
