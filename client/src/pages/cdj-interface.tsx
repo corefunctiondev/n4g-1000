@@ -64,12 +64,12 @@ export default function CDJInterface() {
             ref={containerRef}
             className="border-4 border-gray-500 rounded-lg bg-gray-900/30 backdrop-blur-sm resize overflow-hidden shadow-2xl relative"
             style={{ 
-              width: '1700px',
-              height: '360px',
+              width: '90vw',
+              height: '70vh',
               minWidth: '850px',
-              minHeight: '180px',
+              minHeight: '400px',
               maxWidth: '95vw',
-              maxHeight: '80vh',
+              maxHeight: '85vh',
               resize: 'both'
             }}
           >
