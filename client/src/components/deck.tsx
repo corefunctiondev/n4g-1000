@@ -210,10 +210,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange }: DeckProps
               isPlaying={deck.isPlaying}
             />
             
-            {/* Frequency Band Labels */}
-            <div className="absolute top-1 left-2 text-xs text-cyan-400 font-mono">HIGH</div>
-            <div className="absolute top-1/2 left-2 text-xs text-blue-400 font-mono">MID</div>
-            <div className="absolute bottom-1 left-2 text-xs text-orange-400 font-mono">LOW</div>
+
             
             {/* Hot Cue Markers */}
             <div className="absolute bottom-0 left-0 right-0 h-2 flex">

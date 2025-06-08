@@ -76,20 +76,10 @@ export function Waveform({
         const amplitude = waveformData[i];
         const x = i * barWidth;
         
-        // High frequencies (top 1/3) - cyan
-        const highHeight = (amplitude * height) / 3;
-        ctx.fillStyle = '#00ffff';
-        ctx.fillRect(x, 0, barWidth - 1, highHeight);
-        
-        // Mid frequencies (middle 1/3) - blue  
-        const midHeight = (amplitude * height) / 3;
-        ctx.fillStyle = '#0080ff';
-        ctx.fillRect(x, height / 3, barWidth - 1, midHeight);
-        
-        // Low frequencies (bottom 1/3) - orange
-        const lowHeight = (amplitude * height) / 3;
-        ctx.fillStyle = '#ff8000';
-        ctx.fillRect(x, (2 * height) / 3, barWidth - 1, lowHeight);
+        // Single waveform display using the full height
+        const waveHeight = amplitude * height;
+        ctx.fillStyle = color || '#00ffff';
+        ctx.fillRect(x, height - waveHeight, barWidth - 1, waveHeight);
       }
     }
 
