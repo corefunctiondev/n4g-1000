@@ -155,10 +155,14 @@ export function Deck({ deckId, color }: DeckProps) {
 
   return (
     <div 
-      className="pioneer-cdj p-4 w-[650px] h-[320px]"
+      className="pioneer-cdj p-4 w-[650px] h-[320px] max-w-[90vw] max-h-[60vh]"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      style={{ 
+        minWidth: '500px',
+        aspectRatio: '650/320'
+      }}
     >
       {/* Top Section - Screen and Info Display */}
       <div className="mb-3 flex-1">

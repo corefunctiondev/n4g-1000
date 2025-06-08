@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 export default function CDJInterface() {
   const [isRecording, setIsRecording] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(100);
 
   useEffect(() => {
     // Set page title
@@ -12,13 +13,13 @@ export default function CDJInterface() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-8">
+    <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-2 sm:p-4 lg:p-8 overflow-x-auto">
       {/* Pioneer DJ Setup Layout */}
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full max-w-[98vw] mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Pioneer DJ Virtual Setup</h1>
-          <div className="flex items-center justify-center space-x-6 text-sm text-gray-400">
+        <div className="text-center mb-4 lg:mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">Pioneer DJ Virtual Setup</h1>
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-400">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               <span>System Ready</span>
@@ -35,26 +36,41 @@ export default function CDJInterface() {
                 {isRecording ? '● REC' : '○ REC'}
               </button>
             </div>
-            <div className="text-gray-500 font-mono">
+            <div className="text-gray-500 font-mono text-xs">
               Latency: 5ms | CPU: 12%
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-400">Zoom:</span>
+              <input
+                type="range"
+                min="50"
+                max="150"
+                value={zoomLevel}
+                onChange={(e) => setZoomLevel(Number(e.target.value))}
+                className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+              <span className="text-xs text-gray-400 w-8">{zoomLevel}%</span>
             </div>
           </div>
         </div>
 
-        {/* Main DJ Setup - Horizontal Layout */}
-        <div className="flex items-start justify-center gap-8">
+        {/* Main DJ Setup - Responsive Layout */}
+        <div 
+          className="flex flex-col xl:flex-row items-center xl:items-start justify-center gap-2 sm:gap-4 lg:gap-8"
+          style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'center' }}
+        >
           {/* Left CDJ (Deck A) */}
-          <div className="flex-shrink-0">
+          <div className="origin-center">
             <Deck deckId="A" color="#00d4ff" />
           </div>
 
           {/* Center Mixer */}
-          <div className="flex-shrink-0 mt-16">
+          <div className="xl:mt-16 origin-center">
             <Mixer />
           </div>
 
           {/* Right CDJ (Deck B) */}
-          <div className="flex-shrink-0">
+          <div className="origin-center">
             <Deck deckId="B" color="#ff6b00" />
           </div>
         </div>

@@ -199,7 +199,13 @@ export function Mixer() {
   }, []);
 
   return (
-    <div className="pioneer-mixer p-4 w-[400px] h-[320px] flex flex-col">
+    <div 
+      className="pioneer-mixer p-4 w-[400px] h-[320px] max-w-[90vw] max-h-[60vh] flex flex-col"
+      style={{ 
+        minWidth: '300px',
+        aspectRatio: '400/320'
+      }}
+    >
       {/* Top Section - Pioneer Branding */}
       <div className="text-center mb-3">
         <div className="text-sm font-bold text-white mb-1">Pioneer DJ</div>
