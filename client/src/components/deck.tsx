@@ -246,9 +246,9 @@ export function Deck({ deckId, color }: DeckProps) {
           </div>
         </div>
 
-        {/* Essential Controls Row */}
-        <div className="flex gap-2 mb-4 justify-center">
-          <label className="pioneer-button py-2 px-3 text-xs cursor-pointer text-blue-400 hover:text-blue-300 hover:bg-blue-500">
+        {/* Consolidated Controls Row */}
+        <div className="flex gap-1 mb-2 justify-center">
+          <label className="pioneer-button py-1 px-2 text-xs cursor-pointer text-blue-400 hover:text-blue-300">
             LOAD TRACK
             <input
               type="file"
@@ -258,14 +258,14 @@ export function Deck({ deckId, color }: DeckProps) {
             />
           </label>
           <button 
-            className="pioneer-button py-2 px-3 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500"
+            className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
             onClick={handleSync}
           >
             SYNC
           </button>
           <button 
-            className={`pioneer-button py-2 px-3 text-xs ${
-              deck.isLooping ? 'bg-green-500 text-white' : 'text-green-400 hover:bg-green-500 hover:text-white'
+            className={`pioneer-button py-1 px-2 text-xs ${
+              deck.isLooping ? 'bg-green-500 text-white' : 'text-green-400 hover:bg-green-500'
             }`}
             onClick={toggleLoop}
           >
@@ -274,46 +274,46 @@ export function Deck({ deckId, color }: DeckProps) {
         </div>
       </div>
 
-      {/* Bottom Controls Section - Compact Layout */}
-      <div className="flex items-center justify-between gap-4">
-        {/* Essential Transport Controls */}
-        <div className="flex gap-3">
+      {/* Bottom Controls Section - Ultra Compact */}
+      <div className="flex items-center justify-between gap-2">
+        {/* Play/Stop Controls */}
+        <div className="flex gap-1">
           <button 
             onClick={handlePlayPause}
-            className={`pioneer-button py-3 px-4 ${deck.isPlaying ? 'active text-green-400' : 'text-green-400'}`}
+            className={`pioneer-button py-2 px-3 text-xs ${deck.isPlaying ? 'text-green-400' : 'text-green-400'}`}
           >
-            <div className="text-lg">{deck.isPlaying ? '⏸' : '▶'}</div>
+            <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
             <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
           </button>
           
           <button 
             onClick={stop}
-            className="pioneer-button py-3 px-4 text-red-400 hover:text-red-300"
+            className="pioneer-button py-2 px-3 text-xs text-red-400"
           >
-            <div className="text-lg">⏹</div>
+            <div className="text-sm">⏹</div>
             <div className="text-xs">STOP</div>
           </button>
         </div>
 
-        {/* Right Side - Tempo Control */}
-        <div className="pioneer-eq-section p-2">
+        {/* Tempo Control - Compact */}
+        <div className="pioneer-eq-section p-1">
           <div className="text-xs text-center mb-1 text-gray-300">TEMPO</div>
-          <div className="text-center mb-2">
-            <div className="text-sm font-mono pioneer-led" style={{ color }}>
+          <div className="text-center mb-1">
+            <div className="text-xs font-mono pioneer-led" style={{ color }}>
               {formatTempo(deck.tempo)}
             </div>
           </div>
           <div className="flex justify-center">
             <div 
-              className="pioneer-fader-track h-16 w-6 relative cursor-pointer"
+              className="pioneer-fader-track h-12 w-4 relative cursor-pointer"
               onMouseDown={handleTempoMouseDown}
             >
               <div 
-                className={`pioneer-fader-handle w-8 h-4 absolute -left-1 transition-colors ${
+                className={`pioneer-fader-handle w-6 h-3 absolute -left-1 transition-colors ${
                   isDraggingTempo ? 'bg-blue-400' : ''
                 }`}
                 style={{ 
-                  top: `${((tempoRange - deck.tempo) / (tempoRange * 2)) * (64 - 16)}px`,
+                  top: `${((tempoRange - deck.tempo) / (tempoRange * 2)) * (48 - 12)}px`,
                 }}
               />
             </div>
