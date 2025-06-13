@@ -21,11 +21,40 @@ export default function AdminDashboard() {
   const queryClient = useQueryClient();
   const [editingContent, setEditingContent] = useState<SiteContent | null>(null);
 
-  // Verify admin session on load
-  const { data: adminUser, isLoading: verifyingSession } = useQuery<{ user: { id: number; username: string; isAdmin: boolean } }>({
-    queryKey: ['/api/admin/verify'],
-    retry: false,
-  });
+  // Check for stored admin session
+  const [adminUser, setAdminUser] = useState<any>(null);
+  const [verifyingSession, setVerifyingSession] = useState(true);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('admin_user');
+    const storedSession = localStorage.getItem('admin_session');
+    
+    if (storedUser && storedSession) {
+      try {
+        const user = JSON.parse(storedUser);
+        const session = JSON.parse(storedSession);
+        
+        // Check if session is still valid
+        if (session.expires_at && new Date(session.expires_at * 1000) > new Date()) {
+          setAdminUser({ user });
+        } else {
+          // Session expired
+          localStorage.removeItem('admin_user');
+          localStorage.removeItem('admin_session');
+          navigate('/admin/login');
+        }
+      } catch (error) {
+        console.error('Error parsing stored session:', error);
+        localStorage.removeItem('admin_user');
+        localStorage.removeItem('admin_session');
+        navigate('/admin/login');
+      }
+    } else {
+      navigate('/admin/login');
+    }
+    
+    setVerifyingSession(false);
+  }, [navigate]);
 
   // Get site content
   const { data: siteContent = [], isLoading: loadingContent } = useQuery<SiteContent[]>({
@@ -53,17 +82,17 @@ export default function AdminDashboard() {
     },
   });
 
-  // Logout mutation
-  const logoutMutation = useMutation({
-    mutationFn: () => apiRequest('POST', '/api/admin/logout'),
-    onSuccess: () => {
-      navigate('/admin/login');
-      toast({
-        title: 'Logged out',
-        description: 'Admin session ended',
-      });
-    },
-  });
+  // Logout function for Supabase Auth
+  const handleLogout = () => {
+    localStorage.removeItem('admin_user');
+    localStorage.removeItem('admin_session');
+    setAdminUser(null);
+    navigate('/admin/login');
+    toast({
+      title: 'Logged out',
+      description: 'Admin session ended',
+    });
+  };
 
   // Create/update content mutation
   const saveContentMutation = useMutation({
@@ -162,7 +191,7 @@ export default function AdminDashboard() {
             <p className="text-gray-400">Content Management System</p>
           </div>
           <Button
-            onClick={() => logoutMutation.mutate()}
+            onClick={handleLogout}
             variant="outline"
             className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white"
           >

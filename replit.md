@@ -123,6 +123,9 @@ Changelog:
 - June 13, 2025. Completed major architectural cleanup - removed 61 obsolete packages (Drizzle ORM, PostgreSQL drivers, session management) for simplified Supabase-only design
 - June 13, 2025. Simplified schema.ts to pure TypeScript interfaces and Zod validation schemas without ORM dependencies
 - June 13, 2025. Added burger menu navigation to admin login page with back button and responsive mobile navigation
+- June 13, 2025. Migrated authentication system from custom users table to Supabase Auth for improved security and built-in password management
+- June 13, 2025. Created admin user in Supabase Auth: admin@needforgroove.com with proper metadata flags for admin privileges
+- June 13, 2025. Updated admin login and dashboard to use Supabase Auth sessions with localStorage-based session management
 
 ## User Preferences
 
