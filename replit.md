@@ -103,6 +103,7 @@ Changelog:
 - June 13, 2025. Initial setup
 - June 13, 2025. Successfully connected Supabase database with music_tracks table
 - June 13, 2025. Moved track selectors to top of CDJ interfaces for better UX
+- June 13, 2025. Fixed audio loading timing issue - tracks now load and play successfully from Supabase storage
 
 ## User Preferences
 

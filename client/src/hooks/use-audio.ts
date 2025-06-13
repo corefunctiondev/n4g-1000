@@ -141,14 +141,19 @@ export function useAudio(deckId: 'A' | 'B') {
         console.log(`Using existing audio nodes for deck ${deckId}`);
       }
 
-      setDeck(prev => ({
-        ...prev,
-        track,
-        currentTime: 0,
-        isPlaying: false,
-        isPaused: false,
-        isReady: true,
-      }));
+      // Update deck state and wait for it to complete
+      await new Promise<void>((resolve) => {
+        setDeck(prev => ({
+          ...prev,
+          track,
+          currentTime: 0,
+          isPlaying: false,
+          isPaused: false,
+          isReady: true,
+        }));
+        // Use setTimeout to ensure state update has processed
+        setTimeout(resolve, 100);
+      });
 
       console.log(`Track successfully loaded on deck ${deckId}:`, file.name, `BPM: ${bpm.toFixed(1)}`);
     } catch (error) {
@@ -165,7 +170,12 @@ export function useAudio(deckId: 'A' | 'B') {
 
     if (!deck.track?.audioBuffer) {
       console.error(`No audio buffer available for deck ${deckId}`);
-      return;
+      // Wait a moment and retry once in case of state timing
+      await new Promise(resolve => setTimeout(resolve, 200));
+      if (!deck.track?.audioBuffer) {
+        console.error(`Still no audio buffer after retry - deck ${deckId}`);
+        return;
+      }
     }
 
     if (!audioNodes.current) {
