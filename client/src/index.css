@@ -285,7 +285,7 @@
   --nfg-orange-primary: #FF6B35;    /* Orange highlights */
   --nfg-red-error: #ff0040;         /* Error states */
   --nfg-yellow-warning: #ffff00;    /* Warning states */
-  --nfg-green-success: #00ff00;     /* Success states */
+  --nfg-green-success: #3b82f6;     /* Success states */
   
   --nfg-white-text: #ffffff;        /* Primary text */
   --nfg-gray-dim: #666666;          /* Secondary text */

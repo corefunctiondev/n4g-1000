@@ -326,7 +326,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         <div className="flex gap-1">
           <button 
             onClick={handlePlayPause}
-            className={`pioneer-button py-1 px-2 text-xs ${deck.isPlaying ? 'text-green-400' : 'text-green-400'}`}
+            className={`pioneer-button py-1 px-2 text-xs ${deck.isPlaying ? 'text-blue-400' : 'text-blue-400'}`}
           >
             <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
             <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
@@ -372,7 +372,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               ±{tempoRange}%
             </button>
             <button 
-              className="pioneer-button py-1 text-xs hover:bg-green-500 hover:text-white"
+              className="pioneer-button py-1 text-xs hover:bg-blue-500 hover:text-white"
               onClick={resetTempo}
             >
               RESET
@@ -404,7 +404,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       <div className="grid grid-cols-3 gap-1">
         <button 
           className={`pioneer-button py-1 text-xs ${
-            deck.isLooping ? 'bg-green-500 text-white' : 'text-green-400 hover:bg-green-500'
+            deck.isLooping ? 'bg-blue-500 text-white' : 'text-blue-400 hover:bg-blue-500'
           }`}
           onClick={toggleLoop}
         >

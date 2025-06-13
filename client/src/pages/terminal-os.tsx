@@ -229,7 +229,7 @@ export default function TerminalOS({}: TerminalOSProps) {
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
                 <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
               </div>
             </div>
             
@@ -355,7 +355,7 @@ export default function TerminalOS({}: TerminalOSProps) {
 // Section Components
 function HomeSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ ./welcome.sh</div>
       
       <div className="space-y-2 text-sm">
@@ -392,7 +392,7 @@ function HomeSection() {
 
 function AboutSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ cat ./profiles/*</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -402,7 +402,7 @@ function AboutSection() {
             <div>Location: Brooklyn, NY</div>
             <div>Style: Deep House, Progressive</div>
             <div>Experience: 8+ years</div>
-            <div>Status: <span className="text-green-400">ACTIVE</span></div>
+            <div>Status: <span className="text-blue-400">ACTIVE</span></div>
           </div>
           <div className="mt-3 text-xs text-gray-400">
             Specializes in underground warehouse vibes and late-night deep sets.
@@ -415,7 +415,7 @@ function AboutSection() {
             <div>Location: Manhattan, NY</div>
             <div>Style: Techno, Minimal</div>
             <div>Experience: 6+ years</div>
-            <div>Status: <span className="text-green-400">ACTIVE</span></div>
+            <div>Status: <span className="text-blue-400">ACTIVE</span></div>
           </div>
           <div className="mt-3 text-xs text-gray-400">
             Known for precise mixing and driving techno beats that keep crowds moving.
@@ -428,7 +428,7 @@ function AboutSection() {
 
 function SetsSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ ls -la ./sets/</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -453,7 +453,7 @@ function SetsSection() {
 
 function PodcastsSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ ./podcast_manager.sh --list</div>
       
       <div className="space-y-4">
@@ -479,7 +479,7 @@ function PodcastsSection() {
 
 function BookingsSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ calendar --upcoming</div>
       
       <div className="space-y-4">
@@ -495,7 +495,7 @@ function BookingsSection() {
                 <div className="text-sm text-gray-400">{booking.date} at {booking.time}</div>
               </div>
               <div className={`text-sm px-2 py-1 rounded ${
-                booking.status === 'CONFIRMED' ? 'bg-green-400 text-black' : 'bg-orange-400 text-black'
+                booking.status === 'CONFIRMED' ? 'bg-blue-400 text-black' : 'bg-orange-400 text-black'
               }`}>
                 {booking.status}
               </div>
@@ -509,7 +509,7 @@ function BookingsSection() {
 
 function ReleasesSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ find ./releases/ -type f</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -533,7 +533,7 @@ function ReleasesSection() {
 
 function MixesSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ ./mix_archive.sh --browse</div>
       
       <div className="space-y-4">
@@ -559,7 +559,7 @@ function MixesSection() {
 
 function ContactSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ cat ./contact.info</div>
       
       <div className="space-y-6">
@@ -594,7 +594,7 @@ function ContactSection() {
 
 function AdminSection() {
   return (
-    <div className="space-y-6 text-green-400">
+    <div className="space-y-6 text-blue-400">
       <div className="text-xl font-bold text-cyan-400">$ sudo ./admin_panel.sh</div>
       
       <div className="border border-red-400 p-4 rounded">
@@ -606,7 +606,7 @@ function AdminSection() {
             <label className="block text-xs text-gray-400 mb-1">Username:</label>
             <input 
               type="text" 
-              className="w-full bg-black border border-gray-600 p-2 text-green-400 font-mono"
+              className="w-full bg-black border border-gray-600 p-2 text-blue-400 font-mono"
               placeholder="n4gadmin"
             />
           </div>
@@ -614,7 +614,7 @@ function AdminSection() {
             <label className="block text-xs text-gray-400 mb-1">Password:</label>
             <input 
               type="password" 
-              className="w-full bg-black border border-gray-600 p-2 text-green-400 font-mono"
+              className="w-full bg-black border border-gray-600 p-2 text-blue-400 font-mono"
               placeholder="••••••••"
             />
           </div>
