@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { Save, Plus, Trash2, Eye, Edit3, Home, User, Music, Headphones, Calendar
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { SiteContent } from '@/../../shared/schema';
+import { useLocation } from 'wouter';
 
 interface ContentManagerProps {
   onLogout?: () => void;
@@ -53,7 +54,28 @@ function AdminContentManager({ onLogout }: ContentManagerProps) {
   const [selectedPage, setSelectedPage] = useState('home');
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
+
+  // Check authentication on mount
+  useEffect(() => {
+    const adminSession = localStorage.getItem('admin_session');
+    if (!adminSession) {
+      setLocation('/admin/login');
+      return;
+    }
+
+    try {
+      const session = JSON.parse(adminSession);
+      if (!session.access_token) {
+        setLocation('/admin/login');
+        return;
+      }
+    } catch (error) {
+      localStorage.removeItem('admin_session');
+      setLocation('/admin/login');
+    }
+  }, [setLocation]);
 
   // Fetch content for selected page
   const { data: pageContent = [], isLoading } = useQuery({
