@@ -14,11 +14,18 @@ export const users = pgTable("users", {
 export const siteContent = pgTable("site_content", {
   id: serial("id").primaryKey(),
   key: text("key").notNull().unique(),
+  section: text("section").notNull(), // 'header', 'hero', 'about', 'services', 'footer', etc.
   title: text("title"),
+  subtitle: text("subtitle"),
   content: text("content"),
   imageUrl: text("image_url"),
   videoUrl: text("video_url"),
   linkUrl: text("link_url"),
+  buttonText: text("button_text"),
+  backgroundColor: text("background_color"),
+  textColor: text("text_color"),
+  fontSize: text("font_size"),
+  position: integer("position").default(0), // for ordering content
   isActive: boolean("is_active").default(true).notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
