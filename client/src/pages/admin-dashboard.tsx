@@ -397,7 +397,7 @@ export default function AdminDashboard() {
                   <div>
                     <h3 className="text-white font-medium mb-2">Admin User</h3>
                     <p className="text-gray-400">
-                      Logged in as: <span className="text-cyan-400">{adminUser.user?.username}</span>
+                      Logged in as: <span className="text-cyan-400">{adminUser?.user?.username}</span>
                     </p>
                   </div>
                   <Separator className="bg-gray-600" />
