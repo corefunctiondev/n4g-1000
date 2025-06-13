@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X, Folder, FolderOpen, File } from 'lucide-react';
 import { DynamicContent, DynamicText, DynamicLink } from '@/components/dynamic-content';
+import { VisualEditor } from '@/components/visual-editor';
 import { useContentBySection } from '@/hooks/use-content';
 
 interface TerminalOSProps {}
@@ -16,6 +17,7 @@ export default function TerminalOS({}: TerminalOSProps) {
   const [bootSequence, setBootSequence] = useState(true);
   const [bootText, setBootText] = useState('');
   const [glitchActive, setGlitchActive] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Initialize current section from URL
   useEffect(() => {
@@ -653,6 +655,12 @@ function AdminSection() {
           ACCESS ADMIN PANEL
         </button>
       </div>
+
+      {/* Visual Editor */}
+      <VisualEditor 
+        isEditMode={isEditMode} 
+        onToggleEditMode={() => setIsEditMode(!isEditMode)} 
+      />
     </div>
   );
 }

@@ -30,6 +30,9 @@ export function DynamicContent({
       <Component 
         className={className} 
         style={styles}
+        data-editable="true"
+        data-editable-type="text"
+        data-content-key={contentKey}
       >
         {keyContent.content || keyContent.title || fallbackText}
       </Component>
@@ -42,11 +45,41 @@ export function DynamicContent({
       <Component className={className}>
         {sectionContent.map((content) => (
           <div key={content.id} style={getContentStyles(content)}>
-            {content.title && <h3>{content.title}</h3>}
-            {content.subtitle && <h4>{content.subtitle}</h4>}
-            {content.content && <p>{content.content}</p>}
+            {content.title && (
+              <h3 
+                data-editable="true" 
+                data-editable-type="text" 
+                data-content-key={content.key}
+              >
+                {content.title}
+              </h3>
+            )}
+            {content.subtitle && (
+              <h4 
+                data-editable="true" 
+                data-editable-type="text" 
+                data-content-key={content.key}
+              >
+                {content.subtitle}
+              </h4>
+            )}
+            {content.content && (
+              <p 
+                data-editable="true" 
+                data-editable-type="text" 
+                data-content-key={content.key}
+              >
+                {content.content}
+              </p>
+            )}
             {content.linkUrl && content.buttonText && (
-              <a href={content.linkUrl} className="inline-block mt-2 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700">
+              <a 
+                href={content.linkUrl} 
+                className="inline-block mt-2 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700"
+                data-editable="true" 
+                data-editable-type="link" 
+                data-content-key={content.key}
+              >
                 {content.buttonText}
               </a>
             )}
@@ -77,7 +110,13 @@ export function DynamicText({ contentKey, fallback = '', className = '', as: Com
   const text = content?.title || content?.content || fallback;
 
   return (
-    <Component className={className} style={styles}>
+    <Component 
+      className={className} 
+      style={styles}
+      data-editable="true"
+      data-editable-type="text"
+      data-content-key={contentKey}
+    >
       {text}
     </Component>
   );
@@ -102,7 +141,14 @@ export function DynamicLink({ contentKey, fallbackHref = '#', fallbackText = 'Li
   const text = content?.title || content?.buttonText || fallbackText;
 
   return (
-    <a href={href} className={className} style={styles}>
+    <a 
+      href={href} 
+      className={className} 
+      style={styles}
+      data-editable="true"
+      data-editable-type="link"
+      data-content-key={contentKey}
+    >
       {text}
     </a>
   );
@@ -127,5 +173,14 @@ export function DynamicImage({ contentKey, fallbackSrc = '', alt = '', className
 
   if (!src) return null;
 
-  return <img src={src} alt={imageAlt} className={className} />;
+  return (
+    <img 
+      src={src} 
+      alt={imageAlt} 
+      className={className}
+      data-editable="true"
+      data-editable-type="image"
+      data-content-key={contentKey}
+    />
+  );
 }
