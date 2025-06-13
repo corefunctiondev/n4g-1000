@@ -223,17 +223,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get content by section
-  app.get("/api/content", async (req, res) => {
+  app.get("/api/content/section", async (req, res) => {
     try {
+      const section = req.query.section as string;
       const { data: content, error } = await supabase
         .from('site_content')
         .select('*')
+        .eq('section', section)
         .eq('is_active', true);
       
       if (error) throw error;
       res.json(content);
     } catch (error) {
-      console.error('Error fetching content:', error);
+      console.error('Error fetching content by section:', error);
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  // Get all content
+  app.get("/api/content", async (req, res) => {
+    try {
+      const { data: content, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .eq('is_active', true)
+        .order('position');
+      
+      if (error) throw error;
+      res.json(content);
+    } catch (error) {
+      console.error('Error fetching all content:', error);
       res.status(500).json({ error: "Failed to fetch content" });
     }
   });
