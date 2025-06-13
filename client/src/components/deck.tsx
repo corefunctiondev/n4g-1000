@@ -199,6 +199,32 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       className="pioneer-cdj p-2 flex-1 h-full flex flex-col"
       style={{ position: 'relative', zIndex: 1 }}
     >
+      {/* Track Selection Dropdown - Top of CDJ */}
+      <div className="mb-3" style={{ zIndex: 10, position: 'relative' }}>
+        <div className="text-xs text-blue-300 mb-2 text-center">TRACK SELECTION</div>
+        <Select value={selectedTrackId} onValueChange={handleTrackSelect}>
+          <SelectTrigger className="w-full pioneer-button text-xs bg-gray-800 border-gray-600 text-gray-300">
+            <SelectValue placeholder={tracksLoading ? "Loading tracks..." : "Select a track"} />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-gray-600">
+            {tracks.map((track) => (
+              <SelectItem 
+                key={track.id} 
+                value={track.id.toString()}
+                className="text-gray-300 hover:bg-gray-700"
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">{track.name}</span>
+                  <span className="text-xs text-gray-400">
+                    {track.artist} • {track.bpm} BPM
+                  </span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Top Section - Screen and Info Display */}
       <div className="mb-2 flex-1">
         {/* Main LCD Screen */}
@@ -281,31 +307,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           </div>
         </div>
 
-        {/* Track Selection Dropdown */}
-        <div className="mb-3" style={{ zIndex: 10, position: 'relative' }}>
-          <div className="text-xs text-blue-300 mb-2 text-center">TRACK SELECTION</div>
-          <Select value={selectedTrackId} onValueChange={handleTrackSelect}>
-            <SelectTrigger className="w-full pioneer-button text-xs bg-gray-800 border-gray-600 text-gray-300">
-              <SelectValue placeholder={tracksLoading ? "Loading tracks..." : "Select a track"} />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600">
-              {tracks.map((track) => (
-                <SelectItem 
-                  key={track.id} 
-                  value={track.id.toString()}
-                  className="text-gray-300 hover:bg-gray-700"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium">{track.name}</span>
-                    <span className="text-xs text-gray-400">
-                      {track.artist} • {track.bpm} BPM
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+
 
         {/* Controls Row */}
         <div className="flex gap-1 mb-2 justify-center" style={{ zIndex: 10, position: 'relative' }}>
