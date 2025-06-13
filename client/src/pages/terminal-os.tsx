@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X } from 'lucide-react';
+import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X, Folder, FolderOpen, File } from 'lucide-react';
 
 interface TerminalOSProps {}
 
@@ -55,15 +55,15 @@ export default function TerminalOS({}: TerminalOSProps) {
   }, [navigate, playSound]);
 
   const fileTreeItems = [
-    { id: 'home', label: 'HOME/', icon: Terminal, description: 'System boot and overview' },
-    { id: 'about', label: 'ABOUT/', icon: User, description: 'DJ member profiles' },
-    { id: 'sets', label: 'SETS/', icon: Music, description: 'Live DJ performances' },
-    { id: 'podcasts', label: 'PODCASTS/', icon: Radio, description: 'Audio episodes' },
-    { id: 'bookings', label: 'BOOKINGS/', icon: Calendar, description: 'Event schedule' },
-    { id: 'releases', label: 'RELEASES/', icon: Disc, description: 'Music catalog' },
-    { id: 'mixes', label: 'MIXES/', icon: Headphones, description: 'Mix collections' },
-    { id: 'contact', label: 'CONTACT/', icon: Mail, description: 'Get in touch' },
-    { id: 'n4g-1000', label: 'N4G-1000/', icon: Monitor, description: 'DJ Equipment Interface' },
+    { id: 'home', label: 'HOME/', type: 'folder', description: 'System boot and overview', isLast: false },
+    { id: 'about', label: 'ABOUT/', type: 'folder', description: 'DJ member profiles', isLast: false },
+    { id: 'sets', label: 'SETS/', type: 'folder', description: 'Live DJ performances', isLast: false },
+    { id: 'podcasts', label: 'PODCASTS/', type: 'folder', description: 'Audio episodes', isLast: false },
+    { id: 'bookings', label: 'BOOKINGS/', type: 'folder', description: 'Event schedule', isLast: false },
+    { id: 'releases', label: 'RELEASES/', type: 'folder', description: 'Music catalog', isLast: false },
+    { id: 'mixes', label: 'MIXES/', type: 'folder', description: 'Mix collections', isLast: false },
+    { id: 'contact', label: 'CONTACT/', type: 'folder', description: 'Get in touch', isLast: false },
+    { id: 'n4g-1000', label: 'N4G-1000.exe', type: 'file', description: 'DJ Equipment Interface', isLast: true },
   ];
 
   if (bootSequence) {
@@ -148,8 +148,9 @@ export default function TerminalOS({}: TerminalOSProps) {
           
           <div className="p-2">
             {fileTreeItems.map((item) => {
-              const Icon = item.icon;
+              const isFolder = item.type === 'folder';
               const isActive = currentSection === item.id;
+              const Icon = isActive && isFolder ? FolderOpen : isFolder ? Folder : File;
               
               return (
                 <button
@@ -205,49 +206,68 @@ export default function TerminalOS({}: TerminalOSProps) {
         </div>
       </div>
 
-      {/* Burger Menu - Quick Navigation */}
+      {/* Burger Menu - File Tree Navigation */}
       {isBurgerMenuOpen && (
-        <div className="absolute top-16 right-16 bg-gray-900 border border-cyan-400 rounded-lg p-4 z-50 w-64 shadow-2xl">
+        <div className="absolute top-16 right-16 bg-gray-900 border border-cyan-400 rounded-lg p-4 z-50 w-72 shadow-2xl font-mono">
           <div className="text-cyan-400 font-bold text-sm mb-3 border-b border-gray-700 pb-2">
-            QUICK NAVIGATION
+            FILE TREE
           </div>
-          <div className="space-y-2">
-            {fileTreeItems.map((item) => {
-              const Icon = item.icon;
+          <div className="space-y-1">
+            {fileTreeItems.map((item, index) => {
               const isActive = currentSection === item.id;
+              const isFolder = item.type === 'folder';
+              const Icon = isActive && isFolder ? FolderOpen : isFolder ? Folder : File;
               
               return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavigation(item.id)}
-                  className={`w-full text-left p-2 rounded transition-all duration-200 group ${
-                    isActive 
-                      ? 'bg-cyan-400 text-black' 
-                      : 'hover:bg-gray-800 text-gray-300 hover:text-cyan-400'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <Icon className="w-4 h-4" />
-                    <div className="flex-1">
-                      <div className="text-sm font-medium">{item.label}</div>
-                      <div className={`text-xs ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-400'}`}>
-                        {item.description}
+                <div key={item.id} className="relative">
+                  {/* Tree lines */}
+                  <div className="absolute left-0 top-0 h-full flex flex-col text-gray-600">
+                    <div className="flex items-center h-6">
+                      <span className="text-xs">
+                        {item.isLast ? '└─' : '├─'}
+                      </span>
+                    </div>
+                    {!item.isLast && (
+                      <div className="w-px bg-gray-600 ml-[5px] flex-1"></div>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => handleNavigation(item.id)}
+                    className={`w-full text-left pl-6 pr-2 py-1 rounded transition-all duration-200 group ${
+                      isActive 
+                        ? 'bg-cyan-400 text-black' 
+                        : 'hover:bg-gray-800 text-gray-300 hover:text-cyan-400'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{item.label}</div>
+                        <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                          {item.description}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                </div>
               );
             })}
           </div>
           
           <div className="border-t border-gray-700 mt-3 pt-3">
-            <button
-              onClick={() => handleNavigation('admin')}
-              className="w-full text-left p-2 rounded text-sm text-gray-300 hover:text-orange-400 hover:bg-gray-800 flex items-center space-x-2 transition-all duration-200"
-            >
-              <LogOut className="w-3 h-3" />
-              <span>Admin Panel</span>
-            </button>
+            <div className="relative">
+              <div className="absolute left-0 top-0 h-6 flex items-center text-gray-600">
+                <span className="text-xs">└─</span>
+              </div>
+              <button
+                onClick={() => handleNavigation('admin')}
+                className="w-full text-left pl-6 pr-2 py-1 rounded text-sm text-gray-300 hover:text-orange-400 hover:bg-gray-800 flex items-center space-x-2 transition-all duration-200"
+              >
+                <Settings className="w-4 h-4" />
+                <span>admin.exe</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -4,7 +4,7 @@ import { Deck } from '@/components/deck';
 import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
 import { audioEngine } from '@/lib/audio-engine';
-import { Menu, X, Terminal, User, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, Monitor, LogOut } from 'lucide-react';
+import { Menu, X, Folder, FolderOpen, File, Settings, LogOut } from 'lucide-react';
 
 export default function CDJInterface() {
   const [location, navigate] = useLocation();
