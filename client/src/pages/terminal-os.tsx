@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut } from 'lucide-react';
+import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X } from 'lucide-react';
 
 interface TerminalOSProps {}
 
@@ -8,6 +8,7 @@ export default function TerminalOS({}: TerminalOSProps) {
   const [location, navigate] = useLocation();
   const [currentSection, setCurrentSection] = useState('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
   const [scanlines, setScanlines] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [bootSequence, setBootSequence] = useState(true);
@@ -49,6 +50,7 @@ export default function TerminalOS({}: TerminalOSProps) {
     setCurrentSection(section);
     navigate(`/${section === 'home' ? '' : section}`);
     setIsMenuOpen(false);
+    setIsBurgerMenuOpen(false);
     playSound('click');
   }, [navigate, playSound]);
 
@@ -119,6 +121,13 @@ export default function TerminalOS({}: TerminalOSProps) {
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span>ONLINE</span>
           </div>
+          
+          <button
+            onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
+            className="p-2 hover:bg-gray-800 border border-cyan-400 rounded transition-all duration-200"
+          >
+            {isBurgerMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
           
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -195,6 +204,53 @@ export default function TerminalOS({}: TerminalOSProps) {
           </div>
         </div>
       </div>
+
+      {/* Burger Menu - Quick Navigation */}
+      {isBurgerMenuOpen && (
+        <div className="absolute top-16 right-16 bg-gray-900 border border-cyan-400 rounded-lg p-4 z-50 w-64 shadow-2xl">
+          <div className="text-cyan-400 font-bold text-sm mb-3 border-b border-gray-700 pb-2">
+            QUICK NAVIGATION
+          </div>
+          <div className="space-y-2">
+            {fileTreeItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentSection === item.id;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavigation(item.id)}
+                  className={`w-full text-left p-2 rounded transition-all duration-200 group ${
+                    isActive 
+                      ? 'bg-cyan-400 text-black' 
+                      : 'hover:bg-gray-800 text-gray-300 hover:text-cyan-400'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <Icon className="w-4 h-4" />
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">{item.label}</div>
+                      <div className={`text-xs ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          
+          <div className="border-t border-gray-700 mt-3 pt-3">
+            <button
+              onClick={() => handleNavigation('admin')}
+              className="w-full text-left p-2 rounded text-sm text-gray-300 hover:text-orange-400 hover:bg-gray-800 flex items-center space-x-2 transition-all duration-200"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>Admin Panel</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Settings Menu */}
       {isMenuOpen && (
