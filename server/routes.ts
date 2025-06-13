@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { supabase } from "./supabase";
 import { insertTrackSchema, insertPlaylistSchema, insertDjSessionSchema, adminLoginSchema, insertSiteContentSchema } from "@shared/schema";
 import { 
   requireAdmin, 
@@ -12,9 +11,7 @@ import {
   type AuthenticatedRequest 
 } from "./admin-auth";
 import cookieParser from 'cookie-parser';
-import { db } from "./db";
-import { users, siteContent } from "@shared/schema";
-import { eq, and } from "drizzle-orm";
+import { supabase } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Add cookie parser middleware for admin sessions
@@ -89,14 +86,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const loginData = adminLoginSchema.parse(req.body);
       
-      // Find admin user in database
-      const [adminUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, loginData.username))
-        .limit(1);
+      // Find admin user in Supabase
+      const { data: adminUser, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('username', loginData.username)
+        .single();
 
-      if (!adminUser || !adminUser.isAdmin) {
+      if (userError || !adminUser || !adminUser.is_admin) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
@@ -149,7 +146,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all site content
   app.get("/api/admin/content", requireAdmin, async (req, res) => {
     try {
-      const content = await db.select().from(siteContent).where(eq(siteContent.isActive, true));
+      const { data: content, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
       res.json(content);
     } catch (error) {
       console.error('Error fetching site content:', error);
@@ -161,7 +163,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/content", requireAdmin, async (req, res) => {
     try {
       const contentData = insertSiteContentSchema.parse(req.body);
-      const [newContent] = await db.insert(siteContent).values(contentData).returning();
+      const { data: newContent, error } = await supabase
+        .from('site_content')
+        .insert(contentData)
+        .select()
+        .single();
+        
+      if (error) throw error;
       res.json(newContent);
     } catch (error) {
       console.error('Error creating site content:', error);

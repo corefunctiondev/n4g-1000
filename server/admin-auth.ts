@@ -77,10 +77,12 @@ export async function verifyAdminSession(sessionToken: string): Promise<{ id: nu
     return null;
   }
 
+  const user = Array.isArray(session.users) ? session.users[0] : session.users;
+  
   return {
     id: session.user_id,
-    username: session.users.username,
-    isAdmin: session.users.is_admin,
+    username: user.username,
+    isAdmin: user.is_admin,
   };
 }
 

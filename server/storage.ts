@@ -1,6 +1,5 @@
-import { users, tracks, playlists, playlistTracks, djSessions, type User, type InsertUser, type Track, type InsertTrack, type Playlist, type InsertPlaylist, type PlaylistTrack, type InsertPlaylistTrack, type DjSession, type InsertDjSession } from "@shared/schema";
-import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { type User, type InsertUser, type Track, type InsertTrack, type Playlist, type InsertPlaylist, type PlaylistTrack, type InsertPlaylistTrack, type DjSession, type InsertDjSession } from "@shared/schema";
+import { supabase } from "./db";
 
 export interface IStorage {
   // User operations
