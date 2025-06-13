@@ -12,9 +12,26 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const headers: HeadersInit = data ? { "Content-Type": "application/json" } : {};
+  
+  // Add authorization header for admin API requests
+  if (url.includes('/api/admin/')) {
+    const storedSession = localStorage.getItem('admin_session');
+    if (storedSession) {
+      try {
+        const session = JSON.parse(storedSession);
+        if (session.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      } catch (error) {
+        console.error('Error parsing session for API request:', error);
+      }
+    }
+  }
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -29,8 +46,26 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    // Get the stored session for admin API requests
+    const storedSession = localStorage.getItem('admin_session');
+    const headers: HeadersInit = {
+      credentials: "include",
+    };
+    
+    if (storedSession && queryKey[0]?.toString().includes('/api/admin/')) {
+      try {
+        const session = JSON.parse(storedSession);
+        if (session.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      } catch (error) {
+        console.error('Error parsing session for API request:', error);
+      }
+    }
+
     const res = await fetch(queryKey[0] as string, {
       credentials: "include",
+      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
