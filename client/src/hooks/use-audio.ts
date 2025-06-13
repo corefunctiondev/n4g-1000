@@ -426,30 +426,36 @@ export function useAudio(deckId: 'A' | 'B') {
   }, [deck.track, deck.currentTime, seek]);
 
   const sync = useCallback((targetDeck?: any) => {
+    console.log(`Sync button clicked on deck ${deckId}`);
+    
     if (!deck.track) {
       console.log(`No track loaded on deck ${deckId} for sync`);
       return;
     }
     
     if (!targetDeck || !targetDeck.track) {
-      console.log(`Target deck has no track loaded for sync`);
+      console.log(`No target deck or track available for sync`);
       return;
     }
     
-    // Use original BPM for accurate sync calculations
+    // Get the original BPMs
     const currentOriginalBPM = deck.track.originalBpm || deck.track.bpm;
-    const targetCurrentBPM = targetDeck.track.bpm; // Target's current BPM (includes tempo)
+    const targetOriginalBPM = targetDeck.track.originalBpm || targetDeck.track.bpm;
+    
+    // Calculate the current effective BPM of target deck (includes tempo changes)
+    const targetCurrentBPM = targetOriginalBPM * (1 + (targetDeck.tempo / 100));
     
     // Calculate tempo adjustment needed to match target's current BPM
     const tempoAdjustment = ((targetCurrentBPM / currentOriginalBPM) - 1) * 100;
     
-    // Clamp tempo adjustment to reasonable range
+    // Clamp tempo adjustment to reasonable range (-50% to +50%)
     const clampedTempo = Math.max(-50, Math.min(50, tempoAdjustment));
     
     // Apply the tempo adjustment
     setTempo(clampedTempo);
     
-    console.log(`Deck ${deckId} synced: ${Math.round(currentOriginalBPM)} -> ${Math.round(targetCurrentBPM)} BPM (${clampedTempo.toFixed(1)}% tempo)`);
+    console.log(`Deck ${deckId} synced: ${currentOriginalBPM.toFixed(1)} BPM -> ${targetCurrentBPM.toFixed(1)} BPM (${clampedTempo.toFixed(1)}% tempo)`);
+    console.log(`Target deck tempo: ${targetDeck.tempo.toFixed(1)}%, This deck new tempo: ${clampedTempo.toFixed(1)}%`);
   }, [deckId, deck.track, setTempo]);
 
   return {

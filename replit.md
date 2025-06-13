@@ -108,6 +108,7 @@ Changelog:
 - June 13, 2025. Fixed track switching race condition - completely reset audio timing when loading new tracks to prevent old track resumption
 - June 13, 2025. Changed track switching behavior - new tracks load but don't auto-play, user must manually press PLAY button
 - June 13, 2025. Removed .wav extension from track display names and replaced zoom controls with helpful DJ instructions above CDJs
+- June 13, 2025. Implemented proper beatmatching for sync button - automatically adjusts tempo to match BPM between decks
 
 ## User Preferences
 

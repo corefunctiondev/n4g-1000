@@ -126,31 +126,26 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     e.stopPropagation();
     console.log(`Sync button clicked on deck ${deckId}`);
     
-    if (!playbackOrder || playbackOrder.length === 0) {
-      console.log(`No decks are currently playing - sync requires a playing deck as reference`);
+    // Check if this deck has a track loaded
+    if (!deck.track) {
+      console.log(`Deck ${deckId} has no track loaded for sync`);
       return;
     }
     
-    // Find the first deck that started playing (master deck)
-    const masterDeckId = playbackOrder[0];
-    
-    if (masterDeckId === deckId) {
-      console.log(`Deck ${deckId} is the master deck - cannot sync to itself`);
+    // Check if other deck has a track loaded
+    if (!otherDeckState || !otherDeckState.track) {
+      console.log(`Other deck has no track loaded for sync`);
       return;
     }
     
-    // Get the master deck's state
-    const masterDeckState = masterDeckId === 'A' ? 
-      (deckId === 'B' ? otherDeckState : null) : 
-      (deckId === 'A' ? otherDeckState : null);
+    // Perform beatmatching - sync this deck to the other deck's BPM
+    sync(otherDeckState);
     
-    if (masterDeckState && masterDeckState.track) {
-      sync(masterDeckState);
-      console.log(`Deck ${deckId} syncing to master deck ${masterDeckId} (${masterDeckState.track.bpm} BPM)`);
-    } else {
-      console.log(`Cannot sync - master deck ${masterDeckId} state not available`);
-    }
-  }, [sync, otherDeckState, deckId, playbackOrder]);
+    const currentBPM = deck.track.bpm * (1 + (deck.tempo / 100));
+    const targetBPM = otherDeckState.track.bpm * (1 + (otherDeckState.tempo / 100));
+    
+    console.log(`Beatmatching: Deck ${deckId} (${currentBPM.toFixed(1)} BPM) syncing to other deck (${targetBPM.toFixed(1)} BPM)`);
+  }, [sync, otherDeckState, deckId, deck.track, deck.tempo]);
 
   // Tempo fader interaction
   const handleTempoMouseDown = useCallback((event: React.MouseEvent) => {
