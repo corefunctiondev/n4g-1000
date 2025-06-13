@@ -65,19 +65,28 @@ export default function SimpleAdmin() {
         console.error('Update failed:', errorData);
         throw new Error(errorData || 'Failed to update content');
       }
-      return response.json();
+      
+      const result = await response.json();
+      console.log('Update successful:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Mutation success, invalidating cache');
       queryClient.invalidateQueries({ queryKey: ['/api/admin/content'] });
+      
+      // Clear editing state immediately
+      setEditingItems({});
+      
       toast({
         title: "Success",
         description: "Content updated successfully",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Mutation error:', error);
       toast({
         title: "Error",
-        description: "Failed to update content",
+        description: error.message || "Failed to update content",
         variant: "destructive",
       });
     },
