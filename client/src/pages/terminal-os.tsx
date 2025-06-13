@@ -367,21 +367,11 @@ function HomeSection() {
   };
 
   const getHeroContent = () => {
-    const heroMain = heroContent.find((c: any) => c.key === 'hero_main');
-    if (heroMain) {
-      return {
-        title: heroMain.title || 'Welcome to N4G Terminal OS',
-        subtitle: heroMain.subtitle || 'Digital DJ Experience', 
-        content: heroMain.content || 'Experience DJ Stimulator in your browser with our authentic N4G-1000 featuring our complete music collection.',
-        buttonText: heroMain.button_text || 'Launch N4G-1000',
-        linkUrl: heroMain.link_url || '/n4g-1000'
-      };
-    }
     return {
-      title: 'Welcome to N4G Terminal OS',
-      subtitle: 'Digital DJ Experience',
-      content: 'Experience DJ Stimulator in your browser with our authentic N4G-1000 featuring our complete music collection.',
-      buttonText: 'Launch N4G-1000', 
+      title: getContent('hero_title', 'Welcome to N4G Terminal OS'),
+      subtitle: getContent('hero_subtitle', 'Digital DJ Experience'), 
+      content: getContent('hero_description', 'Experience DJ Stimulator in your browser with our authentic N4G-1000 featuring our complete music collection.'),
+      buttonText: getContent('cta_button', 'Launch N4G-1000'),
       linkUrl: '/n4g-1000'
     };
   };
