@@ -1,114 +1,140 @@
 import { Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
 import { createClient } from '@supabase/supabase-js';
 
-// Extract Supabase credentials
-const rawSupabaseUrl = process.env.SUPABASE_URL;
-const supabaseUrl = rawSupabaseUrl?.includes('=') ? rawSupabaseUrl.split('=')[1] : rawSupabaseUrl;
-
-const rawSupabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabaseAnonKey = rawSupabaseKey?.includes('=') ? rawSupabaseKey.split('=')[1] : rawSupabaseKey;
+// Use environment variables directly
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create client with service role key for admin operations
+const supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
 
 export interface AuthenticatedRequest extends Request {
   user?: {
-    id: number;
-    username: string;
+    id: string;
+    email: string;
     isAdmin: boolean;
   };
 }
 
-// Generate secure session token
-export function generateSessionToken(): string {
-  return uuidv4();
-}
-
-// Hash password with bcrypt
-export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 12;
-  return bcrypt.hash(password, saltRounds);
-}
-
-// Verify password with bcrypt
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
-}
-
-// Create admin session
-export async function createAdminSession(userId: number): Promise<string> {
-  const sessionToken = generateSessionToken();
-  const expiresAt = new Date();
-  expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour session
-
-  const { error } = await supabase
-    .from('admin_sessions')
-    .insert({
-      user_id: userId,
-      session_token: sessionToken,
-      expires_at: expiresAt.toISOString()
+// Authenticate admin user using Supabase Auth
+export async function authenticateAdmin(email: string, password: string): Promise<{ user: any; session: any } | null> {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-  if (error) {
-    throw new Error(`Failed to create admin session: ${error.message}`);
-  }
+    if (error || !data.user) {
+      console.error('Auth error:', error?.message);
+      return null;
+    }
 
-  return sessionToken;
-}
+    // Check if user has admin role in user metadata
+    const isAdmin = data.user.user_metadata?.is_admin === true;
+    
+    if (!isAdmin) {
+      await supabase.auth.signOut();
+      return null;
+    }
 
-// Verify admin session
-export async function verifyAdminSession(sessionToken: string): Promise<{ id: number; username: string; isAdmin: boolean } | null> {
-  const { data: session, error } = await supabase
-    .from('admin_sessions')
-    .select(`
-      user_id,
-      users!inner(id, username, is_admin)
-    `)
-    .eq('session_token', sessionToken)
-    .gt('expires_at', new Date().toISOString())
-    .single();
-
-  if (error || !session) {
+    return data;
+  } catch (error) {
+    console.error('Authentication error:', error);
     return null;
   }
-
-  const user = Array.isArray(session.users) ? session.users[0] : session.users;
-  
-  return {
-    id: session.user_id,
-    username: user.username,
-    isAdmin: user.is_admin,
-  };
 }
 
-// Middleware to check admin authentication
+// Verify admin session using Supabase Auth
+export async function verifyAdminSession(accessToken: string): Promise<{ id: string; email: string; isAdmin: boolean } | null> {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+
+    if (error || !user) {
+      return null;
+    }
+
+    // Check if user has admin role
+    const isAdmin = user.user_metadata?.is_admin === true;
+    
+    if (!isAdmin) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.email || '',
+      isAdmin,
+    };
+  } catch (error) {
+    console.error('Session verification error:', error);
+    return null;
+  }
+}
+
+// Middleware to require admin authentication
 export async function requireAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  const sessionToken = req.cookies?.adminSession || req.headers.authorization?.replace('Bearer ', '');
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
 
-  if (!sessionToken) {
-    return res.status(401).json({ error: 'No session token provided' });
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const user = await verifyAdminSession(token);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    res.status(500).json({ error: 'Authentication error' });
   }
-
-  const user = await verifyAdminSession(sessionToken);
-
-  if (!user || !user.isAdmin) {
-    return res.status(403).json({ error: 'Access denied - admin privileges required' });
-  }
-
-  req.user = user;
-  next();
 }
 
-// Clean up expired sessions
-export async function cleanupExpiredSessions() {
-  const now = new Date();
-  await supabase
-    .from('admin_sessions')
-    .delete()
-    .lt('expires_at', now.toISOString());
+// Create admin user in Supabase Auth
+export async function createAdminUser(email: string, password: string): Promise<any> {
+  try {
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      user_metadata: {
+        is_admin: true
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error creating admin user:', error);
+    throw error;
+  }
+}
+
+// Update user admin status
+export async function updateUserAdminStatus(userId: string, isAdmin: boolean): Promise<void> {
+  try {
+    const { error } = await supabase.auth.admin.updateUserById(userId, {
+      user_metadata: {
+        is_admin: isAdmin
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error updating user admin status:', error);
+    throw error;
+  }
 }

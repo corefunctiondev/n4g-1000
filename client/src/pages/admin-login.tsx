@@ -20,7 +20,7 @@ export default function AdminLogin() {
   const form = useForm<AdminLogin>({
     resolver: zodResolver(adminLoginSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   });
@@ -113,16 +113,16 @@ export default function AdminLogin() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">Username</FormLabel>
+                      <FormLabel className="text-gray-300">Email</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          type="text"
+                          type="email"
                           className="bg-gray-800 border-gray-600 text-white focus:border-cyan-400"
-                          placeholder="Enter admin username"
+                          placeholder="Enter admin email"
                         />
                       </FormControl>
                       <FormMessage />

@@ -139,7 +139,7 @@ export const insertAdminSessionSchema = z.object({
 });
 
 export const adminLoginSchema = z.object({
-  username: z.string().min(1),
+  email: z.string().email(),
   password: z.string().min(1),
 });
 

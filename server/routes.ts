@@ -3,10 +3,7 @@ import { createServer, type Server } from "http";
 import { insertTrackSchema, insertPlaylistSchema, insertDjSessionSchema, adminLoginSchema, insertSiteContentSchema } from "@shared/schema";
 import { 
   requireAdmin, 
-  verifyPassword, 
-  createAdminSession, 
-  cleanupExpiredSessions,
-  hashPassword,
+  authenticateAdmin,
   type AuthenticatedRequest 
 } from "./admin-auth";
 import cookieParser from 'cookie-parser';
@@ -17,46 +14,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(cookieParser());
   
   // SECURE ADMIN AUTHENTICATION ROUTES
-  // Admin login endpoint
+  // Admin login endpoint using Supabase Auth
   app.post("/api/admin/login", async (req, res) => {
     try {
-      const loginData = adminLoginSchema.parse(req.body);
+      const { email, password } = req.body;
       
-      // Find admin user in Supabase
-      const { data: adminUser, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', loginData.username)
-        .single();
-
-      if (userError || !adminUser || !adminUser.is_admin) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password required" });
       }
 
-      // Verify password
-      const passwordValid = await verifyPassword(loginData.password, adminUser.password);
-      if (!passwordValid) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      // Authenticate using Supabase Auth
+      const authResult = await authenticateAdmin(email, password);
+      
+      if (!authResult) {
+        return res.status(401).json({ error: "Invalid credentials or insufficient permissions" });
       }
 
-      // Create secure session
-      const sessionToken = await createAdminSession(adminUser.id);
-      
-      // Set secure HTTP-only cookie
-      res.cookie('adminSession', sessionToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-      });
+      const { user, session } = authResult;
 
       res.json({ 
-        success: true, 
-        user: { 
-          id: adminUser.id, 
-          username: adminUser.username,
-          isAdmin: adminUser.is_admin 
-        } 
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          isAdmin: true
+        },
+        session: {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_at: session.expires_at
+        }
       });
     } catch (error) {
       console.error('Admin login error:', error);
