@@ -39,15 +39,31 @@ export default function SimpleAdmin() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, field, value }: { id: number; field: string; value: string }) => {
+      const storedSession = localStorage.getItem('admin_session');
+      let token = '';
+      
+      if (storedSession) {
+        try {
+          const session = JSON.parse(storedSession);
+          token = session.access_token;
+        } catch (error) {
+          console.error('Error parsing session:', error);
+        }
+      }
+      
       const response = await fetch(`/api/admin/content/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ [field]: value }),
       });
+      
       if (!response.ok) {
-        throw new Error('Failed to update content');
+        const errorData = await response.text();
+        console.error('Update failed:', errorData);
+        throw new Error(errorData || 'Failed to update content');
       }
       return response.json();
     },
@@ -68,7 +84,7 @@ export default function SimpleAdmin() {
   });
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('admin_session');
     setLocation('/admin/login');
   };
 
