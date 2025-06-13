@@ -42,6 +42,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   const [isDraggingTempo, setIsDraggingTempo] = useState(false);
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
+  const [isLoadingTrack, setIsLoadingTrack] = useState(false);
 
   // Fetch tracks from Supabase database
   const { data: tracks = [], isLoading: tracksLoading } = useQuery({
@@ -69,11 +70,15 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     const selectedTrack = tracks.find(track => track.id.toString() === trackId);
     if (selectedTrack && selectedTrack.url) {
       try {
-        // If currently playing, stop first
+        setIsLoadingTrack(true);
+        
+        // If currently playing, stop first and prevent any further playback
         const wasPlaying = deck.isPlaying;
         if (wasPlaying) {
           console.log(`[${deckId}] Stopping current track to load new one`);
           pause();
+          // Additional stop to ensure clean state
+          stop();
         }
         
         const trackUrl = selectedTrack.url;
@@ -95,22 +100,24 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         await loadTrack(file, selectedTrack.bpm);
         console.log(`[${deckId}] ✓ Track loaded successfully: ${selectedTrack.name}`);
         
+        setIsLoadingTrack(false);
+        
         // If the previous track was playing, automatically start the new track
         if (wasPlaying) {
           console.log(`[${deckId}] Auto-starting new track since previous was playing`);
-          // Small delay to ensure track is fully loaded
-          setTimeout(() => {
-            play();
-          }, 200);
+          // Ensure we start from the beginning
+          await new Promise(resolve => setTimeout(resolve, 300));
+          play();
         }
       } catch (error) {
+        setIsLoadingTrack(false);
         console.error(`[${deckId}] ✗ Error loading track:`, error);
         console.error(`[${deckId}] Track details:`, selectedTrack);
       }
     } else {
       console.error('Selected track not found or missing URL:', selectedTrack);
     }
-  }, [tracks, loadTrack, deckId, deck.isPlaying, pause, play]);
+  }, [tracks, loadTrack, deckId, deck.isPlaying, pause, play, stop]);
 
 
 
@@ -234,9 +241,16 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       {/* Track Selection Dropdown - Top of CDJ */}
       <div className="mb-3" style={{ zIndex: 10, position: 'relative' }}>
         <div className="text-xs text-blue-300 mb-2 text-center">TRACK SELECTION</div>
-        <Select value={selectedTrackId} onValueChange={handleTrackSelect}>
+        <Select value={selectedTrackId} onValueChange={handleTrackSelect} disabled={isLoadingTrack}>
           <SelectTrigger className="w-full pioneer-button text-xs bg-gray-800 border-gray-600 text-gray-300">
-            <SelectValue placeholder={tracksLoading ? "Loading tracks..." : "Select a track"} />
+            {isLoadingTrack ? (
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 border border-blue-300 border-t-transparent rounded-full animate-spin"></div>
+                <span>Loading track...</span>
+              </div>
+            ) : (
+              <SelectValue placeholder={tracksLoading ? "Loading tracks..." : "Select a track"} />
+            )}
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-gray-600">
             {tracks.map((track) => (
