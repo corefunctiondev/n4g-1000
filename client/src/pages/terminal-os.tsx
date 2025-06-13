@@ -359,7 +359,7 @@ function HomeSection() {
   return (
     <div className="space-y-6 text-blue-300">
       <DynamicText 
-        contentKey="hero_title" 
+        contentKey="hero_main" 
         fallback="$ ./welcome.sh"
         className="text-xl font-bold text-cyan-400"
         as="div"
@@ -367,7 +367,7 @@ function HomeSection() {
       
       <div className="space-y-2 text-sm">
         <DynamicText 
-          contentKey="hero_subtitle" 
+          contentKey="site_title" 
           fallback="NEED FOR GROOVE OPERATING SYSTEM v2.1.0"
           as="div"
         />
@@ -411,7 +411,7 @@ function AboutSection() {
   return (
     <div className="space-y-6 text-blue-300">
       <DynamicText 
-        contentKey="about_title" 
+        contentKey="about_intro" 
         fallback="$ cat ./profiles/*"
         className="text-xl font-bold text-cyan-400"
         as="div"
@@ -589,7 +589,7 @@ function ContactSection() {
   return (
     <div className="space-y-6 text-blue-300">
       <DynamicText 
-        contentKey="contact_title" 
+        contentKey="contact_info" 
         fallback="$ cat ./contact.info"
         className="text-xl font-bold text-cyan-400"
         as="div"
