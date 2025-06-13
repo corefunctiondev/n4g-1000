@@ -72,13 +72,13 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       try {
         setIsLoadingTrack(true);
         
-        // If currently playing, stop first and prevent any further playback
+        // If currently playing, stop completely and clear state
         const wasPlaying = deck.isPlaying;
         if (wasPlaying) {
           console.log(`[${deckId}] Stopping current track to load new one`);
-          pause();
-          // Additional stop to ensure clean state
-          stop();
+          stop(); // Use stop() to completely reset state
+          // Wait for stop to fully complete
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
         
         const trackUrl = selectedTrack.url;
@@ -105,8 +105,8 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         // If the previous track was playing, automatically start the new track
         if (wasPlaying) {
           console.log(`[${deckId}] Auto-starting new track since previous was playing`);
-          // Ensure we start from the beginning
-          await new Promise(resolve => setTimeout(resolve, 300));
+          // Ensure track is fully loaded and state is updated
+          await new Promise(resolve => setTimeout(resolve, 500));
           play();
         }
       } catch (error) {
@@ -117,7 +117,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     } else {
       console.error('Selected track not found or missing URL:', selectedTrack);
     }
-  }, [tracks, loadTrack, deckId, deck.isPlaying, pause, play, stop]);
+  }, [tracks, loadTrack, deckId, deck.isPlaying, play, stop]);
 
 
 

@@ -140,6 +140,21 @@ export function useAudio(deckId: 'A' | 'B') {
         console.log(`Using existing audio nodes for deck ${deckId}`);
       }
 
+      // Reset all timing references when loading new track
+      pauseTimeRef.current = 0;
+      startTimeRef.current = 0;
+      
+      // Stop any existing source
+      if (sourceRef.current) {
+        try {
+          sourceRef.current.stop();
+          sourceRef.current.disconnect();
+        } catch (e) {
+          // Source may already be stopped
+        }
+        sourceRef.current = null;
+      }
+
       // Update deck state and wait for it to complete
       await new Promise<void>((resolve) => {
         setDeck(prev => ({
