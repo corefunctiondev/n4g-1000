@@ -29,7 +29,13 @@ export default function AdminLogin() {
     mutationFn: async (credentials: AdminLogin) => {
       return apiRequest('POST', '/api/admin/login', credentials);
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      // Store the session data in localStorage for the admin panel
+      if (data.session) {
+        localStorage.setItem('admin_session', JSON.stringify(data.session));
+        localStorage.setItem('admin_user', JSON.stringify(data.user));
+      }
+      
       toast({
         title: 'Login successful',
         description: 'Welcome to the admin panel',
@@ -39,7 +45,7 @@ export default function AdminLogin() {
     onError: (error: any) => {
       toast({
         title: 'Login failed',
-        description: error.message || 'Invalid credentials',
+        description: error.message || 'Invalid credentials or insufficient permissions',
         variant: 'destructive',
       });
     },
