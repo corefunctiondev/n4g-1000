@@ -4,7 +4,8 @@ import type { SiteContent } from '@shared/schema';
 // Hook to get content by section
 export function useContentBySection(section: string) {
   return useQuery<SiteContent[]>({
-    queryKey: ['/api/content', section],
+    queryKey: ['/api/content/section', section],
+    queryFn: () => fetch(`/api/content/section?section=${section}`).then(res => res.json()),
     enabled: !!section,
   });
 }
@@ -28,15 +29,15 @@ export function useAllContent() {
 export function getContentStyles(content: SiteContent) {
   const styles: React.CSSProperties = {};
   
-  if (content.backgroundColor) {
-    styles.backgroundColor = content.backgroundColor;
+  if (content.background_color) {
+    styles.backgroundColor = content.background_color;
   }
   
-  if (content.textColor) {
-    styles.color = content.textColor;
+  if (content.text_color) {
+    styles.color = content.text_color;
   }
   
-  if (content.fontSize) {
+  if (content.font_size) {
     const fontSizeMap = {
       'small': '0.875rem',
       'medium': '1rem',
@@ -44,7 +45,7 @@ export function getContentStyles(content: SiteContent) {
       'xl': '1.5rem',
       '2xl': '2rem'
     };
-    styles.fontSize = fontSizeMap[content.fontSize as keyof typeof fontSizeMap] || '1rem';
+    styles.fontSize = fontSizeMap[content.font_size as keyof typeof fontSizeMap] || '1rem';
   }
   
   return styles;

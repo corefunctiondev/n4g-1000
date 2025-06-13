@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'wouter';
-import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X, Folder, FolderOpen, File } from 'lucide-react';
+import { useLocation, Link } from 'wouter';
+import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X, Folder, FolderOpen, File, Volume2, VolumeX } from 'lucide-react';
 import { DynamicContent, DynamicText, DynamicLink } from '@/components/dynamic-content';
 import { VisualEditor } from '@/components/visual-editor';
 import { useContentBySection } from '@/hooks/use-content';
@@ -358,52 +358,75 @@ export default function TerminalOS({}: TerminalOSProps) {
 
 // Section Components
 function HomeSection() {
+  const { data: homeContent = [] } = useContentBySection('home');
+  const { data: heroContent = [] } = useContentBySection('hero');
+  
+  const getContent = (key: string, fallback: string = '') => {
+    const item = [...homeContent, ...heroContent].find((c: any) => c.key === key);
+    return item?.title || item?.content || fallback;
+  };
+
+  const getHeroContent = () => {
+    const heroMain = heroContent.find((c: any) => c.key === 'hero_main');
+    if (heroMain) {
+      return {
+        title: heroMain.title || 'Welcome to N4G Terminal OS',
+        subtitle: heroMain.subtitle || 'Digital DJ Experience', 
+        content: heroMain.content || 'Experience DJ Stimulator in your browser with our authentic N4G-1000 featuring our complete music collection.',
+        buttonText: heroMain.button_text || 'Launch N4G-1000',
+        linkUrl: heroMain.link_url || '/n4g-1000'
+      };
+    }
+    return {
+      title: 'Welcome to N4G Terminal OS',
+      subtitle: 'Digital DJ Experience',
+      content: 'Experience DJ Stimulator in your browser with our authentic N4G-1000 featuring our complete music collection.',
+      buttonText: 'Launch N4G-1000', 
+      linkUrl: '/n4g-1000'
+    };
+  };
+
+  const hero = getHeroContent();
+
   return (
     <div className="space-y-6 text-blue-300">
-      <DynamicText 
-        contentKey="hero_main" 
-        fallback="$ ./welcome.sh"
-        className="text-xl font-bold text-cyan-400"
-        as="div"
-      />
+      <div className="text-xl font-bold text-cyan-400">$ ./welcome.sh</div>
       
-      <div className="space-y-2 text-sm">
-        <DynamicText 
-          contentKey="site_title" 
-          fallback="NEED FOR GROOVE OPERATING SYSTEM v2.1.0"
-          as="div"
-        />
-        <div data-editable data-key="copyright" data-section="home">Copyright (c) 2024 Need For Groove Collective</div>
-        <div data-editable data-key="rights" data-section="home">All rights reserved.</div>
+      <div className="space-y-4">
+        <div className="text-2xl font-bold text-cyan-400">{hero.title}</div>
+        <div className="text-lg text-orange-400">{hero.subtitle}</div>
+        <div className="text-sm leading-relaxed">{hero.content}</div>
       </div>
       
       <div className="space-y-4">
-        <div className="text-cyan-400" data-editable data-key="system_status_title" data-section="home">SYSTEM STATUS:</div>
+        <div className="text-cyan-400">SYSTEM STATUS:</div>
         <div className="pl-4 space-y-1 text-sm">
-          <div data-editable data-key="audio_engine_status" data-section="home">✓ Audio Engine: ONLINE</div>
-          <div data-editable data-key="dj_equipment_status" data-section="home">✓ DJ Equipment: READY</div>
-          <div data-editable data-key="music_library_status" data-section="home">✓ Music Library: LOADED</div>
-          <div data-editable data-key="network_status" data-section="home">✓ Network: CONNECTED</div>
-        </div>
-      </div>
-      
-      <DynamicContent 
-        section="hero"
-        fallbackText=""
-        className="space-y-4"
-      />
-      
-      <div className="space-y-4">
-        <div className="text-cyan-400" data-editable data-key="active_members_title" data-section="home">ACTIVE MEMBERS:</div>
-        <div className="pl-4 space-y-1 text-sm">
-          <div data-editable data-key="member_alex" data-section="home">alex@brooklyn.nyc - ONLINE</div>
-          <div data-editable data-key="member_jordan" data-section="home">jordan@manhattan.nyc - ONLINE</div>
+          <div>✓ Audio Engine: ONLINE</div>
+          <div>✓ DJ Equipment: READY</div>
+          <div>✓ Music Library: LOADED</div>
+          <div>✓ Network: CONNECTED</div>
         </div>
       </div>
       
       <div className="border border-cyan-400 p-4 rounded">
-        <div className="text-orange-400 mb-2" data-editable data-key="notification_title" data-section="home">LATEST NOTIFICATION:</div>
-        <div className="text-sm" data-editable data-key="latest_notification" data-section="home">New booking confirmed: Brooklyn Warehouse, Saturday 11PM</div>
+        <Link href={hero.linkUrl}>
+          <button className="bg-cyan-400 text-black px-6 py-2 rounded font-bold hover:bg-cyan-300 transition-colors">
+            {hero.buttonText}
+          </button>
+        </Link>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="text-cyan-400">ACTIVE MEMBERS:</div>
+        <div className="pl-4 space-y-1 text-sm">
+          <div>alex@brooklyn.nyc - ONLINE</div>
+          <div>jordan@manhattan.nyc - ONLINE</div>
+        </div>
+      </div>
+      
+      <div className="border border-cyan-400 p-4 rounded">
+        <div className="text-orange-400 mb-2">LATEST NOTIFICATION:</div>
+        <div className="text-sm">New booking confirmed: Brooklyn Warehouse, Saturday 11PM</div>
       </div>
     </div>
   );
