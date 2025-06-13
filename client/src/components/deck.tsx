@@ -69,6 +69,13 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     const selectedTrack = tracks.find(track => track.id.toString() === trackId);
     if (selectedTrack && selectedTrack.url) {
       try {
+        // If currently playing, stop first
+        const wasPlaying = deck.isPlaying;
+        if (wasPlaying) {
+          console.log(`[${deckId}] Stopping current track to load new one`);
+          pause();
+        }
+        
         const trackUrl = selectedTrack.url;
         console.log(`[${deckId}] Loading track: ${selectedTrack.name}`);
         console.log(`[${deckId}] Fetching from: ${trackUrl}`);
@@ -87,6 +94,15 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         
         await loadTrack(file, selectedTrack.bpm);
         console.log(`[${deckId}] ✓ Track loaded successfully: ${selectedTrack.name}`);
+        
+        // If the previous track was playing, automatically start the new track
+        if (wasPlaying) {
+          console.log(`[${deckId}] Auto-starting new track since previous was playing`);
+          // Small delay to ensure track is fully loaded
+          setTimeout(() => {
+            play();
+          }, 200);
+        }
       } catch (error) {
         console.error(`[${deckId}] ✗ Error loading track:`, error);
         console.error(`[${deckId}] Track details:`, selectedTrack);
@@ -94,7 +110,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     } else {
       console.error('Selected track not found or missing URL:', selectedTrack);
     }
-  }, [tracks, loadTrack, deckId]);
+  }, [tracks, loadTrack, deckId, deck.isPlaying, pause, play]);
 
 
 
