@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useLocation } from 'wouter';
 import { Deck } from '@/components/deck';
 import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
 import { audioEngine } from '@/lib/audio-engine';
+import { Menu, X, Terminal, User, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, Monitor, LogOut } from 'lucide-react';
 
 export default function CDJInterface() {
+  const [location, navigate] = useLocation();
   const [isRecording, setIsRecording] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [crossfaderValue, setCrossfaderValue] = useState(50);
@@ -12,6 +15,7 @@ export default function CDJInterface() {
   const [deckAState, setDeckAState] = useState<any>(null);
   const [deckBState, setDeckBState] = useState<any>(null);
   const [playbackOrder, setPlaybackOrder] = useState<('A' | 'B')[]>([]);
+  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -56,9 +60,28 @@ export default function CDJInterface() {
     document.addEventListener('mouseup', handleMouseUp);
   }, []);
 
+  // Navigation handler
+  const handleNavigation = useCallback((section: string) => {
+    navigate(`/${section === 'home' ? '' : section}`);
+    setIsBurgerMenuOpen(false);
+  }, [navigate]);
+
+  // File tree items for navigation
+  const fileTreeItems = [
+    { id: 'home', label: 'HOME/', icon: Terminal, description: 'System boot and overview' },
+    { id: 'about', label: 'ABOUT/', icon: User, description: 'DJ member profiles' },
+    { id: 'sets', label: 'SETS/', icon: Music, description: 'Live DJ performances' },
+    { id: 'podcasts', label: 'PODCASTS/', icon: Radio, description: 'Audio episodes' },
+    { id: 'bookings', label: 'BOOKINGS/', icon: Calendar, description: 'Event schedule' },
+    { id: 'releases', label: 'RELEASES/', icon: Disc, description: 'Music catalog' },
+    { id: 'mixes', label: 'MIXES/', icon: Headphones, description: 'Mix collections' },
+    { id: 'contact', label: 'CONTACT/', icon: Mail, description: 'Get in touch' },
+    { id: 'n4g-1000', label: 'N4G-1000/', icon: Monitor, description: 'DJ Equipment Interface' },
+  ];
+
   useEffect(() => {
     // Set page title
-    document.title = 'Virtual CDJ Pro - Professional DJ Interface';
+    document.title = 'N4G-1000 Digital Turntable Interface';
     
     // Simple responsive scaling - no complex calculations needed
   }, []);
@@ -68,8 +91,18 @@ export default function CDJInterface() {
       {/* Pioneer DJ Setup Layout */}
       <div className="w-full max-w-[98vw] mx-auto">
         {/* Header */}
-        <div className="text-center mb-4 lg:mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">Pioneer DJ Virtual Setup</h1>
+        <div className="mb-4 lg:mb-8 relative">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">N4G-1000 Interface</h1>
+            </div>
+            <button
+              onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
+              className="p-2 hover:bg-gray-800 border border-cyan-400 rounded transition-all duration-200 bg-gray-900"
+            >
+              {isBurgerMenuOpen ? <X className="w-5 h-5 text-cyan-400" /> : <Menu className="w-5 h-5 text-cyan-400" />}
+            </button>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-400">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -203,6 +236,53 @@ export default function CDJInterface() {
             </div>
           </div>
         </div>
+
+        {/* Burger Menu - Quick Navigation */}
+        {isBurgerMenuOpen && (
+          <div className="absolute top-20 right-4 bg-gray-900 border border-cyan-400 rounded-lg p-4 z-50 w-64 shadow-2xl">
+            <div className="text-cyan-400 font-bold text-sm mb-3 border-b border-gray-700 pb-2">
+              QUICK NAVIGATION
+            </div>
+            <div className="space-y-2">
+              {fileTreeItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = item.id === 'n4g-1000';
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavigation(item.id)}
+                    className={`w-full text-left p-2 rounded transition-all duration-200 group ${
+                      isActive 
+                        ? 'bg-cyan-400 text-black' 
+                        : 'hover:bg-gray-800 text-gray-300 hover:text-cyan-400'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Icon className="w-4 h-4" />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">{item.label}</div>
+                        <div className={`text-xs ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                          {item.description}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            
+            <div className="border-t border-gray-700 mt-3 pt-3">
+              <button
+                onClick={() => handleNavigation('admin')}
+                className="w-full text-left p-2 rounded text-sm text-gray-300 hover:text-orange-400 hover:bg-gray-800 flex items-center space-x-2 transition-all duration-200"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>Admin Panel</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
