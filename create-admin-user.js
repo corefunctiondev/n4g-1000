@@ -1,80 +1,49 @@
-import { createClient } from '@supabase/supabase-js';
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import { users, siteContent, adminSessions } from './shared/schema.ts';
 import bcrypt from 'bcryptjs';
-import { config } from 'dotenv';
+import ws from "ws";
+import { neonConfig } from '@neondatabase/serverless';
 
-config();
+neonConfig.webSocketConstructor = ws;
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables');
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL environment variable is required');
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = drizzle({ client: pool, schema: { users, siteContent, adminSessions } });
 
 async function createAdminUser() {
   try {
     const adminUsername = 'admin';
-    const adminPassword = 'SecureAdminPass2024!'; // Change this to your secure password
+    const adminPassword = 'SecureAdminPass2024!';
     
     // Hash the password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
     
-    // Create users table if it doesn't exist
-    const { error: tableError } = await supabase.rpc('exec_sql', {
-      sql: `
-        CREATE TABLE IF NOT EXISTS users (
-          id SERIAL PRIMARY KEY,
-          username TEXT UNIQUE NOT NULL,
-          password TEXT NOT NULL,
-          is_admin BOOLEAN DEFAULT FALSE NOT NULL,
-          created_at TIMESTAMP DEFAULT NOW() NOT NULL
-        );
-        
-        CREATE TABLE IF NOT EXISTS site_content (
-          id SERIAL PRIMARY KEY,
-          key TEXT UNIQUE NOT NULL,
-          title TEXT,
-          content TEXT,
-          image_url TEXT,
-          video_url TEXT,
-          link_url TEXT,
-          is_active BOOLEAN DEFAULT TRUE NOT NULL,
-          updated_at TIMESTAMP DEFAULT NOW() NOT NULL
-        );
-        
-        CREATE TABLE IF NOT EXISTS admin_sessions (
-          id SERIAL PRIMARY KEY,
-          user_id INTEGER REFERENCES users(id) NOT NULL,
-          session_token TEXT UNIQUE NOT NULL,
-          expires_at TIMESTAMP NOT NULL,
-          created_at TIMESTAMP DEFAULT NOW() NOT NULL
-        );
-      `
-    });
+    console.log('Setting up admin user in database...');
     
-    if (tableError) {
-      console.log('Tables may already exist, continuing...');
-    }
-    
-    // Insert admin user
-    const { data, error } = await supabase
-      .from('users')
-      .upsert({
+    // Insert or update admin user
+    const [adminUser] = await db
+      .insert(users)
+      .values({
         username: adminUsername,
         password: hashedPassword,
-        is_admin: true
-      }, {
-        onConflict: 'username'
-      });
+        isAdmin: true
+      })
+      .onConflictDoUpdate({
+        target: users.username,
+        set: {
+          password: hashedPassword,
+          isAdmin: true
+        }
+      })
+      .returning();
     
-    if (error) {
-      console.error('Error creating admin user:', error);
-      return;
-    }
+    console.log('Admin user created/updated successfully:', adminUser.username);
     
     console.log('✅ Admin user created successfully!');
     console.log('Username:', adminUsername);
