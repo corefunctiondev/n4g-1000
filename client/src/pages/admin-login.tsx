@@ -27,15 +27,14 @@ export default function AdminLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: AdminLogin) => {
-      return apiRequest('POST', '/api/admin/login', credentials);
+      const response = await apiRequest('POST', '/api/admin/login', credentials);
+      return await response.json();
     },
     onSuccess: (data: any) => {
-      console.log('Login success data:', data);
       // Store the session data in localStorage for the admin panel
       if (data.session) {
         localStorage.setItem('admin_session', JSON.stringify(data.session));
         localStorage.setItem('admin_user', JSON.stringify(data.user));
-        console.log('Session stored successfully');
       }
       
       toast({
@@ -43,9 +42,7 @@ export default function AdminLogin() {
         description: 'Welcome to the admin panel',
       });
       
-      console.log('About to navigate to /admin/dashboard');
       navigate('/admin/dashboard');
-      console.log('Navigation called');
     },
     onError: (error: any) => {
       toast({
