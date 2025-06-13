@@ -2,10 +2,11 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from "@shared/schema";
 
-// Direct connection to bypass corrupted environment variables
-const connectionString = "postgresql://neondb_owner:npg_ZOCP74MXIegS@ep-frosty-moon-a6kl3obs.us-west-2.aws.neon.tech:5432/neondb";
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
+}
 
-const sql = postgres(connectionString, {
+const sql = postgres(process.env.DATABASE_URL, {
   ssl: { rejectUnauthorized: false },
   max: 1,
   idle_timeout: 20,
