@@ -1,10 +1,13 @@
 import { useCallback, useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAudio } from '@/hooks/use-audio';
 import { Waveform } from './waveform';
 import { Knob } from './knob';
 import { Fader } from './fader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { Track } from '@shared/schema';
 
 interface DeckProps {
   deckId: 'A' | 'B';
@@ -39,6 +42,13 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   const [isDragOver, setIsDragOver] = useState(false);
   const [isDraggingTempo, setIsDraggingTempo] = useState(false);
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
+  const [selectedTrackId, setSelectedTrackId] = useState<string>('');
+
+  // Fetch tracks from Supabase database
+  const { data: tracks = [], isLoading: tracksLoading } = useQuery({
+    queryKey: ['/api/tracks'],
+    select: (data: Track[]) => data || []
+  });
 
   // Share deck state with parent component for sync functionality
   useEffect(() => {
@@ -54,41 +64,24 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     }
   }, [deck.isPlaying, deckId, onPlaybackChange]);
 
-  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('File input changed:', event.target.files);
-    const file = event.target.files?.[0];
-    if (file) {
-      console.log('Selected file:', file.name, file.type, file.size);
-      loadTrack(file);
-      // Reset input to allow same file to be selected again
-      event.target.value = '';
-    } else {
-      console.log('No file selected');
-    }
-  }, [loadTrack]);
-
-  const handleDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
-  const handleDrop = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    setIsDragOver(false);
-    
-    const files = event.dataTransfer.files;
-    if (files.length > 0) {
-      const file = files[0];
-      if (file.type.startsWith('audio/')) {
+  // Handle track selection from database
+  const handleTrackSelect = useCallback(async (trackId: string) => {
+    setSelectedTrackId(trackId);
+    const selectedTrack = tracks.find(track => track.id.toString() === trackId);
+    if (selectedTrack && selectedTrack.filePath) {
+      try {
+        // Fetch the audio file from the path
+        const response = await fetch(selectedTrack.filePath);
+        const blob = await response.blob();
+        const file = new File([blob], selectedTrack.name + '.mp3', { type: 'audio/mpeg' });
         loadTrack(file);
+      } catch (error) {
+        console.error('Error loading track:', error);
       }
     }
-  }, [loadTrack]);
+  }, [tracks, loadTrack]);
+
+
 
   const handlePlayPause = useCallback(() => {
     if (deck.isPlaying) {
@@ -205,9 +198,6 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   return (
     <div 
       className="pioneer-cdj p-2 flex-1 h-full flex flex-col"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
       style={{ position: 'relative', zIndex: 1 }}
     >
       {/* Top Section - Screen and Info Display */}
