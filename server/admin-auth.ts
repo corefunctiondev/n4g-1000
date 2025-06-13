@@ -38,8 +38,8 @@ export async function authenticateAdmin(email: string, password: string): Promis
       return null;
     }
 
-    // Check if user has admin role in user metadata or allow any user temporarily
-    const isAdmin = data.user.user_metadata?.is_admin === true || true; // Temporarily allow all users
+    // Check if user has admin role in user metadata
+    const isAdmin = data.user.user_metadata?.is_admin === true;
     
     if (!isAdmin) {
       await supabase.auth.signOut();
