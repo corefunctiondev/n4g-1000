@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import TerminalOS from "@/pages/terminal-os";
 import CDJInterface from "@/pages/cdj-interface";
 import AdminLogin from "@/pages/admin-login";
-import AdminContentManager from "@/pages/admin-content-manager";
+import SimpleAdmin from "@/pages/simple-admin";
 
 function Router() {
   return (
@@ -22,7 +22,7 @@ function Router() {
       <Route path="/contact" component={TerminalOS} />
       <Route path="/n4g-1000" component={CDJInterface} />
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/dashboard" component={AdminContentManager} />
+      <Route path="/admin/dashboard" component={SimpleAdmin} />
       <Route path="/admin" component={AdminLogin} />
       <Route>
         <TerminalOS />
