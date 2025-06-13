@@ -656,11 +656,7 @@ function AdminSection() {
         </button>
       </div>
 
-      {/* Visual Editor */}
-      <VisualEditor 
-        isEditMode={isEditMode} 
-        onToggleEditMode={() => setIsEditMode(!isEditMode)} 
-      />
+      {/* Visual Editor - moved to main component */}
     </div>
   );
 }
