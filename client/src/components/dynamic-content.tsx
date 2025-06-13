@@ -72,15 +72,15 @@ export function DynamicContent({
                 {content.content}
               </p>
             )}
-            {content.linkUrl && content.buttonText && (
+            {content.link_url && content.button_text && (
               <a 
-                href={content.linkUrl} 
+                href={content.link_url} 
                 className="inline-block mt-2 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700"
                 data-editable="true" 
                 data-editable-type="link" 
                 data-content-key={content.key}
               >
-                {content.buttonText}
+                {content.button_text}
               </a>
             )}
           </div>
@@ -137,8 +137,8 @@ export function DynamicLink({ contentKey, fallbackHref = '#', fallbackText = 'Li
   }
 
   const styles = getContentStyles(content || {} as SiteContent);
-  const href = content?.linkUrl || fallbackHref;
-  const text = content?.title || content?.buttonText || fallbackText;
+  const href = content?.link_url || fallbackHref;
+  const text = content?.title || content?.button_text || fallbackText;
 
   return (
     <a 
@@ -168,7 +168,7 @@ export function DynamicImage({ contentKey, fallbackSrc = '', alt = '', className
     return <div className={`${className} animate-pulse bg-gray-800`} />;
   }
 
-  const src = content?.imageUrl || fallbackSrc;
+  const src = content?.image_url || fallbackSrc;
   const imageAlt = content?.title || alt;
 
   if (!src) return null;
