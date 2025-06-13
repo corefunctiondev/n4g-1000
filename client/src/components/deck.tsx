@@ -85,7 +85,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         const file = new File([blob], selectedTrack.name + '.wav', { type: 'audio/wav' });
         console.log(`[${deckId}] Created File object, starting audio loading...`);
         
-        await loadTrack(file);
+        await loadTrack(file, selectedTrack.bpm);
         console.log(`[${deckId}] ✓ Track loaded successfully: ${selectedTrack.name}`);
       } catch (error) {
         console.error(`[${deckId}] ✗ Error loading track:`, error);

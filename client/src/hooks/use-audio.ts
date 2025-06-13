@@ -103,7 +103,7 @@ export function useAudio(deckId: 'A' | 'B') {
     }
   }, [deck.isPlaying, deck.track, updateCurrentTime]);
 
-  const loadTrack = useCallback(async (file: File) => {
+  const loadTrack = useCallback(async (file: File, metadataBpm?: number) => {
     try {
       console.log(`Starting to load track on deck ${deckId}:`, file.name);
       
@@ -117,10 +117,9 @@ export function useAudio(deckId: 'A' | 'B') {
       const audioBuffer = await audioEngine.decodeAudioFile(file);
       console.log(`Audio decoded, duration: ${audioBuffer.duration}s`);
       
-      console.log(`Analyzing BPM...`);
-      const bpmAnalyzer = new BPMAnalyzer(audioEngine.getContext()!);
-      const bpm = await bpmAnalyzer.analyzeBPM(audioBuffer);
-      console.log(`BPM detected: ${bpm}`);
+      // Use BPM from database metadata instead of lengthy analysis
+      const bpm = metadataBpm || 128; // Use provided BPM or default
+      console.log(`Using metadata BPM: ${bpm}`);
       
       const track: AudioTrack = {
         file,
