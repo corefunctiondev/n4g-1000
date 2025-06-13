@@ -399,12 +399,12 @@ function HomeSection() {
       </div>
       
       <div className="space-y-4">
-        <div className="text-cyan-400">SYSTEM STATUS:</div>
+        <div className="text-cyan-400">{getContent('system_status_title', 'SYSTEM STATUS:')}</div>
         <div className="pl-4 space-y-1 text-sm">
-          <div>✓ Audio Engine: ONLINE</div>
-          <div>✓ DJ Equipment: READY</div>
-          <div>✓ Music Library: LOADED</div>
-          <div>✓ Network: CONNECTED</div>
+          <div>{getContent('audio_engine_status', '✓ Audio Engine: ONLINE')}</div>
+          <div>{getContent('dj_equipment_status', '✓ DJ Equipment: READY')}</div>
+          <div>{getContent('music_library_status', '✓ Music Library: LOADED')}</div>
+          <div>{getContent('network_status', '✓ Network: CONNECTED')}</div>
         </div>
       </div>
       
@@ -417,16 +417,16 @@ function HomeSection() {
       </div>
       
       <div className="space-y-4">
-        <div className="text-cyan-400">ACTIVE MEMBERS:</div>
+        <div className="text-cyan-400">{getContent('active_members_title', 'ACTIVE MEMBERS:')}</div>
         <div className="pl-4 space-y-1 text-sm">
-          <div>alex@brooklyn.nyc - ONLINE</div>
-          <div>jordan@manhattan.nyc - ONLINE</div>
+          <div>{getContent('member_alex', 'alex@brooklyn.nyc - ONLINE')}</div>
+          <div>{getContent('member_jordan', 'jordan@manhattan.nyc - ONLINE')}</div>
         </div>
       </div>
       
       <div className="border border-cyan-400 p-4 rounded">
-        <div className="text-orange-400 mb-2">LATEST NOTIFICATION:</div>
-        <div className="text-sm">New booking confirmed: Brooklyn Warehouse, Saturday 11PM</div>
+        <div className="text-orange-400 mb-2">{getContent('notification_title', 'LATEST NOTIFICATION:')}</div>
+        <div className="text-sm">{getContent('latest_notification', 'New booking confirmed: Brooklyn Warehouse, Saturday 11PM')}</div>
       </div>
     </div>
   );
@@ -464,16 +464,28 @@ function AboutSection() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border border-cyan-400 p-4 rounded">
-          <div className="text-cyan-400 font-bold mb-3">{getContent('mixing_title', 'Live Mixing')}</div>
-          <div className="text-sm">
-            {getContent('mixing_description', 'Professional mixing capabilities with dual-deck control, tempo adjustment, and real-time effects.')}
+          <div className="text-cyan-400 font-bold mb-3">{getContent('alex_name', 'ALEX RODRIGUEZ')}</div>
+          <div className="space-y-2 text-sm">
+            <div>{getContent('alex_location', 'Location: Brooklyn, NY')}</div>
+            <div>{getContent('alex_style', 'Style: Deep House, Progressive')}</div>
+            <div>{getContent('alex_experience', 'Experience: 8+ years')}</div>
+            <div>Status: <span className="text-blue-300">{getContent('alex_status', 'ACTIVE')}</span></div>
+          </div>
+          <div className="mt-3 text-xs text-gray-300">
+            {getContent('alex_bio', 'Specializes in underground warehouse vibes and late-night deep sets.')}
           </div>
         </div>
         
         <div className="border border-orange-400 p-4 rounded">
-          <div className="text-orange-400 font-bold mb-3">{getContent('library_title', 'Music Library')}</div>
-          <div className="text-sm">
-            {getContent('library_description', 'Access our music collection of 25 Need For Groove tracks.')}
+          <div className="text-orange-400 font-bold mb-3">{getContent('jordan_name', 'JORDAN CHEN')}</div>
+          <div className="space-y-2 text-sm">
+            <div>{getContent('jordan_location', 'Location: Manhattan, NY')}</div>
+            <div>{getContent('jordan_style', 'Style: Techno, Minimal')}</div>
+            <div>{getContent('jordan_experience', 'Experience: 6+ years')}</div>
+            <div>Status: <span className="text-blue-300">{getContent('jordan_status', 'ACTIVE')}</span></div>
+          </div>
+          <div className="mt-3 text-xs text-gray-300">
+            {getContent('jordan_bio', 'Known for precise mixing and driving techno beats that keep crowds moving.')}
           </div>
         </div>
       </div>
@@ -482,25 +494,53 @@ function AboutSection() {
 }
 
 function SetsSection() {
+  const { data: setsContent = [] } = useContentBySection('sets');
+  
+  const getContent = (key: string, fallback: string = '') => {
+    const item = setsContent.find((c: any) => c.key === key);
+    return item?.title || item?.content || fallback;
+  };
+
   return (
     <div className="space-y-6 text-blue-300">
-      <div className="text-xl font-bold text-cyan-400" data-editable data-key="sets_title" data-section="sets">$ ls -la ./sets/</div>
+      <div className="text-xl font-bold text-cyan-400">$ ls -la ./sets/</div>
+      
+      <div className="space-y-4">
+        <div className="text-2xl font-bold text-cyan-400">
+          {getContent('sets_title', 'DJ Sets & Performances')}
+        </div>
+        <div className="text-sm leading-relaxed">
+          {getContent('sets_description', 'Explore our collection of live DJ sets and recorded performances featuring the N4G-1000 digital turntable system.')}
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[
-          { title: "Warehouse Sessions #1", date: "2024-01-15", duration: "2:30:00", plays: 1248 },
-          { title: "Rooftop Sunset Mix", date: "2024-01-10", duration: "1:45:00", plays: 892 },
-          { title: "Deep Underground", date: "2024-01-05", duration: "3:00:00", plays: 2156 },
-        ].map((set, index) => (
-          <div key={index} className="border border-gray-600 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
-            <div className="text-cyan-400 font-bold mb-2" data-editable data-key={`set_${index}_title`} data-section="sets">{set.title}</div>
-            <div className="text-xs space-y-1 text-gray-300">
-              <div data-editable data-key={`set_${index}_date`} data-section="sets">Date: {set.date}</div>
-              <div data-editable data-key={`set_${index}_duration`} data-section="sets">Duration: {set.duration}</div>
-              <div data-editable data-key={`set_${index}_plays`} data-section="sets">Plays: {set.plays}</div>
-            </div>
+        <div className="border border-cyan-400 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
+          <div className="text-cyan-400 font-bold mb-2">{getContent('set_0_title', 'Warehouse Sessions #1')}</div>
+          <div className="text-xs space-y-1 text-gray-300">
+            <div>{getContent('set_0_date', 'Date: 2024-01-15')}</div>
+            <div>{getContent('set_0_duration', 'Duration: 2:30:00')}</div>
+            <div>{getContent('set_0_plays', 'Plays: 1248')}</div>
           </div>
-        ))}
+        </div>
+        
+        <div className="border border-orange-400 p-4 rounded hover:border-orange-400 transition-colors cursor-pointer">
+          <div className="text-orange-400 font-bold mb-2">{getContent('set_1_title', 'Rooftop Sunset Mix')}</div>
+          <div className="text-xs space-y-1 text-gray-300">
+            <div>{getContent('set_1_date', 'Date: 2024-01-10')}</div>
+            <div>{getContent('set_1_duration', 'Duration: 1:45:00')}</div>
+            <div>{getContent('set_1_plays', 'Plays: 892')}</div>
+          </div>
+        </div>
+        
+        <div className="border border-green-400 p-4 rounded hover:border-green-400 transition-colors cursor-pointer">
+          <div className="text-green-400 font-bold mb-2">{getContent('set_2_title', 'Deep Underground')}</div>
+          <div className="text-xs space-y-1 text-gray-300">
+            <div>{getContent('set_2_date', 'Date: 2024-01-05')}</div>
+            <div>{getContent('set_2_duration', 'Duration: 3:00:00')}</div>
+            <div>{getContent('set_2_plays', 'Plays: 2156')}</div>
+          </div>
+        </div>
       </div>
     </div>
   );
