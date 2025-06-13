@@ -99,7 +99,7 @@ export default function TerminalOS({}: TerminalOSProps) {
 
   if (bootSequence) {
     return (
-      <div className="min-h-screen bg-black text-blue-400 font-mono flex items-center justify-center">
+      <div className="min-h-screen bg-black text-blue-300 font-mono flex items-center justify-center">
         <div className="text-left">
           <pre className="text-sm whitespace-pre-line">
             {bootText}
@@ -138,13 +138,13 @@ export default function TerminalOS({}: TerminalOSProps) {
             <Zap className="w-6 h-6 text-cyan-400" />
             <span className="text-cyan-400 font-bold text-xl">NEED FOR GROOVE</span>
           </div>
-          <div className="text-gray-400 text-sm">
+          <div className="text-gray-300 text-sm">
             NYC • HOUSE • TECHNO
           </div>
         </div>
         
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-400">
+          <div className="flex items-center space-x-2 text-sm text-gray-300">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
             <span>ONLINE</span>
           </div>
@@ -170,7 +170,7 @@ export default function TerminalOS({}: TerminalOSProps) {
         <div className="w-64 bg-gray-900 border-r border-cyan-400 overflow-y-auto">
           <div className="p-4 border-b border-gray-700">
             <div className="text-cyan-400 font-bold text-sm mb-2">SYSTEM/</div>
-            <div className="text-xs text-gray-400">Need For Groove OS v2.1.0</div>
+            <div className="text-xs text-gray-300">Need For Groove OS v2.1.0</div>
           </div>
           
           <div className="p-2 space-y-1">
@@ -182,7 +182,7 @@ export default function TerminalOS({}: TerminalOSProps) {
               return (
                 <div key={item.id} className="relative">
                   {/* Tree lines */}
-                  <div className="absolute left-2 top-0 h-full flex flex-col text-gray-600">
+                  <div className="absolute left-2 top-0 h-full flex flex-col text-gray-500">
                     <div className="flex items-center h-6">
                       <span className="text-xs font-mono">
                         {item.isLast ? '└─' : '├─'}
@@ -205,7 +205,7 @@ export default function TerminalOS({}: TerminalOSProps) {
                       <Icon className="w-4 h-4 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{item.label}</div>
-                        <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                        <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-400 group-hover:text-gray-300'}`}>
                           {item.description}
                         </div>
                       </div>
@@ -263,7 +263,7 @@ export default function TerminalOS({}: TerminalOSProps) {
               return (
                 <div key={item.id} className="relative">
                   {/* Tree lines */}
-                  <div className="absolute left-0 top-0 h-full flex flex-col text-gray-600">
+                  <div className="absolute left-0 top-0 h-full flex flex-col text-gray-500">
                     <div className="flex items-center h-6">
                       <span className="text-xs">
                         {item.isLast ? '└─' : '├─'}
@@ -286,7 +286,7 @@ export default function TerminalOS({}: TerminalOSProps) {
                       <Icon className="w-4 h-4 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{item.label}</div>
-                        <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                        <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-400 group-hover:text-gray-300'}`}>
                           {item.description}
                         </div>
                       </div>
@@ -299,7 +299,7 @@ export default function TerminalOS({}: TerminalOSProps) {
           
           <div className="border-t border-gray-700 mt-3 pt-3">
             <div className="relative">
-              <div className="absolute left-0 top-0 h-6 flex items-center text-gray-600">
+              <div className="absolute left-0 top-0 h-6 flex items-center text-gray-500">
                 <span className="text-xs">└─</span>
               </div>
               <button
@@ -355,7 +355,7 @@ export default function TerminalOS({}: TerminalOSProps) {
 // Section Components
 function HomeSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ./welcome.sh</div>
       
       <div className="space-y-2 text-sm">
@@ -392,7 +392,7 @@ function HomeSection() {
 
 function AboutSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ cat ./profiles/*</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -402,9 +402,9 @@ function AboutSection() {
             <div>Location: Brooklyn, NY</div>
             <div>Style: Deep House, Progressive</div>
             <div>Experience: 8+ years</div>
-            <div>Status: <span className="text-blue-400">ACTIVE</span></div>
+            <div>Status: <span className="text-blue-300">ACTIVE</span></div>
           </div>
-          <div className="mt-3 text-xs text-gray-400">
+          <div className="mt-3 text-xs text-gray-300">
             Specializes in underground warehouse vibes and late-night deep sets.
           </div>
         </div>
@@ -415,9 +415,9 @@ function AboutSection() {
             <div>Location: Manhattan, NY</div>
             <div>Style: Techno, Minimal</div>
             <div>Experience: 6+ years</div>
-            <div>Status: <span className="text-blue-400">ACTIVE</span></div>
+            <div>Status: <span className="text-blue-300">ACTIVE</span></div>
           </div>
-          <div className="mt-3 text-xs text-gray-400">
+          <div className="mt-3 text-xs text-gray-300">
             Known for precise mixing and driving techno beats that keep crowds moving.
           </div>
         </div>
@@ -428,7 +428,7 @@ function AboutSection() {
 
 function SetsSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ls -la ./sets/</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -439,7 +439,7 @@ function SetsSection() {
         ].map((set, index) => (
           <div key={index} className="border border-gray-600 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
             <div className="text-cyan-400 font-bold mb-2">{set.title}</div>
-            <div className="text-xs space-y-1 text-gray-400">
+            <div className="text-xs space-y-1 text-gray-300">
               <div>Date: {set.date}</div>
               <div>Duration: {set.duration}</div>
               <div>Plays: {set.plays}</div>
@@ -453,7 +453,7 @@ function SetsSection() {
 
 function PodcastsSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ./podcast_manager.sh --list</div>
       
       <div className="space-y-4">
@@ -466,7 +466,7 @@ function PodcastsSection() {
             <div className="flex justify-between items-start">
               <div>
                 <div className="text-cyan-400 font-bold">{podcast.episode}: {podcast.title}</div>
-                <div className="text-sm text-gray-400 mt-1">Released: {podcast.date}</div>
+                <div className="text-sm text-gray-300 mt-1">Released: {podcast.date}</div>
               </div>
               <div className="text-sm text-orange-400">{podcast.duration}</div>
             </div>
@@ -479,7 +479,7 @@ function PodcastsSection() {
 
 function BookingsSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ calendar --upcoming</div>
       
       <div className="space-y-4">
@@ -492,7 +492,7 @@ function BookingsSection() {
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-cyan-400 font-bold">{booking.venue}</div>
-                <div className="text-sm text-gray-400">{booking.date} at {booking.time}</div>
+                <div className="text-sm text-gray-300">{booking.date} at {booking.time}</div>
               </div>
               <div className={`text-sm px-2 py-1 rounded ${
                 booking.status === 'CONFIRMED' ? 'bg-blue-400 text-black' : 'bg-orange-400 text-black'
@@ -509,7 +509,7 @@ function BookingsSection() {
 
 function ReleasesSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ find ./releases/ -type f</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -520,7 +520,7 @@ function ReleasesSection() {
         ].map((release, index) => (
           <div key={index} className="border border-gray-600 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
             <div className="text-cyan-400 font-bold mb-2">{release.title}</div>
-            <div className="text-xs space-y-1 text-gray-400">
+            <div className="text-xs space-y-1 text-gray-300">
               <div>Year: {release.year}</div>
               <div>Label: {release.label}</div>
             </div>
@@ -533,7 +533,7 @@ function ReleasesSection() {
 
 function MixesSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ./mix_archive.sh --browse</div>
       
       <div className="space-y-4">
@@ -559,7 +559,7 @@ function MixesSection() {
 
 function ContactSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ cat ./contact.info</div>
       
       <div className="space-y-6">
@@ -594,7 +594,7 @@ function ContactSection() {
 
 function AdminSection() {
   return (
-    <div className="space-y-6 text-blue-400">
+    <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ sudo ./admin_panel.sh</div>
       
       <div className="border border-red-400 p-4 rounded">
@@ -603,18 +603,18 @@ function AdminSection() {
         
         <div className="space-y-3">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Username:</label>
+            <label className="block text-xs text-gray-300 mb-1">Username:</label>
             <input 
               type="text" 
-              className="w-full bg-black border border-gray-600 p-2 text-blue-400 font-mono"
+              className="w-full bg-black border border-gray-600 p-2 text-blue-300 font-mono"
               placeholder="n4gadmin"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Password:</label>
+            <label className="block text-xs text-gray-300 mb-1">Password:</label>
             <input 
               type="password" 
-              className="w-full bg-black border border-gray-600 p-2 text-blue-400 font-mono"
+              className="w-full bg-black border border-gray-600 p-2 text-blue-300 font-mono"
               placeholder="••••••••"
             />
           </div>

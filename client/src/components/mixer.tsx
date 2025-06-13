@@ -221,7 +221,7 @@ export function Mixer() {
       {/* Top Section - Pioneer Branding */}
       <div className="text-center mb-2">
         <div className="text-xs font-bold text-white mb-1">Pioneer DJ</div>
-        <div className="text-xs text-gray-400 font-mono">DJM-750MK2</div>
+        <div className="text-xs text-gray-300 font-mono">DJM-750MK2</div>
       </div>
 
       {/* Channel Strips - Compact Layout */}
@@ -229,7 +229,7 @@ export function Mixer() {
         {/* Channel A */}
         <div className="pioneer-eq-section p-1 flex-1">
           <div className="text-center mb-1">
-            <div className="text-xs font-bold text-blue-400">CH A</div>
+            <div className="text-xs font-bold text-blue-300">CH A</div>
           </div>
           
           {/* Compact EQ Controls */}
@@ -242,7 +242,7 @@ export function Mixer() {
                 style={{ transform: `rotate(${(channelA.eq.high - 50) * 2.7}deg)` }}
                 onMouseDown={handleKnobMouseDown('high', 'A')}
               />
-              <div className="text-xs text-gray-400">HI</div>
+              <div className="text-xs text-gray-300">HI</div>
             </div>
             <div className="text-center">
               <div 
@@ -252,7 +252,7 @@ export function Mixer() {
                 style={{ transform: `rotate(${(channelA.eq.mid - 50) * 2.7}deg)` }}
                 onMouseDown={handleKnobMouseDown('mid', 'A')}
               />
-              <div className="text-xs text-gray-400">MID</div>
+              <div className="text-xs text-gray-300">MID</div>
             </div>
             <div className="text-center">
               <div 
@@ -262,7 +262,7 @@ export function Mixer() {
                 style={{ transform: `rotate(${(channelA.eq.low - 50) * 2.7}deg)` }}
                 onMouseDown={handleKnobMouseDown('low', 'A')}
               />
-              <div className="text-xs text-gray-400">LOW</div>
+              <div className="text-xs text-gray-300">LOW</div>
             </div>
           </div>
 
@@ -304,7 +304,7 @@ export function Mixer() {
                 style={{ transform: `rotate(${(channelB.eq.high - 50) * 2.7}deg)` }}
                 onMouseDown={handleKnobMouseDown('high', 'B')}
               />
-              <div className="text-xs text-gray-400">HI</div>
+              <div className="text-xs text-gray-300">HI</div>
             </div>
             <div className="text-center">
               <div 
@@ -314,7 +314,7 @@ export function Mixer() {
                 style={{ transform: `rotate(${(channelB.eq.mid - 50) * 2.7}deg)` }}
                 onMouseDown={handleKnobMouseDown('mid', 'B')}
               />
-              <div className="text-xs text-gray-400">MID</div>
+              <div className="text-xs text-gray-300">MID</div>
             </div>
             <div className="text-center">
               <div 
@@ -324,7 +324,7 @@ export function Mixer() {
                 style={{ transform: `rotate(${(channelB.eq.low - 50) * 2.7}deg)` }}
                 onMouseDown={handleKnobMouseDown('low', 'B')}
               />
-              <div className="text-xs text-gray-400">LOW</div>
+              <div className="text-xs text-gray-300">LOW</div>
             </div>
           </div>
 

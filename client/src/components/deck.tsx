@@ -215,8 +215,8 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         {/* Main LCD Screen */}
         <div className="pioneer-screen p-3 mb-3 h-full flex flex-col">
           <div className="flex justify-between items-start mb-2">
-            <div className="text-xs text-blue-400 font-mono">CDJ-3000</div>
-            <div className="text-xs text-blue-400 font-mono">
+            <div className="text-xs text-blue-300 font-mono">CDJ-3000</div>
+            <div className="text-xs text-blue-300 font-mono">
               {deck.isReady ? 'READY' : 'LOADING'}
             </div>
           </div>
@@ -226,7 +226,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             <div className="text-orange-400 font-mono text-sm">
               {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm / 4))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm / 4)) * 4) + 1}` : '0.1'} Bars
             </div>
-            <div className="text-blue-400 font-mono text-sm">
+            <div className="text-blue-300 font-mono text-sm">
               {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm)) * 4) + 1}` : '0.1'} Bars
             </div>
           </div>
@@ -265,7 +265,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               <div className="text-sm font-bold truncate flex-1 mr-2">
                 {deck.track?.name || 'No Track Loaded'}
               </div>
-              <div className="text-xs text-gray-400">TRACK 01</div>
+              <div className="text-xs text-gray-300">TRACK 01</div>
             </div>
             
             <div className="flex justify-between items-center text-xs">
@@ -284,7 +284,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             </div>
             
             {/* Additional CDJ Info */}
-            <div className="flex justify-between items-center mt-2 text-xs text-gray-400">
+            <div className="flex justify-between items-center mt-2 text-xs text-gray-300">
               <span>A.HOT CUE</span>
               <span>{deck.track ? `${formatTempo(deck.tempo)}` : '+0.0%'}</span>
               <span>02:34</span>
@@ -294,7 +294,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
 
         {/* Consolidated Controls Row */}
         <div className="flex gap-1 mb-2 justify-center" style={{ zIndex: 10, position: 'relative' }}>
-          <label className="pioneer-button py-1 px-2 text-xs cursor-pointer text-blue-400 hover:text-blue-300" style={{ zIndex: 11 }}>
+          <label className="pioneer-button py-1 px-2 text-xs cursor-pointer text-blue-300 hover:text-blue-300" style={{ zIndex: 11 }}>
             LOAD TRACK
             <input
               type="file"
@@ -326,7 +326,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         <div className="flex gap-1">
           <button 
             onClick={handlePlayPause}
-            className={`pioneer-button py-1 px-2 text-xs ${deck.isPlaying ? 'text-blue-400' : 'text-blue-400'}`}
+            className={`pioneer-button py-1 px-2 text-xs ${deck.isPlaying ? 'text-blue-300' : 'text-blue-300'}`}
           >
             <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
             <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
@@ -385,8 +385,8 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       <div className="mb-2">
         <label className={`block w-full p-2 border-2 border-dashed rounded-lg cursor-pointer transition-all text-center ${
           isDragOver 
-            ? 'border-blue-400 bg-blue-400 bg-opacity-10' 
-            : 'border-gray-600 hover:border-blue-400'
+            ? 'border-blue-300 bg-blue-400 bg-opacity-10' 
+            : 'border-gray-600 hover:border-blue-300'
         }`}>
           <input
             type="file"
@@ -394,7 +394,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             onChange={handleFileUpload}
             className="hidden"
           />
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-gray-300">
             {isDragOver ? 'Drop your track here!' : 'Load Track'}
           </div>
         </label>
@@ -404,14 +404,14 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       <div className="grid grid-cols-3 gap-1">
         <button 
           className={`pioneer-button py-1 text-xs ${
-            deck.isLooping ? 'bg-blue-500 text-white' : 'text-blue-400 hover:bg-blue-500'
+            deck.isLooping ? 'bg-blue-500 text-white' : 'text-blue-300 hover:bg-blue-500'
           }`}
           onClick={toggleLoop}
         >
           LOOP
         </button>
         <button 
-          className="pioneer-button py-1 text-xs text-blue-400 hover:bg-blue-500"
+          className="pioneer-button py-1 text-xs text-blue-300 hover:bg-blue-500"
           onClick={() => beatJump(-1)}
         >
           SLIP

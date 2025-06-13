@@ -5,21 +5,21 @@
 
 :root {
   --background: hsl(0, 0%, 8%);
-  --foreground: hsl(0, 0%, 95%);
+  --foreground: hsl(0, 0%, 98%);
   --muted: hsl(0, 0%, 12%);
-  --muted-foreground: hsl(0, 0%, 60%);
+  --muted-foreground: hsl(0, 0%, 75%);
   --popover: hsl(0, 0%, 8%);
-  --popover-foreground: hsl(0, 0%, 95%);
+  --popover-foreground: hsl(0, 0%, 98%);
   --card: hsl(0, 0%, 12%);
-  --card-foreground: hsl(0, 0%, 95%);
+  --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(0, 0%, 18%);
   --input: hsl(0, 0%, 18%);
   --primary: hsl(207, 90%, 54%);
   --primary-foreground: hsl(211, 100%, 99%);
   --secondary: hsl(0, 0%, 16%);
-  --secondary-foreground: hsl(0, 0%, 95%);
+  --secondary-foreground: hsl(0, 0%, 98%);
   --accent: hsl(0, 0%, 16%);
-  --accent-foreground: hsl(0, 0%, 95%);
+  --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(60, 9%, 98%);
   --ring: hsl(0, 0%, 83%);
@@ -31,9 +31,9 @@
   --pioneer-gray: hsl(0, 0%, 15%);
   --pioneer-light-gray: hsl(0, 0%, 20%);
   --pioneer-silver: hsl(0, 0%, 65%);
-  --pioneer-blue: hsl(210, 100%, 50%);
-  --pioneer-cyan: hsl(195, 100%, 50%);
-  --pioneer-green: hsl(210, 100%, 50%);
+  --pioneer-blue: hsl(210, 100%, 65%);
+  --pioneer-cyan: hsl(195, 100%, 65%);
+  --pioneer-green: hsl(210, 100%, 65%);
   --pioneer-orange: hsl(30, 100%, 50%);
   --pioneer-red: hsl(0, 100%, 50%);
   --pioneer-yellow: hsl(60, 100%, 50%);
@@ -288,8 +288,8 @@
   --nfg-green-success: #3b82f6;     /* Success states */
   
   --nfg-white-text: #ffffff;        /* Primary text */
-  --nfg-gray-dim: #666666;          /* Secondary text */
-  --nfg-gray-border: #333333;       /* Border colors */
+  --nfg-gray-dim: #cccccc;          /* Secondary text */
+  --nfg-gray-border: #555555;       /* Border colors */
 }
 
 /* Terminal OS Base Styling */

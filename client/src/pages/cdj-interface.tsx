@@ -103,7 +103,7 @@ export default function CDJInterface() {
               {isBurgerMenuOpen ? <X className="w-5 h-5 text-cyan-400" /> : <Menu className="w-5 h-5 text-cyan-400" />}
             </button>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-400">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-300">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
               <span>System Ready</span>
@@ -120,11 +120,11 @@ export default function CDJInterface() {
                 {isRecording ? '● REC' : '○ REC'}
               </button>
             </div>
-            <div className="text-gray-500 font-mono text-xs">
+            <div className="text-gray-400 font-mono text-xs">
               Latency: 5ms | CPU: 12%
             </div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-400">Zoom:</span>
+              <span className="text-xs text-gray-300">Zoom:</span>
               <input
                 type="range"
                 min="50"
@@ -133,7 +133,7 @@ export default function CDJInterface() {
                 onChange={(e) => setZoomLevel(Number(e.target.value))}
                 className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
               />
-              <span className="text-xs text-gray-400 w-8">{zoomLevel}%</span>
+              <span className="text-xs text-gray-300 w-8">{zoomLevel}%</span>
             </div>
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function CDJInterface() {
           <div className="pioneer-eq-section p-4 rounded-lg">
             <div className="text-center mb-2">
               <div className="text-sm font-bold text-white">DJM-750MK2</div>
-              <div className="text-xs text-gray-400">CROSSFADER</div>
+              <div className="text-xs text-gray-300">CROSSFADER</div>
             </div>
             <div className="flex justify-center">
               <div 
@@ -202,7 +202,7 @@ export default function CDJInterface() {
                 />
               </div>
             </div>
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <div className="flex justify-between text-xs text-gray-300 mt-1">
               <span>A</span>
               <span>B</span>
             </div>
@@ -211,7 +211,7 @@ export default function CDJInterface() {
 
         {/* Connection Cables Visual */}
         <div className="mt-8 flex justify-center">
-          <div className="text-xs text-gray-600 font-mono">
+          <div className="text-xs text-gray-500 font-mono">
             CDJ-A ═══════════ DJM-750MK2 ═══════════ CDJ-B
           </div>
         </div>
@@ -219,19 +219,19 @@ export default function CDJInterface() {
         {/* Footer Info */}
         <div className="mt-8 text-center">
           <div className="pioneer-eq-section inline-block p-4">
-            <div className="text-xs text-gray-400 mb-2">MASTER OUTPUT</div>
+            <div className="text-xs text-gray-300 mb-2">MASTER OUTPUT</div>
             <div className="flex items-center justify-center space-x-4 text-sm">
               <div className="flex items-center space-x-2">
-                <i className="fas fa-headphones text-blue-400" />
-                <span className="text-gray-400">Monitoring</span>
+                <i className="fas fa-headphones text-blue-300" />
+                <span className="text-gray-300">Monitoring</span>
               </div>
               <div className="flex items-center space-x-2">
-                <i className="fas fa-volume-up text-blue-400" />
-                <span className="text-gray-400">Main Out</span>
+                <i className="fas fa-volume-up text-blue-300" />
+                <span className="text-gray-300">Main Out</span>
               </div>
               <div className="flex items-center space-x-2">
                 <i className="fas fa-microphone text-orange-400" />
-                <span className="text-gray-400">Booth Out</span>
+                <span className="text-gray-300">Booth Out</span>
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function CDJInterface() {
                 return (
                   <div key={item.id} className="relative">
                     {/* Tree lines */}
-                    <div className="absolute left-0 top-0 h-full flex flex-col text-gray-600">
+                    <div className="absolute left-0 top-0 h-full flex flex-col text-gray-500">
                       <div className="flex items-center h-6">
                         <span className="text-xs">
                           {item.isLast ? '└─' : '├─'}
@@ -275,7 +275,7 @@ export default function CDJInterface() {
                         <Icon className="w-4 h-4 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium truncate">{item.label}</div>
-                          <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                          <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-400 group-hover:text-gray-300'}`}>
                             {item.description}
                           </div>
                         </div>
@@ -288,7 +288,7 @@ export default function CDJInterface() {
             
             <div className="border-t border-gray-700 mt-3 pt-3">
               <div className="relative">
-                <div className="absolute left-0 top-0 h-6 flex items-center text-gray-600">
+                <div className="absolute left-0 top-0 h-6 flex items-center text-gray-500">
                   <span className="text-xs">└─</span>
                 </div>
                 <button
