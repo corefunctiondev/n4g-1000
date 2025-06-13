@@ -1,192 +1,154 @@
-import { pgTable, text, serial, integer, timestamp, real, boolean } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { relations } from "drizzle-orm";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  isAdmin: boolean("is_admin").default(false).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+// Type definitions for Supabase tables
+export interface User {
+  id: number;
+  username: string;
+  password: string;
+  is_admin: boolean;
+  created_at: string;
+}
+
+export interface SiteContent {
+  id: number;
+  key: string;
+  section: string;
+  title?: string;
+  subtitle?: string;
+  content?: string;
+  value?: string;
+  image_url?: string;
+  video_url?: string;
+  link_url?: string;
+  button_text?: string;
+  background_color?: string;
+  text_color?: string;
+  font_size?: string;
+  position: number;
+  is_active: boolean;
+  updated_at: string;
+  created_at: string;
+}
+
+export interface Track {
+  id: number;
+  name: string;
+  artist: string;
+  bpm: number;
+  duration: string;
+  genre: string;
+  url: string;
+  user_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Playlist {
+  id: number;
+  name: string;
+  description?: string;
+  user_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlaylistTrack {
+  id: number;
+  playlist_id: number;
+  track_id: number;
+  position: number;
+  created_at: string;
+}
+
+export interface DjSession {
+  id: number;
+  name: string;
+  description?: string;
+  user_id: number;
+  session_data?: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminSession {
+  id: number;
+  user_id: number;
+  session_token: string;
+  expires_at: string;
+  created_at: string;
+}
+
+// Zod schemas for validation
+export const insertUserSchema = z.object({
+  username: z.string().min(1),
+  password: z.string().min(1),
+  is_admin: z.boolean().default(false),
 });
 
-export const siteContent = pgTable("site_content", {
-  id: serial("id").primaryKey(),
-  key: text("key").notNull().unique(),
-  section: text("section").notNull(), // 'header', 'hero', 'about', 'services', 'footer', etc.
-  title: text("title"),
-  subtitle: text("subtitle"),
-  content: text("content"),
-  imageUrl: text("image_url"),
-  videoUrl: text("video_url"),
-  linkUrl: text("link_url"),
-  buttonText: text("button_text"),
-  backgroundColor: text("background_color"),
-  textColor: text("text_color"),
-  fontSize: text("font_size"),
-  position: integer("position").default(0), // for ordering content
-  isActive: boolean("is_active").default(true).notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+export const insertSiteContentSchema = z.object({
+  key: z.string().min(1),
+  section: z.string().min(1),
+  title: z.string().optional(),
+  subtitle: z.string().optional(),
+  content: z.string().optional(),
+  value: z.string().optional(),
+  image_url: z.string().optional(),
+  video_url: z.string().optional(),
+  link_url: z.string().optional(),
+  button_text: z.string().optional(),
+  background_color: z.string().optional(),
+  text_color: z.string().optional(),
+  font_size: z.string().optional(),
+  position: z.number().default(0),
+  is_active: z.boolean().default(true),
 });
 
-export const adminSessions = pgTable("admin_sessions", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  sessionToken: text("session_token").notNull().unique(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+export const insertTrackSchema = z.object({
+  name: z.string().min(1),
+  artist: z.string().min(1),
+  bpm: z.number().min(1),
+  duration: z.string(),
+  genre: z.string(),
+  url: z.string().url(),
+  user_id: z.number(),
 });
 
-export const tracks = pgTable("tracks", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
-  name: text("name").notNull(),
-  artist: text("artist"),
-  album: text("album"),
-  genre: text("genre"),
-  bpm: real("bpm").notNull(),
-  duration: real("duration").notNull(),
-  key: text("key"),
-  filePath: text("file_path").notNull(),
-  waveformData: text("waveform_data"), // JSON string of waveform data
-  cuePoints: text("cue_points"), // JSON array of cue points
-  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+export const insertPlaylistSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  user_id: z.number(),
 });
 
-export const playlists = pgTable("playlists", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  name: text("name").notNull(),
-  description: text("description"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+export const insertPlaylistTrackSchema = z.object({
+  playlist_id: z.number(),
+  track_id: z.number(),
+  position: z.number(),
 });
 
-export const playlistTracks = pgTable("playlist_tracks", {
-  id: serial("id").primaryKey(),
-  playlistId: integer("playlist_id").references(() => playlists.id).notNull(),
-  trackId: integer("track_id").references(() => tracks.id).notNull(),
-  position: integer("position").notNull(),
-  addedAt: timestamp("added_at").defaultNow().notNull(),
+export const insertDjSessionSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  user_id: z.number(),
+  session_data: z.any().optional(),
 });
 
-export const djSessions = pgTable("dj_sessions", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
-  name: text("name").notNull(),
-  duration: real("duration"), // session duration in seconds
-  trackCount: integer("track_count").default(0),
-  recordingPath: text("recording_path"), // path to recorded mix file
-  sessionData: text("session_data"), // JSON data of session state
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+export const insertAdminSessionSchema = z.object({
+  user_id: z.number(),
+  session_token: z.string(),
+  expires_at: z.string(),
 });
 
-// Relations
-export const usersRelations = relations(users, ({ many }) => ({
-  tracks: many(tracks),
-  playlists: many(playlists),
-  djSessions: many(djSessions),
-  adminSessions: many(adminSessions),
-}));
-
-export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
-  user: one(users, {
-    fields: [adminSessions.userId],
-    references: [users.id],
-  }),
-}));
-
-export const tracksRelations = relations(tracks, ({ one, many }) => ({
-  user: one(users, {
-    fields: [tracks.userId],
-    references: [users.id],
-  }),
-  playlistTracks: many(playlistTracks),
-}));
-
-export const playlistsRelations = relations(playlists, ({ one, many }) => ({
-  user: one(users, {
-    fields: [playlists.userId],
-    references: [users.id],
-  }),
-  playlistTracks: many(playlistTracks),
-}));
-
-export const playlistTracksRelations = relations(playlistTracks, ({ one }) => ({
-  playlist: one(playlists, {
-    fields: [playlistTracks.playlistId],
-    references: [playlists.id],
-  }),
-  track: one(tracks, {
-    fields: [playlistTracks.trackId],
-    references: [tracks.id],
-  }),
-}));
-
-export const djSessionsRelations = relations(djSessions, ({ one }) => ({
-  user: one(users, {
-    fields: [djSessions.userId],
-    references: [users.id],
-  }),
-}));
-
-// Insert schemas
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
-
-export const insertTrackSchema = createInsertSchema(tracks).omit({
-  id: true,
-  uploadedAt: true,
-});
-
-export const insertPlaylistSchema = createInsertSchema(playlists).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertPlaylistTrackSchema = createInsertSchema(playlistTracks).omit({
-  id: true,
-  addedAt: true,
-});
-
-export const insertDjSessionSchema = createInsertSchema(djSessions).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertSiteContentSchema = createInsertSchema(siteContent).omit({
-  id: true,
-  updatedAt: true,
-});
-
-export const insertAdminSessionSchema = createInsertSchema(adminSessions).omit({
-  id: true,
-  createdAt: true,
-});
-
-// Admin login schema
 export const adminLoginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+  username: z.string().min(1),
+  password: z.string().min(1),
 });
 
-// Types
+// Type inference
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
-export type InsertTrack = z.infer<typeof insertTrackSchema>;
-export type Track = typeof tracks.$inferSelect;
-export type InsertPlaylist = z.infer<typeof insertPlaylistSchema>;
-export type Playlist = typeof playlists.$inferSelect;
-export type InsertPlaylistTrack = z.infer<typeof insertPlaylistTrackSchema>;
-export type PlaylistTrack = typeof playlistTracks.$inferSelect;
-export type InsertDjSession = z.infer<typeof insertDjSessionSchema>;
-export type DjSession = typeof djSessions.$inferSelect;
 export type InsertSiteContent = z.infer<typeof insertSiteContentSchema>;
-export type SiteContent = typeof siteContent.$inferSelect;
+export type InsertTrack = z.infer<typeof insertTrackSchema>;
+export type InsertPlaylist = z.infer<typeof insertPlaylistSchema>;
+export type InsertPlaylistTrack = z.infer<typeof insertPlaylistTrackSchema>;
+export type InsertDjSession = z.infer<typeof insertDjSessionSchema>;
 export type InsertAdminSession = z.infer<typeof insertAdminSessionSchema>;
-export type AdminSession = typeof adminSessions.$inferSelect;
 export type AdminLogin = z.infer<typeof adminLoginSchema>;

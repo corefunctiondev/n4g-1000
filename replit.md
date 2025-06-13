@@ -17,9 +17,10 @@ This is a full-stack web application that replicates the functionality of profes
 ### Backend Architecture  
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript with ESM modules
-- **Database**: Supabase PostgreSQL with direct client connection
+- **Database**: Supabase PostgreSQL (exclusive data source)
 - **Storage**: Supabase Storage with "music" bucket for audio files
-- **API Design**: RESTful endpoints connected to Supabase database
+- **API Design**: RESTful endpoints using Supabase client directly
+- **Architecture**: Simplified single-database design (no local PostgreSQL)
 
 ### Audio Engine Architecture
 - **Core**: Custom AudioEngine class managing Web Audio API
