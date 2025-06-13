@@ -373,17 +373,17 @@ function HomeSection() {
           fallback="NEED FOR GROOVE OPERATING SYSTEM v2.1.0"
           as="div"
         />
-        <div>Copyright (c) 2024 Need For Groove Collective</div>
-        <div>All rights reserved.</div>
+        <div data-editable data-key="copyright" data-section="home">Copyright (c) 2024 Need For Groove Collective</div>
+        <div data-editable data-key="rights" data-section="home">All rights reserved.</div>
       </div>
       
       <div className="space-y-4">
-        <div className="text-cyan-400">SYSTEM STATUS:</div>
+        <div className="text-cyan-400" data-editable data-key="system_status_title" data-section="home">SYSTEM STATUS:</div>
         <div className="pl-4 space-y-1 text-sm">
-          <div>✓ Audio Engine: ONLINE</div>
-          <div>✓ DJ Equipment: READY</div>
-          <div>✓ Music Library: LOADED</div>
-          <div>✓ Network: CONNECTED</div>
+          <div data-editable data-key="audio_engine_status" data-section="home">✓ Audio Engine: ONLINE</div>
+          <div data-editable data-key="dj_equipment_status" data-section="home">✓ DJ Equipment: READY</div>
+          <div data-editable data-key="music_library_status" data-section="home">✓ Music Library: LOADED</div>
+          <div data-editable data-key="network_status" data-section="home">✓ Network: CONNECTED</div>
         </div>
       </div>
       
@@ -394,16 +394,16 @@ function HomeSection() {
       />
       
       <div className="space-y-4">
-        <div className="text-cyan-400">ACTIVE MEMBERS:</div>
+        <div className="text-cyan-400" data-editable data-key="active_members_title" data-section="home">ACTIVE MEMBERS:</div>
         <div className="pl-4 space-y-1 text-sm">
-          <div>alex@brooklyn.nyc - ONLINE</div>
-          <div>jordan@manhattan.nyc - ONLINE</div>
+          <div data-editable data-key="member_alex" data-section="home">alex@brooklyn.nyc - ONLINE</div>
+          <div data-editable data-key="member_jordan" data-section="home">jordan@manhattan.nyc - ONLINE</div>
         </div>
       </div>
       
       <div className="border border-cyan-400 p-4 rounded">
-        <div className="text-orange-400 mb-2">LATEST NOTIFICATION:</div>
-        <div className="text-sm">New booking confirmed: Brooklyn Warehouse, Saturday 11PM</div>
+        <div className="text-orange-400 mb-2" data-editable data-key="notification_title" data-section="home">LATEST NOTIFICATION:</div>
+        <div className="text-sm" data-editable data-key="latest_notification" data-section="home">New booking confirmed: Brooklyn Warehouse, Saturday 11PM</div>
       </div>
     </div>
   );
@@ -427,27 +427,27 @@ function AboutSection() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border border-cyan-400 p-4 rounded">
-          <div className="text-cyan-400 font-bold mb-3">ALEX RODRIGUEZ</div>
+          <div className="text-cyan-400 font-bold mb-3" data-editable data-key="alex_name" data-section="about">ALEX RODRIGUEZ</div>
           <div className="space-y-2 text-sm">
-            <div>Location: Brooklyn, NY</div>
-            <div>Style: Deep House, Progressive</div>
-            <div>Experience: 8+ years</div>
-            <div>Status: <span className="text-blue-300">ACTIVE</span></div>
+            <div data-editable data-key="alex_location" data-section="about">Location: Brooklyn, NY</div>
+            <div data-editable data-key="alex_style" data-section="about">Style: Deep House, Progressive</div>
+            <div data-editable data-key="alex_experience" data-section="about">Experience: 8+ years</div>
+            <div>Status: <span className="text-blue-300" data-editable data-key="alex_status" data-section="about">ACTIVE</span></div>
           </div>
-          <div className="mt-3 text-xs text-gray-300">
+          <div className="mt-3 text-xs text-gray-300" data-editable data-key="alex_bio" data-section="about">
             Specializes in underground warehouse vibes and late-night deep sets.
           </div>
         </div>
         
         <div className="border border-orange-400 p-4 rounded">
-          <div className="text-orange-400 font-bold mb-3">JORDAN CHEN</div>
+          <div className="text-orange-400 font-bold mb-3" data-editable data-key="jordan_name" data-section="about">JORDAN CHEN</div>
           <div className="space-y-2 text-sm">
-            <div>Location: Manhattan, NY</div>
-            <div>Style: Techno, Minimal</div>
-            <div>Experience: 6+ years</div>
-            <div>Status: <span className="text-blue-300">ACTIVE</span></div>
+            <div data-editable data-key="jordan_location" data-section="about">Location: Manhattan, NY</div>
+            <div data-editable data-key="jordan_style" data-section="about">Style: Techno, Minimal</div>
+            <div data-editable data-key="jordan_experience" data-section="about">Experience: 6+ years</div>
+            <div>Status: <span className="text-blue-300" data-editable data-key="jordan_status" data-section="about">ACTIVE</span></div>
           </div>
-          <div className="mt-3 text-xs text-gray-300">
+          <div className="mt-3 text-xs text-gray-300" data-editable data-key="jordan_bio" data-section="about">
             Known for precise mixing and driving techno beats that keep crowds moving.
           </div>
         </div>
@@ -459,7 +459,7 @@ function AboutSection() {
 function SetsSection() {
   return (
     <div className="space-y-6 text-blue-300">
-      <div className="text-xl font-bold text-cyan-400">$ ls -la ./sets/</div>
+      <div className="text-xl font-bold text-cyan-400" data-editable data-key="sets_title" data-section="sets">$ ls -la ./sets/</div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
@@ -468,11 +468,11 @@ function SetsSection() {
           { title: "Deep Underground", date: "2024-01-05", duration: "3:00:00", plays: 2156 },
         ].map((set, index) => (
           <div key={index} className="border border-gray-600 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
-            <div className="text-cyan-400 font-bold mb-2">{set.title}</div>
+            <div className="text-cyan-400 font-bold mb-2" data-editable data-key={`set_${index}_title`} data-section="sets">{set.title}</div>
             <div className="text-xs space-y-1 text-gray-300">
-              <div>Date: {set.date}</div>
-              <div>Duration: {set.duration}</div>
-              <div>Plays: {set.plays}</div>
+              <div data-editable data-key={`set_${index}_date`} data-section="sets">Date: {set.date}</div>
+              <div data-editable data-key={`set_${index}_duration`} data-section="sets">Duration: {set.duration}</div>
+              <div data-editable data-key={`set_${index}_plays`} data-section="sets">Plays: {set.plays}</div>
             </div>
           </div>
         ))}
