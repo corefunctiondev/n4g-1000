@@ -14,7 +14,7 @@ import {
 import cookieParser from 'cookie-parser';
 import { db } from "./db";
 import { users, siteContent } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Add cookie parser middleware for admin sessions
@@ -198,6 +198,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting site content:', error);
       res.status(500).json({ error: "Failed to delete content" });
+    }
+  });
+
+  // PUBLIC CONTENT API - for website content consumption
+  // Get content by section
+  app.get("/api/content/:section", async (req, res) => {
+    try {
+      const { section } = req.params;
+      const content = await db
+        .select()
+        .from(siteContent)
+        .where(eq(siteContent.section, section))
+        .orderBy(siteContent.position);
+      
+      res.json(content);
+    } catch (error) {
+      console.error('Error fetching content:', error);
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  // Get content by key
+  app.get("/api/content/key/:key", async (req, res) => {
+    try {
+      const { key } = req.params;
+      const content = await db
+        .select()
+        .from(siteContent)
+        .where(eq(siteContent.key, key))
+        .limit(1);
+      
+      if (!content || content.length === 0) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+      
+      res.json(content[0]);
+    } catch (error) {
+      console.error('Error fetching content:', error);
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  // Get all active content
+  app.get("/api/content", async (req, res) => {
+    try {
+      const content = await db
+        .select()
+        .from(siteContent)
+        .where(eq(siteContent.isActive, true));
+      
+      res.json(content);
+    } catch (error) {
+      console.error('Error fetching content:', error);
+      res.status(500).json({ error: "Failed to fetch content" });
     }
   });
 
