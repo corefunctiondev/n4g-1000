@@ -7,7 +7,7 @@ import { Fader } from './fader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Track } from '@shared/schema';
+import { DatabaseTrack } from '@/types/audio';
 
 interface DeckProps {
   deckId: 'A' | 'B';
@@ -46,7 +46,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   // Fetch tracks from Supabase database
   const { data: tracks = [], isLoading: tracksLoading } = useQuery({
     queryKey: ['/api/tracks'],
-    select: (data: Track[]) => data || []
+    select: (data: DatabaseTrack[]) => data || []
   });
 
   // Share deck state with parent component for sync functionality
@@ -67,22 +67,29 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   const handleTrackSelect = useCallback(async (trackId: string) => {
     setSelectedTrackId(trackId);
     const selectedTrack = tracks.find(track => track.id.toString() === trackId);
-    if (selectedTrack && (selectedTrack.url || selectedTrack.filePath)) {
+    if (selectedTrack && selectedTrack.url) {
       try {
-        const trackUrl = selectedTrack.url || selectedTrack.filePath;
-        console.log(`Loading track: ${selectedTrack.name} from ${trackUrl}`);
+        const trackUrl = selectedTrack.url;
+        console.log(`[${deckId}] Loading track: ${selectedTrack.name}`);
+        console.log(`[${deckId}] Fetching from: ${trackUrl}`);
+        
         // Fetch the audio file from the URL
         const response = await fetch(trackUrl);
         if (!response.ok) {
-          throw new Error(`Failed to fetch track: ${response.status}`);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+        
         const blob = await response.blob();
+        console.log(`[${deckId}] Downloaded ${blob.size} bytes, type: ${blob.type}`);
+        
         const file = new File([blob], selectedTrack.name + '.wav', { type: 'audio/wav' });
-        console.log(`Created file object for ${selectedTrack.name}, size: ${blob.size} bytes`);
+        console.log(`[${deckId}] Created File object, starting audio loading...`);
+        
         await loadTrack(file);
-        console.log(`Track ${selectedTrack.name} loaded successfully on deck ${deckId}`);
+        console.log(`[${deckId}] ✓ Track loaded successfully: ${selectedTrack.name}`);
       } catch (error) {
-        console.error(`Error loading track ${selectedTrack.name}:`, error);
+        console.error(`[${deckId}] ✗ Error loading track:`, error);
+        console.error(`[${deckId}] Track details:`, selectedTrack);
       }
     } else {
       console.error('Selected track not found or missing URL:', selectedTrack);
