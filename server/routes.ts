@@ -71,16 +71,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // SITE CONTENT MANAGEMENT ROUTES (Admin Only)
-  // Get all site content
+  // Get site content with optional section filtering
   app.get("/api/admin/content", requireAdmin, async (req, res) => {
     try {
-      const { data: content, error } = await supabase
+      const { section } = req.query;
+      
+      let query = supabase
         .from('site_content')
         .select('*')
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .order('position', { ascending: true });
+      
+      if (section) {
+        query = query.eq('section', section);
+      }
+      
+      const { data: content, error } = await query;
       
       if (error) throw error;
-      res.json(content);
+      res.json(content || []);
     } catch (error) {
       console.error('Error fetching site content:', error);
       res.status(500).json({ error: "Failed to fetch content" });

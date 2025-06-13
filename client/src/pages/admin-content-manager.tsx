@@ -66,16 +66,28 @@ function AdminContentManager({ onLogout }: ContentManagerProps) {
         }
       });
       if (!response.ok) throw new Error('Failed to fetch content');
-      return response.json() as SiteContent[];
+      return await response.json();
     }
   });
 
   // Create or update content mutation
   const saveContentMutation = useMutation({
     mutationFn: async (content: Partial<ContentItem>) => {
-      const method = content.id ? 'PATCH' : 'POST';
       const url = content.id ? `/api/admin/content/${content.id}` : '/api/admin/content';
-      return await apiRequest(method, url, content);
+      const method = content.id ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('admin_session') || '{}').access_token}`
+        },
+        credentials: 'include',
+        body: JSON.stringify(content)
+      });
+      
+      if (!response.ok) throw new Error('Failed to save content');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/admin/content`] });
@@ -98,7 +110,16 @@ function AdminContentManager({ onLogout }: ContentManagerProps) {
   // Delete content mutation
   const deleteContentMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/admin/content/${id}`);
+      const response = await fetch(`/api/admin/content/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('admin_session') || '{}').access_token}`
+        },
+        credentials: 'include'
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete content');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/admin/content`] });
