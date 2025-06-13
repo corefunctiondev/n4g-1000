@@ -409,11 +409,11 @@ function HomeSection() {
       </div>
       
       <div className="border border-cyan-400 p-4 rounded">
-        <Link href={hero.linkUrl}>
+        <a href={hero.linkUrl}>
           <button className="bg-cyan-400 text-black px-6 py-2 rounded font-bold hover:bg-cyan-300 transition-colors">
             {hero.buttonText}
           </button>
-        </Link>
+        </a>
       </div>
       
       <div className="space-y-4">
@@ -433,45 +433,47 @@ function HomeSection() {
 }
 
 function AboutSection() {
+  const { data: aboutContent = [] } = useContentBySection('about');
+  
+  const getContent = (key: string, fallback: string = '') => {
+    const item = aboutContent.find((c: any) => c.key === key);
+    return item?.title || item?.content || fallback;
+  };
+
   return (
     <div className="space-y-6 text-blue-300">
-      <DynamicText 
-        contentKey="about_intro" 
-        fallback="$ cat ./profiles/*"
-        className="text-xl font-bold text-cyan-400"
-        as="div"
-      />
+      <div className="text-xl font-bold text-cyan-400">$ cat ./profiles/*</div>
       
-      <DynamicContent 
-        section="about"
-        fallbackText=""
-        className="space-y-6"
-      />
+      <div className="space-y-4">
+        <div className="text-2xl font-bold text-cyan-400">
+          {getContent('about_title', 'About Need For Groove')}
+        </div>
+        <div className="text-sm leading-relaxed">
+          {getContent('about_description', 'Need For Groove represents the intersection of technology and musical artistry. Our digital platform recreates the authentic feel of professional DJ equipment while providing access to our music library.')}
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="text-xl font-bold text-cyan-400">
+          {getContent('features_title', 'Professional Features')}
+        </div>
+        <div className="text-sm leading-relaxed">
+          {getContent('features_description', 'Real-time BPM analysis, beatmatching, 3-band EQ, crossfading, waveform visualization, and seamless track switching - all powered by N4G.')}
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border border-cyan-400 p-4 rounded">
-          <div className="text-cyan-400 font-bold mb-3" data-editable data-key="alex_name" data-section="about">ALEX RODRIGUEZ</div>
-          <div className="space-y-2 text-sm">
-            <div data-editable data-key="alex_location" data-section="about">Location: Brooklyn, NY</div>
-            <div data-editable data-key="alex_style" data-section="about">Style: Deep House, Progressive</div>
-            <div data-editable data-key="alex_experience" data-section="about">Experience: 8+ years</div>
-            <div>Status: <span className="text-blue-300" data-editable data-key="alex_status" data-section="about">ACTIVE</span></div>
-          </div>
-          <div className="mt-3 text-xs text-gray-300" data-editable data-key="alex_bio" data-section="about">
-            Specializes in underground warehouse vibes and late-night deep sets.
+          <div className="text-cyan-400 font-bold mb-3">{getContent('mixing_title', 'Live Mixing')}</div>
+          <div className="text-sm">
+            {getContent('mixing_description', 'Professional mixing capabilities with dual-deck control, tempo adjustment, and real-time effects.')}
           </div>
         </div>
         
         <div className="border border-orange-400 p-4 rounded">
-          <div className="text-orange-400 font-bold mb-3" data-editable data-key="jordan_name" data-section="about">JORDAN CHEN</div>
-          <div className="space-y-2 text-sm">
-            <div data-editable data-key="jordan_location" data-section="about">Location: Manhattan, NY</div>
-            <div data-editable data-key="jordan_style" data-section="about">Style: Techno, Minimal</div>
-            <div data-editable data-key="jordan_experience" data-section="about">Experience: 6+ years</div>
-            <div>Status: <span className="text-blue-300" data-editable data-key="jordan_status" data-section="about">ACTIVE</span></div>
-          </div>
-          <div className="mt-3 text-xs text-gray-300" data-editable data-key="jordan_bio" data-section="about">
-            Known for precise mixing and driving techno beats that keep crowds moving.
+          <div className="text-orange-400 font-bold mb-3">{getContent('library_title', 'Music Library')}</div>
+          <div className="text-sm">
+            {getContent('library_description', 'Access our music collection of 25 Need For Groove tracks.')}
           </div>
         </div>
       </div>
