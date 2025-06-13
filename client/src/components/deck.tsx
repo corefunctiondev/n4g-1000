@@ -216,7 +216,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         <div className="pioneer-screen p-3 mb-3 h-full flex flex-col">
           <div className="flex justify-between items-start mb-2">
             <div className="text-xs text-blue-400 font-mono">CDJ-3000</div>
-            <div className="text-xs text-green-400 font-mono">
+            <div className="text-xs text-blue-400 font-mono">
               {deck.isReady ? 'READY' : 'LOADING'}
             </div>
           </div>
@@ -226,7 +226,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             <div className="text-orange-400 font-mono text-sm">
               {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm / 4))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm / 4)) * 4) + 1}` : '0.1'} Bars
             </div>
-            <div className="text-green-400 font-mono text-sm">
+            <div className="text-blue-400 font-mono text-sm">
               {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm)) * 4) + 1}` : '0.1'} Bars
             </div>
           </div>
@@ -252,7 +252,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               {[1, 2, 3, 4].map((cue) => (
                 <div 
                   key={cue}
-                  className="w-1 h-2 bg-green-400 mr-4"
+                  className="w-1 h-2 bg-blue-400 mr-4"
                   style={{ left: `${cue * 20}%` }}
                 />
               ))}

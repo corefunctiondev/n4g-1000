@@ -42,13 +42,13 @@ export default function TerminalOS({}: TerminalOSProps) {
           currentText += bootLines[currentLine][currentChar];
           setBootText(currentText);
           currentChar++;
-          setTimeout(typeText, 30); // Very fast typing
+          setTimeout(typeText, 5); // Ultra fast typing
         } else {
           currentText += '\n';
           setBootText(currentText);
           currentLine++;
           currentChar = 0;
-          setTimeout(typeText, 100); // Short pause between lines
+          setTimeout(typeText, 20); // Very short pause between lines
         }
       } else {
         // Boot complete, switch to main interface
@@ -99,7 +99,7 @@ export default function TerminalOS({}: TerminalOSProps) {
 
   if (bootSequence) {
     return (
-      <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center">
+      <div className="min-h-screen bg-black text-blue-400 font-mono flex items-center justify-center">
         <div className="text-left">
           <pre className="text-sm whitespace-pre-line">
             {bootText}
@@ -145,7 +145,7 @@ export default function TerminalOS({}: TerminalOSProps) {
         
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2 text-sm text-gray-400">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
             <span>ONLINE</span>
           </div>
           
