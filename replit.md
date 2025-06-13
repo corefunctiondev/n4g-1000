@@ -110,6 +110,8 @@ Changelog:
 - June 13, 2025. Removed .wav extension from track display names and replaced zoom controls with helpful DJ instructions above CDJs
 - June 13, 2025. Implemented proper beatmatching for sync button - automatically adjusts tempo to match BPM between decks
 - June 13, 2025. Added secure admin authentication system with content management capabilities for site administration
+- June 13, 2025. Created complete database schema in Supabase with all tables: site_content, users, admin_sessions, tracks, playlists, playlist_tracks, dj_sessions
+- June 13, 2025. Connected dynamic content system - admin-managed content now displays live on main Terminal OS website
 
 ## User Preferences
 
