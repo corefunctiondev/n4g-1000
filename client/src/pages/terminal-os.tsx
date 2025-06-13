@@ -12,6 +12,7 @@ export default function TerminalOS({}: TerminalOSProps) {
   const [scanlines, setScanlines] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [bootSequence, setBootSequence] = useState(true);
+  const [bootText, setBootText] = useState('');
   const [glitchActive, setGlitchActive] = useState(false);
 
   // Initialize current section from URL
@@ -20,12 +21,42 @@ export default function TerminalOS({}: TerminalOSProps) {
     setCurrentSection(path);
   }, [location]);
 
-  // Boot sequence
+  // Fast boot sequence with typewriter effect
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setBootSequence(false);
-    }, 3000);
-    return () => clearTimeout(timer);
+    const bootLines = [
+      'NEED FOR GROOVE OS',
+      'v2.1.0',
+      'Initializing audio systems...',
+      'Loading DJ profiles...',
+      'Connecting to music database...',
+      'SYSTEM READY'
+    ];
+    
+    let currentLine = 0;
+    let currentChar = 0;
+    let currentText = '';
+    
+    const typeText = () => {
+      if (currentLine < bootLines.length) {
+        if (currentChar < bootLines[currentLine].length) {
+          currentText += bootLines[currentLine][currentChar];
+          setBootText(currentText);
+          currentChar++;
+          setTimeout(typeText, 30); // Very fast typing
+        } else {
+          currentText += '\n';
+          setBootText(currentText);
+          currentLine++;
+          currentChar = 0;
+          setTimeout(typeText, 100); // Short pause between lines
+        }
+      } else {
+        // Boot complete, switch to main interface
+        setTimeout(() => setBootSequence(false), 300);
+      }
+    };
+    
+    typeText();
   }, []);
 
   // Random glitch effect
@@ -69,15 +100,11 @@ export default function TerminalOS({}: TerminalOSProps) {
   if (bootSequence) {
     return (
       <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="text-2xl animate-pulse">NEED FOR GROOVE OS</div>
-          <div className="text-sm">v2.1.0</div>
-          <div className="text-xs space-y-1">
-            <div>Initializing audio systems...</div>
-            <div>Loading DJ profiles...</div>
-            <div>Connecting to music database...</div>
-            <div className="text-cyan-400">SYSTEM READY</div>
-          </div>
+        <div className="text-left">
+          <pre className="text-sm whitespace-pre-line">
+            {bootText}
+            <span className="animate-pulse">|</span>
+          </pre>
         </div>
       </div>
     );
