@@ -309,7 +309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if we should use mock data
       if (app.locals.mockTracks) {
-        const tracks = app.locals.mockTracks.map((track, index) => ({
+        const tracks = app.locals.mockTracks.map((track: any, index: number) => ({
           id: index + 1,
           name: track.title,
           artist: track.artist,

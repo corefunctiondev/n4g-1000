@@ -2,11 +2,21 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
+// Construct DATABASE_URL from individual environment variables if needed
+let databaseUrl = process.env.DATABASE_URL;
+
+// If DATABASE_URL is malformed or contains wrong content, reconstruct it
+if (!databaseUrl || databaseUrl.includes('NEXT_PUBLIC_SUPABASE_URL') || !databaseUrl.startsWith('postgres')) {
+  const { PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE } = process.env;
+  
+  if (!PGHOST || !PGPORT || !PGUSER || !PGPASSWORD || !PGDATABASE) {
+    throw new Error("Database connection details missing. Please ensure PostgreSQL is properly configured.");
+  }
+  
+  databaseUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
 }
 
-const sql = postgres(process.env.DATABASE_URL, {
+const sql = postgres(databaseUrl, {
   ssl: { rejectUnauthorized: false },
   max: 1,
   idle_timeout: 20,
