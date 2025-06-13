@@ -1,9 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from './db';
-import { users, adminSessions } from '@shared/schema';
-import { eq, and, gt, lt, sql } from 'drizzle-orm';
+import { createClient } from '@supabase/supabase-js';
+
+// Extract Supabase credentials
+const rawSupabaseUrl = process.env.SUPABASE_URL;
+const supabaseUrl = rawSupabaseUrl?.includes('=') ? rawSupabaseUrl.split('=')[1] : rawSupabaseUrl;
+
+const rawSupabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabaseAnonKey = rawSupabaseKey?.includes('=') ? rawSupabaseKey.split('=')[1] : rawSupabaseKey;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -35,41 +46,41 @@ export async function createAdminSession(userId: number): Promise<string> {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour session
 
-  await db.insert(adminSessions).values({
-    userId,
-    sessionToken,
-    expiresAt,
-  });
+  const { error } = await supabase
+    .from('admin_sessions')
+    .insert({
+      user_id: userId,
+      session_token: sessionToken,
+      expires_at: expiresAt.toISOString()
+    });
+
+  if (error) {
+    throw new Error(`Failed to create admin session: ${error.message}`);
+  }
 
   return sessionToken;
 }
 
 // Verify admin session
 export async function verifyAdminSession(sessionToken: string): Promise<{ id: number; username: string; isAdmin: boolean } | null> {
-  const session = await db
-    .select({
-      userId: adminSessions.userId,
-      username: users.username,
-      isAdmin: users.isAdmin,
-    })
-    .from(adminSessions)
-    .innerJoin(users, eq(adminSessions.userId, users.id))
-    .where(
-      and(
-        eq(adminSessions.sessionToken, sessionToken),
-        gt(adminSessions.expiresAt, new Date())
-      )
-    )
-    .limit(1);
+  const { data: session, error } = await supabase
+    .from('admin_sessions')
+    .select(`
+      user_id,
+      users!inner(id, username, is_admin)
+    `)
+    .eq('session_token', sessionToken)
+    .gt('expires_at', new Date().toISOString())
+    .single();
 
-  if (session.length === 0) {
+  if (error || !session) {
     return null;
   }
 
   return {
-    id: session[0].userId,
-    username: session[0].username,
-    isAdmin: session[0].isAdmin,
+    id: session.user_id,
+    username: session.users.username,
+    isAdmin: session.users.is_admin,
   };
 }
 
@@ -94,7 +105,8 @@ export async function requireAdmin(req: AuthenticatedRequest, res: Response, nex
 // Clean up expired sessions
 export async function cleanupExpiredSessions() {
   const now = new Date();
-  await db.delete(adminSessions).where(
-    lt(adminSessions.expiresAt, now)
-  );
+  await supabase
+    .from('admin_sessions')
+    .delete()
+    .lt('expires_at', now.toISOString());
 }
