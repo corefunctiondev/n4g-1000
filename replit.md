@@ -123,7 +123,6 @@ Changelog:
 - June 13, 2025. Completed major architectural cleanup - removed 61 obsolete packages (Drizzle ORM, PostgreSQL drivers, session management) for simplified Supabase-only design
 - June 13, 2025. Simplified schema.ts to pure TypeScript interfaces and Zod validation schemas without ORM dependencies
 - June 13, 2025. Added burger menu navigation to admin login page with back button and responsive mobile navigation
-- June 13, 2025. Created update-admin-password.js utility script for secure password updates using bcrypt hashing
 
 ## User Preferences
 
