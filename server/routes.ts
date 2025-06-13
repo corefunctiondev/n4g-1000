@@ -201,6 +201,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Visual Editor API - Update content by key (for click-to-edit functionality)
+  app.post("/api/content/update", async (req, res) => {
+    try {
+      const { key, content } = req.body;
+      
+      if (!key || content === undefined) {
+        return res.status(400).json({ error: "Key and content are required" });
+      }
+      
+      // Check if content exists
+      const existingContent = await db
+        .select()
+        .from(siteContent)
+        .where(eq(siteContent.key, key))
+        .limit(1);
+      
+      let result;
+      if (existingContent.length > 0) {
+        // Update existing content
+        [result] = await db
+          .update(siteContent)
+          .set({ 
+            content: content,
+            updatedAt: new Date() 
+          })
+          .where(eq(siteContent.key, key))
+          .returning();
+      } else {
+        // Create new content with basic structure
+        [result] = await db
+          .insert(siteContent)
+          .values({
+            key: key,
+            content: content,
+            section: 'general',
+            position: 0
+          })
+          .returning();
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error updating content via visual editor:', error);
+      res.status(500).json({ error: "Failed to update content" });
+    }
+  });
+
   // PUBLIC CONTENT API - for website content consumption
   // Get content by section
   app.get("/api/content/:section", async (req, res) => {

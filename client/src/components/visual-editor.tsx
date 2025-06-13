@@ -116,7 +116,7 @@ export function VisualEditor({ isEditMode, onToggleEditMode }: VisualEditorProps
     if (!editingElement || !editingElement.key) return;
 
     try {
-      const response = await fetch('/api/admin/content', {
+      const response = await fetch('/api/content/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
