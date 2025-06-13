@@ -107,6 +107,7 @@ Changelog:
 - June 13, 2025. Optimized track switching - selecting new track while playing auto-stops current and starts new track
 - June 13, 2025. Fixed track switching race condition - completely reset audio timing when loading new tracks to prevent old track resumption
 - June 13, 2025. Changed track switching behavior - new tracks load but don't auto-play, user must manually press PLAY button
+- June 13, 2025. Removed .wav extension from track display names and replaced zoom controls with helpful DJ instructions above CDJs
 
 ## User Preferences
 

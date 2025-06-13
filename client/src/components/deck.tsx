@@ -316,7 +316,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           <div className="text-white">
             <div className="flex justify-between items-start mb-1">
               <div className="text-sm font-bold truncate flex-1 mr-2">
-                {deck.track?.name || 'No Track Loaded'}
+                {deck.track?.name?.replace(/\.wav$/i, '') || 'No Track Loaded'}
               </div>
               <div className="text-xs text-gray-300">TRACK 01</div>
             </div>

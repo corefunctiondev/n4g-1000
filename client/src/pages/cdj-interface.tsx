@@ -123,17 +123,26 @@ export default function CDJInterface() {
             <div className="text-gray-400 font-mono text-xs">
               Latency: 5ms | CPU: 12%
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-300">Zoom:</span>
-              <input
-                type="range"
-                min="50"
-                max="150"
-                value={zoomLevel}
-                onChange={(e) => setZoomLevel(Number(e.target.value))}
-                className="w-16 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-              />
-              <span className="text-xs text-gray-300 w-8">{zoomLevel}%</span>
+          </div>
+        </div>
+
+        {/* Instructions */}
+        <div className="mb-6 text-center">
+          <div className="bg-gray-800/50 border border-cyan-400/30 rounded-lg p-4 max-w-4xl mx-auto">
+            <h2 className="text-cyan-400 font-semibold mb-2">DJ INSTRUCTIONS</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-300">
+              <div>
+                <span className="text-cyan-300 font-medium">1. SELECT TRACK:</span>
+                <p>Choose from dropdown above each deck</p>
+              </div>
+              <div>
+                <span className="text-cyan-300 font-medium">2. PRESS PLAY:</span>
+                <p>Hit play button when ready to start</p>
+              </div>
+              <div>
+                <span className="text-cyan-300 font-medium">3. MIX & BLEND:</span>
+                <p>Use crossfader and EQ knobs to mix</p>
+              </div>
             </div>
           </div>
         </div>
