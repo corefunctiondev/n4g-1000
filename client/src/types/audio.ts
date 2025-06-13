@@ -8,6 +8,17 @@ export interface AudioTrack {
   waveformData: Float32Array | null;
 }
 
+export interface DatabaseTrack {
+  id: number;
+  name: string;
+  artist: string;
+  bpm: number;
+  duration: string;
+  genre: string;
+  url: string;
+  waveformData: any;
+}
+
 export interface DeckState {
   track: AudioTrack | null;
   isPlaying: boolean;

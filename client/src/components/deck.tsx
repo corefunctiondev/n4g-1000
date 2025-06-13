@@ -67,18 +67,27 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   const handleTrackSelect = useCallback(async (trackId: string) => {
     setSelectedTrackId(trackId);
     const selectedTrack = tracks.find(track => track.id.toString() === trackId);
-    if (selectedTrack && selectedTrack.filePath) {
+    if (selectedTrack && (selectedTrack.url || selectedTrack.filePath)) {
       try {
-        // Fetch the audio file from the path
-        const response = await fetch(selectedTrack.filePath);
+        const trackUrl = selectedTrack.url || selectedTrack.filePath;
+        console.log(`Loading track: ${selectedTrack.name} from ${trackUrl}`);
+        // Fetch the audio file from the URL
+        const response = await fetch(trackUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch track: ${response.status}`);
+        }
         const blob = await response.blob();
-        const file = new File([blob], selectedTrack.name + '.mp3', { type: 'audio/mpeg' });
-        loadTrack(file);
+        const file = new File([blob], selectedTrack.name + '.wav', { type: 'audio/wav' });
+        console.log(`Created file object for ${selectedTrack.name}, size: ${blob.size} bytes`);
+        await loadTrack(file);
+        console.log(`Track ${selectedTrack.name} loaded successfully on deck ${deckId}`);
       } catch (error) {
-        console.error('Error loading track:', error);
+        console.error(`Error loading track ${selectedTrack.name}:`, error);
       }
+    } else {
+      console.error('Selected track not found or missing URL:', selectedTrack);
     }
-  }, [tracks, loadTrack]);
+  }, [tracks, loadTrack, deckId]);
 
 
 
