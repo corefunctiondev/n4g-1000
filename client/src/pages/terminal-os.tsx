@@ -547,106 +547,218 @@ function SetsSection() {
 }
 
 function PodcastsSection() {
+  const { data: podcastsContent = [] } = useContentBySection('podcasts');
+  
+  const getContent = (key: string, fallback: string = '') => {
+    const item = podcastsContent.find((c: any) => c.key === key);
+    return item?.title || item?.content || fallback;
+  };
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ./podcast_manager.sh --list</div>
       
       <div className="space-y-4">
-        {[
-          { episode: "EP001", title: "NYC Underground Scene", date: "2024-01-20", duration: "45:30" },
-          { episode: "EP002", title: "House Music Evolution", date: "2024-01-13", duration: "52:15" },
-          { episode: "EP003", title: "Techno Production Tips", date: "2024-01-06", duration: "38:45" },
-        ].map((podcast, index) => (
-          <div key={index} className="border border-gray-600 p-4 rounded">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="text-cyan-400 font-bold">{podcast.episode}: {podcast.title}</div>
-                <div className="text-sm text-gray-300 mt-1">Released: {podcast.date}</div>
-              </div>
-              <div className="text-sm text-orange-400">{podcast.duration}</div>
+        <div className="text-2xl font-bold text-cyan-400">
+          {getContent('podcasts_title', 'N4G Podcast Series')}
+        </div>
+        <div className="text-sm leading-relaxed">
+          {getContent('podcasts_description', 'Deep dives into electronic music production, DJ techniques, and the future of digital music technology.')}
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="border border-cyan-400 p-4 rounded">
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="text-cyan-400 font-bold">{getContent('podcast_0_title', 'EP001: NYC Underground Scene')}</div>
+              <div className="text-sm text-gray-300 mt-1">{getContent('podcast_0_date', 'Released: 2024-01-20')}</div>
             </div>
+            <div className="text-sm text-orange-400">{getContent('podcast_0_duration', 'Duration: 45:30')}</div>
           </div>
-        ))}
+        </div>
+        
+        <div className="border border-orange-400 p-4 rounded">
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="text-orange-400 font-bold">{getContent('podcast_1_title', 'EP002: House Music Evolution')}</div>
+              <div className="text-sm text-gray-300 mt-1">{getContent('podcast_1_date', 'Released: 2024-01-13')}</div>
+            </div>
+            <div className="text-sm text-orange-400">{getContent('podcast_1_duration', 'Duration: 52:15')}</div>
+          </div>
+        </div>
+        
+        <div className="border border-green-400 p-4 rounded">
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="text-green-400 font-bold">{getContent('podcast_2_title', 'EP003: Techno Production Tips')}</div>
+              <div className="text-sm text-gray-300 mt-1">{getContent('podcast_2_date', 'Released: 2024-01-06')}</div>
+            </div>
+            <div className="text-sm text-green-400">{getContent('podcast_2_duration', 'Duration: 38:45')}</div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 function BookingsSection() {
+  const { data: bookingsContent = [] } = useContentBySection('bookings');
+  
+  const getContent = (key: string, fallback: string = '') => {
+    const item = bookingsContent.find((c: any) => c.key === key);
+    return item?.title || item?.content || fallback;
+  };
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ calendar --upcoming</div>
       
       <div className="space-y-4">
-        {[
-          { venue: "Brooklyn Warehouse", date: "2024-02-15", time: "23:00", status: "CONFIRMED" },
-          { venue: "Manhattan Rooftop", date: "2024-02-22", time: "20:00", status: "PENDING" },
-          { venue: "Queens Underground", date: "2024-03-01", time: "22:30", status: "CONFIRMED" },
-        ].map((booking, index) => (
-          <div key={index} className="border border-gray-600 p-4 rounded">
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="text-cyan-400 font-bold">{booking.venue}</div>
-                <div className="text-sm text-gray-300">{booking.date} at {booking.time}</div>
-              </div>
-              <div className={`text-sm px-2 py-1 rounded ${
-                booking.status === 'CONFIRMED' ? 'bg-blue-400 text-black' : 'bg-orange-400 text-black'
-              }`}>
-                {booking.status}
-              </div>
+        <div className="text-2xl font-bold text-cyan-400">
+          {getContent('bookings_title', 'Book Need For Groove')}
+        </div>
+        <div className="text-sm leading-relaxed">
+          {getContent('bookings_description', 'Available for live performances, club bookings, private events, and music production collaborations.')}
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="text-cyan-400 font-bold">
+          {getContent('booking_services_title', 'AVAILABLE SERVICES:')}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border border-cyan-400 p-4 rounded">
+            <div className="text-cyan-400 font-bold">
+              {getContent('booking_club_events', '🎧 Club Events & Nightlife')}
             </div>
           </div>
-        ))}
+          <div className="border border-orange-400 p-4 rounded">
+            <div className="text-orange-400 font-bold">
+              {getContent('booking_private_parties', '🎉 Private Parties & Corporate Events')}
+            </div>
+          </div>
+          <div className="border border-green-400 p-4 rounded">
+            <div className="text-green-400 font-bold">
+              {getContent('booking_festivals', '🎪 Music Festivals & Outdoor Events')}
+            </div>
+          </div>
+          <div className="border border-purple-400 p-4 rounded">
+            <div className="text-purple-400 font-bold">
+              {getContent('booking_production', '🎵 Music Production & Collaboration')}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 function ReleasesSection() {
+  const { data: releasesContent = [] } = useContentBySection('releases');
+  
+  const getContent = (key: string, fallback: string = '') => {
+    const item = releasesContent.find((c: any) => c.key === key);
+    return item?.title || item?.content || fallback;
+  };
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ find ./releases/ -type f</div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[
-          { title: "Underground NYC EP", year: "2024", label: "Deep Groove Records" },
-          { title: "Deep Sessions Vol. 1", year: "2023", label: "House Collective" },
-          { title: "Night Groove", year: "2023", label: "Brooklyn Beats" },
-        ].map((release, index) => (
-          <div key={index} className="border border-gray-600 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
-            <div className="text-cyan-400 font-bold mb-2">{release.title}</div>
+      <div className="space-y-4">
+        <div className="text-2xl font-bold text-cyan-400">
+          {getContent('releases_title', 'Music Releases')}
+        </div>
+        <div className="text-sm leading-relaxed">
+          {getContent('releases_description', 'Original tracks, remixes, and collaborative works from the Need For Groove collective.')}
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="text-cyan-400 font-bold">
+          {getContent('latest_releases_title', 'LATEST RELEASES:')}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="border border-cyan-400 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
+            <div className="text-cyan-400 font-bold mb-2">{getContent('release_0_title', 'Underground Frequencies EP')}</div>
             <div className="text-xs space-y-1 text-gray-300">
-              <div>Year: {release.year}</div>
-              <div>Label: {release.label}</div>
+              <div>{getContent('release_0_date', 'Released: January 2024')}</div>
             </div>
           </div>
-        ))}
+          
+          <div className="border border-orange-400 p-4 rounded hover:border-orange-400 transition-colors cursor-pointer">
+            <div className="text-orange-400 font-bold mb-2">{getContent('release_1_title', 'Brooklyn Nights (Remix)')}</div>
+            <div className="text-xs space-y-1 text-gray-300">
+              <div>{getContent('release_1_date', 'Released: December 2023')}</div>
+            </div>
+          </div>
+          
+          <div className="border border-green-400 p-4 rounded hover:border-green-400 transition-colors cursor-pointer">
+            <div className="text-green-400 font-bold mb-2">{getContent('release_2_title', 'Digital Dreams Album')}</div>
+            <div className="text-xs space-y-1 text-gray-300">
+              <div>{getContent('release_2_date', 'Released: November 2023')}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 function MixesSection() {
+  const { data: mixesContent = [] } = useContentBySection('mixes');
+  
+  const getContent = (key: string, fallback: string = '') => {
+    const item = mixesContent.find((c: any) => c.key === key);
+    return item?.title || item?.content || fallback;
+  };
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ./mix_archive.sh --browse</div>
       
       <div className="space-y-4">
-        {[
-          { series: "Deep Sessions", episode: 15, title: "Winter Warmth", duration: "90:00" },
-          { series: "Techno Nights", episode: 8, title: "Industrial Pulse", duration: "75:30" },
-          { series: "House Foundations", episode: 23, title: "Classic Vibes", duration: "105:45" },
-        ].map((mix, index) => (
-          <div key={index} className="border border-gray-600 p-4 rounded">
+        <div className="text-2xl font-bold text-cyan-400">
+          {getContent('mixes_title', 'DJ Mixes')}
+        </div>
+        <div className="text-sm leading-relaxed">
+          {getContent('mixes_description', 'Curated DJ mixes showcasing the latest in electronic music and exclusive N4G productions.')}
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="text-cyan-400 font-bold">
+          {getContent('featured_mixes_title', 'FEATURED MIXES:')}
+        </div>
+        <div className="space-y-4">
+          <div className="border border-cyan-400 p-4 rounded">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-cyan-400 font-bold">{mix.series} #{mix.episode}</div>
-                <div className="text-sm text-gray-300">{mix.title}</div>
+                <div className="text-cyan-400 font-bold">{getContent('mix_0_title', 'After Hours: Deep Sessions')}</div>
+                <div className="text-sm text-gray-300">{getContent('mix_0_duration', 'Duration: 90 minutes')}</div>
               </div>
-              <div className="text-sm text-orange-400">{mix.duration}</div>
             </div>
           </div>
-        ))}
+          
+          <div className="border border-orange-400 p-4 rounded">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-orange-400 font-bold">{getContent('mix_1_title', 'Techno Therapy Vol. 3')}</div>
+                <div className="text-sm text-gray-300">{getContent('mix_1_duration', 'Duration: 75 minutes')}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="border border-green-400 p-4 rounded">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-green-400 font-bold">{getContent('mix_2_title', 'Progressive Journeys')}</div>
+                <div className="text-sm text-gray-300">{getContent('mix_2_duration', 'Duration: 60 minutes')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
