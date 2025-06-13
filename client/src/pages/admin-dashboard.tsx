@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   // Logout mutation
   const logoutMutation = useMutation({
-    mutationFn: () => apiRequest('/api/admin/logout', { method: 'POST' }),
+    mutationFn: () => apiRequest('POST', '/api/admin/logout'),
     onSuccess: () => {
       navigate('/admin/login');
       toast({
@@ -65,11 +65,7 @@ export default function AdminDashboard() {
         ? `/api/admin/content/${editingContent.id}`
         : '/api/admin/content';
       
-      return apiRequest(url, {
-        method: editingContent ? 'PUT' : 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return apiRequest(editingContent ? 'PUT' : 'POST', url, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/content'] });
@@ -91,7 +87,7 @@ export default function AdminDashboard() {
 
   // Delete content mutation
   const deleteContentMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/admin/content/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/admin/content/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/content'] });
       toast({
@@ -116,11 +112,11 @@ export default function AdminDashboard() {
     setEditingContent(content);
     form.reset({
       key: content.key,
-      title: content.title || '',
-      content: content.content || '',
-      imageUrl: content.imageUrl || '',
-      videoUrl: content.videoUrl || '',
-      linkUrl: content.linkUrl || '',
+      title: content.title ?? '',
+      content: content.content ?? '',
+      imageUrl: content.imageUrl ?? '',
+      videoUrl: content.videoUrl ?? '',
+      linkUrl: content.linkUrl ?? '',
       isActive: content.isActive,
     });
   };
