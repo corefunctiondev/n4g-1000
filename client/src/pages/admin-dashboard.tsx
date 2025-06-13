@@ -419,6 +419,7 @@ export default function AdminDashboard() {
                               <FormControl>
                                 <select 
                                   {...field}
+                                  value={field.value || 'medium'}
                                   className="w-full bg-gray-800 border border-gray-600 text-white p-2 rounded"
                                 >
                                   <option value="small">Small</option>
