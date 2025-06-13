@@ -26,18 +26,27 @@ export default function AdminDashboard() {
   const [verifyingSession, setVerifyingSession] = useState(true);
 
   useEffect(() => {
+    console.log('AdminDashboard useEffect running');
     const storedUser = localStorage.getItem('admin_user');
     const storedSession = localStorage.getItem('admin_session');
+    
+    console.log('Stored user:', storedUser);
+    console.log('Stored session:', storedSession);
     
     if (storedUser && storedSession) {
       try {
         const user = JSON.parse(storedUser);
         const session = JSON.parse(storedSession);
         
+        console.log('Parsed user:', user);
+        console.log('Parsed session:', session);
+        
         // Check if session is still valid
         if (session.expires_at && new Date(session.expires_at * 1000) > new Date()) {
+          console.log('Session is valid, setting admin user');
           setAdminUser({ user });
         } else {
+          console.log('Session expired, redirecting to login');
           // Session expired
           localStorage.removeItem('admin_user');
           localStorage.removeItem('admin_session');
@@ -50,6 +59,7 @@ export default function AdminDashboard() {
         navigate('/admin/login');
       }
     } else {
+      console.log('No stored session, redirecting to login');
       navigate('/admin/login');
     }
     
