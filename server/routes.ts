@@ -17,69 +17,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add cookie parser middleware for admin sessions
   app.use(cookieParser());
   
-  // Initialize database schema on first request
-  let schemaInitialized = false;
-  
-  async function ensureSchema() {
-    if (schemaInitialized) return;
-    
-    try {
-      // Try to query the table first
-      const { data, error } = await supabase
-        .from('music_tracks')
-        .select('count')
-        .limit(1);
-      
-      if (error && error.code === '42P01') {
-        // Table doesn't exist, set flag to use fallback
-        console.log('Database table not found, using fallback mode');
-        app.locals.useFallback = true;
-      }
-      
-      schemaInitialized = true;
-    } catch (error) {
-      console.error('Schema initialization error:', error);
-      // Set up mock data as fallback
-      const sampleTracks = [
-        {
-          id: '550e8400-e29b-41d4-a716-446655440001',
-          title: 'House Anthem',
-          artist: 'DJ Producer',
-          genre: 'House',
-          bpm: 128,
-          duration: '4:32',
-          file_url: 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kangaroo_MusiQue_-_The_Neverwritten_Role_Playing_Game.mp3',
-          is_active: true,
-          plays: 0
-        },
-        {
-          id: '550e8400-e29b-41d4-a716-446655440002',
-          title: 'Techno Drive',
-          artist: 'Beat Master',
-          genre: 'Techno',
-          bpm: 130,
-          duration: '5:15',
-          file_url: 'https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg',
-          is_active: true,
-          plays: 0
-        },
-        {
-          id: '550e8400-e29b-41d4-a716-446655440003',
-          title: 'Deep Vibes',
-          artist: 'Sound Creator',
-          genre: 'Deep House',
-          bpm: 124,
-          duration: '6:45',
-          file_url: 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Sevish_-__nbsp_.mp3',
-          is_active: true,
-          plays: 0
-        }
-      ];
-      app.locals.mockTracks = sampleTracks;
-      schemaInitialized = true;
-    }
-  }
-
   // SECURE ADMIN AUTHENTICATION ROUTES
   // Admin login endpoint
   app.post("/api/admin/login", async (req, res) => {
@@ -119,7 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: { 
           id: adminUser.id, 
           username: adminUser.username,
-          isAdmin: adminUser.isAdmin 
+          isAdmin: adminUser.is_admin 
         } 
       });
     } catch (error) {
@@ -130,8 +67,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin logout endpoint
   app.post("/api/admin/logout", async (req, res) => {
-    res.clearCookie('adminSession');
-    res.json({ success: true });
+    try {
+      res.clearCookie('adminSession');
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Admin logout error:', error);
+      res.status(500).json({ error: "Logout failed" });
+    }
   });
 
   // Verify admin session endpoint
@@ -180,17 +122,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update site content
   app.put("/api/admin/content/:id", requireAdmin, async (req, res) => {
     try {
-      const contentData = insertSiteContentSchema.parse(req.body);
-      const [updatedContent] = await db
-        .update(siteContent)
-        .set({ ...contentData, updatedAt: new Date() })
-        .where(eq(siteContent.id, parseInt(req.params.id)))
-        .returning();
+      const contentId = parseInt(req.params.id);
+      const updateData = insertSiteContentSchema.partial().parse(req.body);
+      
+      const { data: updatedContent, error } = await supabase
+        .from('site_content')
+        .update(updateData)
+        .eq('id', contentId)
+        .select()
+        .single();
+
+      if (error) throw error;
       
       if (!updatedContent) {
         return res.status(404).json({ error: "Content not found" });
       }
-      
+
       res.json(updatedContent);
     } catch (error) {
       console.error('Error updating site content:', error);
@@ -201,7 +148,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete site content
   app.delete("/api/admin/content/:id", requireAdmin, async (req, res) => {
     try {
-      await db.delete(siteContent).where(eq(siteContent.id, parseInt(req.params.id)));
+      const contentId = parseInt(req.params.id);
+      const { error } = await supabase
+        .from('site_content')
+        .delete()
+        .eq('id', contentId);
+        
+      if (error) throw error;
       res.json({ success: true });
     } catch (error) {
       console.error('Error deleting site content:', error);
@@ -209,64 +162,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Visual Editor API - Update content by key (for click-to-edit functionality)
-  app.post("/api/content/update", async (req, res) => {
+  // PUBLIC CONTENT ROUTES
+  // Get content by key
+  app.get("/api/content/key", async (req, res) => {
     try {
-      const { key, content } = req.body;
+      const { data: content, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .eq('is_active', true);
       
-      if (!key || content === undefined) {
-        return res.status(400).json({ error: "Key and content are required" });
-      }
-      
-      // Check if content exists
-      const existingContent = await db
-        .select()
-        .from(siteContent)
-        .where(eq(siteContent.key, key))
-        .limit(1);
-      
-      let result;
-      if (existingContent.length > 0) {
-        // Update existing content
-        [result] = await db
-          .update(siteContent)
-          .set({ 
-            content: content,
-            updatedAt: new Date() 
-          })
-          .where(eq(siteContent.key, key))
-          .returning();
-      } else {
-        // Create new content with basic structure
-        [result] = await db
-          .insert(siteContent)
-          .values({
-            key: key,
-            content: content,
-            section: 'general',
-            position: 0
-          })
-          .returning();
-      }
-      
-      res.json(result);
-    } catch (error) {
-      console.error('Error updating content via visual editor:', error);
-      res.status(500).json({ error: "Failed to update content" });
-    }
-  });
-
-  // PUBLIC CONTENT API - for website content consumption
-  // Get content by section
-  app.get("/api/content/:section", async (req, res) => {
-    try {
-      const { section } = req.params;
-      const content = await db
-        .select()
-        .from(siteContent)
-        .where(eq(siteContent.section, section))
-        .orderBy(siteContent.position);
-      
+      if (error) throw error;
       res.json(content);
     } catch (error) {
       console.error('Error fetching content:', error);
@@ -274,278 +179,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get content by key
-  app.get("/api/content/key/:key", async (req, res) => {
-    try {
-      const { key } = req.params;
-      const content = await db
-        .select()
-        .from(siteContent)
-        .where(eq(siteContent.key, key))
-        .limit(1);
-      
-      if (!content || content.length === 0) {
-        return res.status(404).json({ error: "Content not found" });
-      }
-      
-      res.json(content[0]);
-    } catch (error) {
-      console.error('Error fetching content:', error);
-      res.status(500).json({ error: "Failed to fetch content" });
-    }
-  });
-
-  // Get all active content
+  // Get content by section
   app.get("/api/content", async (req, res) => {
     try {
-      const content = await db
-        .select()
-        .from(siteContent)
-        .where(eq(siteContent.isActive, true));
+      const { data: content, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .eq('is_active', true);
       
+      if (error) throw error;
       res.json(content);
     } catch (error) {
       console.error('Error fetching content:', error);
       res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  // Update content by key
+  app.put("/api/content/:key", async (req, res) => {
+    try {
+      const { key } = req.params;
+      const { value } = req.body;
+
+      // Check if content exists
+      const { data: existingContent, error: checkError } = await supabase
+        .from('site_content')
+        .select('*')
+        .eq('key', key)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
+      if (existingContent) {
+        // Update existing content
+        const { data: updatedContent, error } = await supabase
+          .from('site_content')
+          .update({ value })
+          .eq('key', key)
+          .select()
+          .single();
+
+        if (error) throw error;
+        res.json(updatedContent);
+      } else {
+        // Create new content
+        const { data: newContent, error } = await supabase
+          .from('site_content')
+          .insert({
+            key,
+            value,
+            section: 'dynamic',
+            is_active: true
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        res.json(newContent);
+      }
+    } catch (error) {
+      console.error('Error updating content:', error);
+      res.status(500).json({ error: "Failed to update content" });
     }
   });
 
   // Track management routes - using Supabase directly
   app.get("/api/tracks", async (req, res) => {
     try {
-      await ensureSchema();
-      
-      // Check if we should use mock data
-      if (app.locals.mockTracks) {
-        const tracks = app.locals.mockTracks.map((track: any, index: number) => ({
-          id: index + 1,
-          name: track.title,
-          artist: track.artist,
-          bpm: track.bpm || 120,
-          duration: track.duration || "0:00",
-          genre: track.genre || "Unknown",
-          url: track.file_url,
-          waveformData: track.waveform_data || null
-        }));
-        return res.json(tracks);
-      }
-
-      const { data, error } = await supabase
+      const { data: tracks, error } = await supabase
         .from('music_tracks')
         .select('*')
         .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('Supabase error:', error);
-        // Fall back to sample tracks
-        const sampleTracks = [
-          {
-            id: 1,
-            name: 'House Anthem',
-            artist: 'DJ Producer',
-            bpm: 128,
-            duration: '4:32',
-            genre: 'House',
-            url: 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kangaroo_MusiQue_-_The_Neverwritten_Role_Playing_Game.mp3',
-            waveformData: null
-          },
-          {
-            id: 2,
-            name: 'Techno Drive',
-            artist: 'Beat Master',
-            bpm: 130,
-            duration: '5:15',
-            genre: 'Techno',
-            url: 'https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg',
-            waveformData: null
-          },
-          {
-            id: 3,
-            name: 'Deep Vibes',
-            artist: 'Sound Creator',
-            bpm: 124,
-            duration: '6:45',
-            genre: 'Deep House',
-            url: 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Sevish_-__nbsp_.mp3',
-            waveformData: null
-          }
-        ];
-        return res.json(sampleTracks);
-      }
+      if (error) throw error;
 
-      // Transform Supabase data to match expected format
-      const tracks = data.map((track, index) => ({
-        id: index + 1,
+      // Transform to match expected format
+      const formattedTracks = tracks.map((track: any) => ({
+        id: track.id,
         name: track.title,
         artist: track.artist,
         bpm: track.bpm || 120,
         duration: track.duration || "0:00",
         genre: track.genre || "Unknown",
         url: track.file_url,
-        waveformData: track.waveform_data || null
+        waveformData: track.waveform_data
       }));
 
-      res.json(tracks);
+      res.json(formattedTracks);
     } catch (error) {
-      console.error(`Error in /api/tracks: ${error}`);
+      console.error('Error fetching tracks:', error);
       res.status(500).json({ error: "Failed to fetch tracks" });
     }
   });
 
-  app.post("/api/tracks", async (req, res) => {
-    try {
-      const { title, artist, genre, bpm, duration, file_url } = req.body;
-      
-      const { data, error } = await supabase
-        .from('music_tracks')
-        .insert({
-          title: title || 'Unknown Track',
-          artist: artist || 'Unknown Artist',
-          genre: genre || null,
-          bpm: bpm || null,
-          duration: duration || null,
-          file_url: file_url
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        return res.status(500).json({ error: "Failed to save track to database" });
-      }
-
-      res.status(201).json(data);
-    } catch (error) {
-      console.error(`Error in POST /api/tracks: ${error}`);
-      res.status(500).json({ error: "Failed to save track" });
-    }
-  });
-
-  app.get("/api/tracks/:id", async (req, res) => {
-    try {
-      const track = await storage.getTrack(parseInt(req.params.id));
-      if (!track) {
-        return res.status(404).json({ error: "Track not found" });
-      }
-      res.json(track);
-    } catch (error) {
-      console.error(`Error in GET /api/tracks/:id: ${error}`);
-      res.status(500).json({ error: "Failed to fetch track" });
-    }
-  });
-
-  app.put("/api/tracks/:id", async (req, res) => {
-    try {
-      const trackData = {
-        name: req.body.name,
-        artist: req.body.artist,
-        album: req.body.album,
-        genre: req.body.genre,
-        bpm: req.body.bpm ? parseFloat(req.body.bpm) : undefined,
-        duration: req.body.duration ? parseFloat(req.body.duration) : undefined,
-        key: req.body.key,
-        waveformData: req.body.waveformData,
-        cuePoints: req.body.cuePoints,
-      };
-
-      const track = await storage.updateTrack(parseInt(req.params.id), trackData);
-      if (!track) {
-        return res.status(404).json({ error: "Track not found" });
-      }
-      res.json(track);
-    } catch (error) {
-      console.error(`Error in PUT /api/tracks/:id: ${error}`);
-      res.status(500).json({ error: "Failed to update track" });
-    }
-  });
-
-  app.delete("/api/tracks/:id", async (req, res) => {
-    try {
-      const success = await storage.deleteTrack(parseInt(req.params.id));
-      if (!success) {
-        return res.status(404).json({ error: "Track not found" });
-      }
-      res.json({ success: true });
-    } catch (error) {
-      console.error(`Error in DELETE /api/tracks/:id: ${error}`);
-      res.status(500).json({ error: "Failed to delete track" });
-    }
-  });
-
-  // Playlist management routes
-  app.get("/api/playlists", async (req, res) => {
-    try {
-      const userId = req.query.userId as string;
-      if (!userId) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-      
-      const playlists = await storage.getUserPlaylists(parseInt(userId));
-      res.json(playlists);
-    } catch (error) {
-      console.error(`Error in /api/playlists: ${error}`);
-      res.status(500).json({ error: "Failed to fetch playlists" });
-    }
-  });
-
-  app.post("/api/playlists", async (req, res) => {
-    try {
-      const validation = insertPlaylistSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json({ error: "Invalid playlist data", details: validation.error });
-      }
-
-      const playlist = await storage.createPlaylist(validation.data);
-      res.status(201).json(playlist);
-    } catch (error) {
-      console.error(`Error in POST /api/playlists: ${error}`);
-      res.status(500).json({ error: "Failed to create playlist" });
-    }
-  });
-
-  app.get("/api/playlists/:id/tracks", async (req, res) => {
-    try {
-      const tracks = await storage.getPlaylistTracks(parseInt(req.params.id));
-      res.json(tracks);
-    } catch (error) {
-      console.error(`Error in GET /api/playlists/:id/tracks: ${error}`);
-      res.status(500).json({ error: "Failed to fetch playlist tracks" });
-    }
-  });
-
-  // DJ Session management routes
-  app.get("/api/sessions", async (req, res) => {
-    try {
-      const userId = req.query.userId as string;
-      if (!userId) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-      
-      const sessions = await storage.getUserDjSessions(parseInt(userId));
-      res.json(sessions);
-    } catch (error) {
-      console.error(`Error in /api/sessions: ${error}`);
-      res.status(500).json({ error: "Failed to fetch sessions" });
-    }
-  });
-
-  app.post("/api/sessions", async (req, res) => {
-    try {
-      const validation = insertDjSessionSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json({ error: "Invalid session data", details: validation.error });
-      }
-
-      const session = await storage.createDjSession(validation.data);
-      res.status(201).json(session);
-    } catch (error) {
-      console.error(`Error in POST /api/sessions: ${error}`);
-      res.status(500).json({ error: "Failed to create session" });
-    }
-  });
-
   const httpServer = createServer(app);
-
   return httpServer;
 }
