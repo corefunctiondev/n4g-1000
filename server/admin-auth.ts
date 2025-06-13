@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from './db';
 import { users, adminSessions } from '@shared/schema';
-import { eq, and, gt } from 'drizzle-orm';
+import { eq, and, gt, lt, sql } from 'drizzle-orm';
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -93,7 +93,8 @@ export async function requireAdmin(req: AuthenticatedRequest, res: Response, nex
 
 // Clean up expired sessions
 export async function cleanupExpiredSessions() {
+  const now = new Date();
   await db.delete(adminSessions).where(
-    gt(new Date(), adminSessions.expiresAt)
+    lt(adminSessions.expiresAt, now)
   );
 }

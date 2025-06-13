@@ -2,9 +2,24 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { supabase } from "./supabase";
-import { insertTrackSchema, insertPlaylistSchema, insertDjSessionSchema } from "@shared/schema";
+import { insertTrackSchema, insertPlaylistSchema, insertDjSessionSchema, adminLoginSchema, insertSiteContentSchema } from "@shared/schema";
+import { 
+  requireAdmin, 
+  verifyPassword, 
+  createAdminSession, 
+  cleanupExpiredSessions,
+  hashPassword,
+  type AuthenticatedRequest 
+} from "./admin-auth";
+import cookieParser from 'cookie-parser';
+import { db } from "./db";
+import { users, siteContent } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Add cookie parser middleware for admin sessions
+  app.use(cookieParser());
+  
   // Initialize database schema on first request
   let schemaInitialized = false;
   
@@ -67,6 +82,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
       schemaInitialized = true;
     }
   }
+
+  // SECURE ADMIN AUTHENTICATION ROUTES
+  // Admin login endpoint
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const loginData = adminLoginSchema.parse(req.body);
+      
+      // Find admin user in database
+      const [adminUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, loginData.username))
+        .limit(1);
+
+      if (!adminUser || !adminUser.isAdmin) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      // Verify password
+      const passwordValid = await verifyPassword(loginData.password, adminUser.password);
+      if (!passwordValid) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      // Create secure session
+      const sessionToken = await createAdminSession(adminUser.id);
+      
+      // Set secure HTTP-only cookie
+      res.cookie('adminSession', sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      res.json({ 
+        success: true, 
+        user: { 
+          id: adminUser.id, 
+          username: adminUser.username,
+          isAdmin: adminUser.isAdmin 
+        } 
+      });
+    } catch (error) {
+      console.error('Admin login error:', error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Admin logout endpoint
+  app.post("/api/admin/logout", async (req, res) => {
+    res.clearCookie('adminSession');
+    res.json({ success: true });
+  });
+
+  // Verify admin session endpoint
+  app.get("/api/admin/verify", requireAdmin, async (req: AuthenticatedRequest, res) => {
+    res.json({ 
+      success: true, 
+      user: req.user 
+    });
+  });
+
+  // SITE CONTENT MANAGEMENT ROUTES (Admin Only)
+  // Get all site content
+  app.get("/api/admin/content", requireAdmin, async (req, res) => {
+    try {
+      const content = await db.select().from(siteContent).where(eq(siteContent.isActive, true));
+      res.json(content);
+    } catch (error) {
+      console.error('Error fetching site content:', error);
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
+  // Create new site content
+  app.post("/api/admin/content", requireAdmin, async (req, res) => {
+    try {
+      const contentData = insertSiteContentSchema.parse(req.body);
+      const [newContent] = await db.insert(siteContent).values(contentData).returning();
+      res.json(newContent);
+    } catch (error) {
+      console.error('Error creating site content:', error);
+      res.status(500).json({ error: "Failed to create content" });
+    }
+  });
+
+  // Update site content
+  app.put("/api/admin/content/:id", requireAdmin, async (req, res) => {
+    try {
+      const contentData = insertSiteContentSchema.parse(req.body);
+      const [updatedContent] = await db
+        .update(siteContent)
+        .set({ ...contentData, updatedAt: new Date() })
+        .where(eq(siteContent.id, parseInt(req.params.id)))
+        .returning();
+      
+      if (!updatedContent) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+      
+      res.json(updatedContent);
+    } catch (error) {
+      console.error('Error updating site content:', error);
+      res.status(500).json({ error: "Failed to update content" });
+    }
+  });
+
+  // Delete site content
+  app.delete("/api/admin/content/:id", requireAdmin, async (req, res) => {
+    try {
+      await db.delete(siteContent).where(eq(siteContent.id, parseInt(req.params.id)));
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting site content:', error);
+      res.status(500).json({ error: "Failed to delete content" });
+    }
+  });
 
   // Track management routes - using Supabase directly
   app.get("/api/tracks", async (req, res) => {
