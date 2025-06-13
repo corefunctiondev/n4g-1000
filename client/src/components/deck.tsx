@@ -39,7 +39,6 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     getAnalyser,
   } = useAudio(deckId);
 
-  const [isDragOver, setIsDragOver] = useState(false);
   const [isDraggingTempo, setIsDraggingTempo] = useState(false);
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
@@ -282,17 +281,34 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           </div>
         </div>
 
-        {/* Consolidated Controls Row */}
+        {/* Track Selection Dropdown */}
+        <div className="mb-3" style={{ zIndex: 10, position: 'relative' }}>
+          <div className="text-xs text-blue-300 mb-2 text-center">TRACK SELECTION</div>
+          <Select value={selectedTrackId} onValueChange={handleTrackSelect}>
+            <SelectTrigger className="w-full pioneer-button text-xs bg-gray-800 border-gray-600 text-gray-300">
+              <SelectValue placeholder={tracksLoading ? "Loading tracks..." : "Select a track"} />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 border-gray-600">
+              {tracks.map((track) => (
+                <SelectItem 
+                  key={track.id} 
+                  value={track.id.toString()}
+                  className="text-gray-300 hover:bg-gray-700"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{track.name}</span>
+                    <span className="text-xs text-gray-400">
+                      {track.artist} • {track.bpm} BPM
+                    </span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Controls Row */}
         <div className="flex gap-1 mb-2 justify-center" style={{ zIndex: 10, position: 'relative' }}>
-          <label className="pioneer-button py-1 px-2 text-xs cursor-pointer text-blue-300 hover:text-blue-300" style={{ zIndex: 11 }}>
-            LOAD TRACK
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </label>
           <button 
             className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
             onClick={handleSync}
@@ -371,24 +387,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         </div>
       </div>
 
-      {/* File Upload Area - Compact */}
-      <div className="mb-2">
-        <label className={`block w-full p-2 border-2 border-dashed rounded-lg cursor-pointer transition-all text-center ${
-          isDragOver 
-            ? 'border-blue-300 bg-blue-400 bg-opacity-10' 
-            : 'border-gray-600 hover:border-blue-300'
-        }`}>
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <div className="text-xs text-gray-300">
-            {isDragOver ? 'Drop your track here!' : 'Load Track'}
-          </div>
-        </label>
-      </div>
+
 
       {/* Bottom Controls - Compact */}
       <div className="grid grid-cols-3 gap-1">
