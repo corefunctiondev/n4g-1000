@@ -7,6 +7,27 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  isAdmin: boolean("is_admin").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const siteContent = pgTable("site_content", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  title: text("title"),
+  content: text("content"),
+  imageUrl: text("image_url"),
+  videoUrl: text("video_url"),
+  linkUrl: text("link_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const adminSessions = pgTable("admin_sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  sessionToken: text("session_token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -59,6 +80,14 @@ export const usersRelations = relations(users, ({ many }) => ({
   tracks: many(tracks),
   playlists: many(playlists),
   djSessions: many(djSessions),
+  adminSessions: many(adminSessions),
+}));
+
+export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
+  user: one(users, {
+    fields: [adminSessions.userId],
+    references: [users.id],
+  }),
 }));
 
 export const tracksRelations = relations(tracks, ({ one, many }) => ({
@@ -122,6 +151,22 @@ export const insertDjSessionSchema = createInsertSchema(djSessions).omit({
   createdAt: true,
 });
 
+export const insertSiteContentSchema = createInsertSchema(siteContent).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertAdminSessionSchema = createInsertSchema(adminSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Admin login schema
+export const adminLoginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -133,3 +178,8 @@ export type InsertPlaylistTrack = z.infer<typeof insertPlaylistTrackSchema>;
 export type PlaylistTrack = typeof playlistTracks.$inferSelect;
 export type InsertDjSession = z.infer<typeof insertDjSessionSchema>;
 export type DjSession = typeof djSessions.$inferSelect;
+export type InsertSiteContent = z.infer<typeof insertSiteContentSchema>;
+export type SiteContent = typeof siteContent.$inferSelect;
+export type InsertAdminSession = z.infer<typeof insertAdminSessionSchema>;
+export type AdminSession = typeof adminSessions.$inferSelect;
+export type AdminLogin = z.infer<typeof adminLoginSchema>;
