@@ -22,13 +22,13 @@ export default function AdminDashboard() {
   const [editingContent, setEditingContent] = useState<SiteContent | null>(null);
 
   // Verify admin session on load
-  const { data: adminUser, isLoading: verifyingSession } = useQuery({
+  const { data: adminUser, isLoading: verifyingSession } = useQuery<{ user: { id: number; username: string; isAdmin: boolean } }>({
     queryKey: ['/api/admin/verify'],
     retry: false,
   });
 
   // Get site content
-  const { data: siteContent = [], isLoading: loadingContent } = useQuery({
+  const { data: siteContent = [], isLoading: loadingContent } = useQuery<SiteContent[]>({
     queryKey: ['/api/admin/content'],
     enabled: !!adminUser,
   });
@@ -209,6 +209,7 @@ export default function AdminDashboard() {
                             <FormControl>
                               <Input
                                 {...field}
+                                value={field.value || ''}
                                 className="bg-gray-800 border-gray-600 text-white"
                                 placeholder="Content title"
                               />
@@ -226,6 +227,7 @@ export default function AdminDashboard() {
                             <FormControl>
                               <Textarea
                                 {...field}
+                                value={field.value || ''}
                                 className="bg-gray-800 border-gray-600 text-white min-h-[100px]"
                                 placeholder="Enter content text"
                               />
@@ -243,6 +245,7 @@ export default function AdminDashboard() {
                             <FormControl>
                               <Input
                                 {...field}
+                                value={field.value || ''}
                                 className="bg-gray-800 border-gray-600 text-white"
                                 placeholder="https://example.com/image.jpg"
                               />
@@ -260,6 +263,7 @@ export default function AdminDashboard() {
                             <FormControl>
                               <Input
                                 {...field}
+                                value={field.value || ''}
                                 className="bg-gray-800 border-gray-600 text-white"
                                 placeholder="https://youtube.com/watch?v=..."
                               />
@@ -277,6 +281,7 @@ export default function AdminDashboard() {
                             <FormControl>
                               <Input
                                 {...field}
+                                value={field.value || ''}
                                 className="bg-gray-800 border-gray-600 text-white"
                                 placeholder="https://example.com"
                               />
