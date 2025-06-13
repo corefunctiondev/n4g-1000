@@ -146,30 +146,45 @@ export default function TerminalOS({}: TerminalOSProps) {
             <div className="text-xs text-gray-400">Need For Groove OS v2.1.0</div>
           </div>
           
-          <div className="p-2">
-            {fileTreeItems.map((item) => {
+          <div className="p-2 space-y-1">
+            {fileTreeItems.map((item, index) => {
               const isFolder = item.type === 'folder';
               const isActive = currentSection === item.id;
               const Icon = isActive && isFolder ? FolderOpen : isFolder ? Folder : File;
               
               return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavigation(item.id)}
-                  className={`w-full text-left p-3 rounded mb-1 transition-all duration-200 group ${
-                    isActive 
-                      ? 'bg-cyan-400 text-black' 
-                      : 'hover:bg-gray-800 text-gray-300 hover:text-cyan-400'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <Icon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{item.label}</span>
+                <div key={item.id} className="relative">
+                  {/* Tree lines */}
+                  <div className="absolute left-2 top-0 h-full flex flex-col text-gray-600">
+                    <div className="flex items-center h-6">
+                      <span className="text-xs font-mono">
+                        {item.isLast ? '└─' : '├─'}
+                      </span>
+                    </div>
+                    {!item.isLast && (
+                      <div className="w-px bg-gray-600 ml-[5px] flex-1"></div>
+                    )}
                   </div>
-                  <div className={`text-xs mt-1 ${isActive ? 'text-black' : 'text-gray-500 group-hover:text-gray-300'}`}>
-                    {item.description}
-                  </div>
-                </button>
+                  
+                  <button
+                    onClick={() => handleNavigation(item.id)}
+                    className={`w-full text-left pl-8 pr-3 py-2 rounded transition-all duration-200 group ${
+                      isActive 
+                        ? 'bg-cyan-400 text-black' 
+                        : 'hover:bg-gray-800 text-gray-300 hover:text-cyan-400'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{item.label}</div>
+                        <div className={`text-xs truncate ${isActive ? 'text-black opacity-70' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                          {item.description}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
               );
             })}
           </div>
