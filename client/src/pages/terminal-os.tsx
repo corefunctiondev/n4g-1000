@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X, Folder, FolderOpen, File } from 'lucide-react';
+import { DynamicContent, DynamicText, DynamicLink } from '@/components/dynamic-content';
+import { useContentBySection } from '@/hooks/use-content';
 
 interface TerminalOSProps {}
 
@@ -356,10 +358,19 @@ export default function TerminalOS({}: TerminalOSProps) {
 function HomeSection() {
   return (
     <div className="space-y-6 text-blue-300">
-      <div className="text-xl font-bold text-cyan-400">$ ./welcome.sh</div>
+      <DynamicText 
+        contentKey="hero_title" 
+        fallback="$ ./welcome.sh"
+        className="text-xl font-bold text-cyan-400"
+        as="div"
+      />
       
       <div className="space-y-2 text-sm">
-        <div>NEED FOR GROOVE OPERATING SYSTEM v2.1.0</div>
+        <DynamicText 
+          contentKey="hero_subtitle" 
+          fallback="NEED FOR GROOVE OPERATING SYSTEM v2.1.0"
+          as="div"
+        />
         <div>Copyright (c) 2024 Need For Groove Collective</div>
         <div>All rights reserved.</div>
       </div>
@@ -373,6 +384,12 @@ function HomeSection() {
           <div>✓ Network: CONNECTED</div>
         </div>
       </div>
+      
+      <DynamicContent 
+        section="hero"
+        fallbackText=""
+        className="space-y-4"
+      />
       
       <div className="space-y-4">
         <div className="text-cyan-400">ACTIVE MEMBERS:</div>
@@ -393,7 +410,18 @@ function HomeSection() {
 function AboutSection() {
   return (
     <div className="space-y-6 text-blue-300">
-      <div className="text-xl font-bold text-cyan-400">$ cat ./profiles/*</div>
+      <DynamicText 
+        contentKey="about_title" 
+        fallback="$ cat ./profiles/*"
+        className="text-xl font-bold text-cyan-400"
+        as="div"
+      />
+      
+      <DynamicContent 
+        section="about"
+        fallbackText=""
+        className="space-y-6"
+      />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="border border-cyan-400 p-4 rounded">
@@ -560,7 +588,18 @@ function MixesSection() {
 function ContactSection() {
   return (
     <div className="space-y-6 text-blue-300">
-      <div className="text-xl font-bold text-cyan-400">$ cat ./contact.info</div>
+      <DynamicText 
+        contentKey="contact_title" 
+        fallback="$ cat ./contact.info"
+        className="text-xl font-bold text-cyan-400"
+        as="div"
+      />
+      
+      <DynamicContent 
+        section="contact"
+        fallbackText=""
+        className="space-y-6"
+      />
       
       <div className="space-y-6">
         <div className="border border-cyan-400 p-4 rounded">
@@ -593,35 +632,26 @@ function ContactSection() {
 }
 
 function AdminSection() {
+  const [, navigate] = useLocation();
+  
+  const handleAdminAccess = () => {
+    navigate('/admin');
+  };
+  
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ sudo ./admin_panel.sh</div>
       
       <div className="border border-red-400 p-4 rounded">
         <div className="text-red-400 font-bold mb-3">ADMIN ACCESS REQUIRED</div>
-        <div className="text-sm mb-4">Please authenticate to access the content management system.</div>
+        <div className="text-sm mb-4">Click below to access the content management system.</div>
         
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs text-gray-300 mb-1">Username:</label>
-            <input 
-              type="text" 
-              className="w-full bg-black border border-gray-600 p-2 text-blue-300 font-mono"
-              placeholder="n4gadmin"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-300 mb-1">Password:</label>
-            <input 
-              type="password" 
-              className="w-full bg-black border border-gray-600 p-2 text-blue-300 font-mono"
-              placeholder="••••••••"
-            />
-          </div>
-          <button className="bg-cyan-400 text-black px-4 py-2 rounded font-bold hover:bg-cyan-300 transition-colors">
-            AUTHENTICATE
-          </button>
-        </div>
+        <button 
+          onClick={handleAdminAccess}
+          className="bg-cyan-400 text-black px-4 py-2 rounded font-bold hover:bg-cyan-300 transition-colors"
+        >
+          ACCESS ADMIN PANEL
+        </button>
       </div>
     </div>
   );
