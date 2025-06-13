@@ -1,18 +1,36 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { supabase } from "./supabase";
 import { insertTrackSchema, insertPlaylistSchema, insertDjSessionSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Track management routes
+  // Track management routes - using Supabase directly
   app.get("/api/tracks", async (req, res) => {
     try {
-      const userId = req.query.userId as string;
-      if (!userId) {
-        return res.status(400).json({ error: "User ID is required" });
+      const { data, error } = await supabase
+        .from('music_tracks')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        return res.status(500).json({ error: "Failed to fetch tracks from database" });
       }
-      
-      const tracks = await storage.getUserTracks(parseInt(userId));
+
+      // Transform Supabase data to match expected format
+      const tracks = data.map(track => ({
+        id: parseInt(track.id) || 0,
+        name: track.title,
+        artist: track.artist,
+        bpm: track.bpm || 120,
+        duration: track.duration || "0:00",
+        genre: track.genre || "Unknown",
+        url: track.file_url,
+        waveformData: track.waveform_data || null
+      }));
+
       res.json(tracks);
     } catch (error) {
       console.error(`Error in /api/tracks: ${error}`);
@@ -22,13 +40,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/tracks", async (req, res) => {
     try {
-      const validation = insertTrackSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json({ error: "Invalid track data", details: validation.error });
+      const { title, artist, genre, bpm, duration, file_url } = req.body;
+      
+      const { data, error } = await supabase
+        .from('music_tracks')
+        .insert({
+          title: title || 'Unknown Track',
+          artist: artist || 'Unknown Artist',
+          genre: genre || null,
+          bpm: bpm || null,
+          duration: duration || null,
+          file_url: file_url
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        return res.status(500).json({ error: "Failed to save track to database" });
       }
 
-      const track = await storage.createTrack(validation.data);
-      res.status(201).json(track);
+      res.status(201).json(data);
     } catch (error) {
       console.error(`Error in POST /api/tracks: ${error}`);
       res.status(500).json({ error: "Failed to save track" });

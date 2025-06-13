@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+// Extract URL from environment variable that might include prefix
+const rawSupabaseUrl = process.env.SUPABASE_URL;
+const supabaseUrl = rawSupabaseUrl?.includes('=') ? rawSupabaseUrl.split('=')[1] : rawSupabaseUrl;
+
+const rawSupabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabaseAnonKey = rawSupabaseKey?.includes('=') ? rawSupabaseKey.split('=')[1] : rawSupabaseKey;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
@@ -58,26 +62,6 @@ export type Database = {
           plays?: number;
           file_size?: number | null;
           upload_date?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-      site_config: {
-        Row: {
-          id: string;
-          config: any;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          config: any;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          config?: any;
           created_at?: string;
           updated_at?: string;
         };
