@@ -147,6 +147,7 @@ Changelog:
 - June 14, 2025. Replaced header text with Need For Groove logo, uploaded to Supabase storage for proper asset management
 - June 14, 2025. Updated to blue "NEED FOR GROOVE" text logo with proper layout matching user design - "NEED" and "FOR" on top line, "GROOVE" centered below
 - June 14, 2025. Created dedicated images bucket in Supabase storage with organized folders and replaced logo with user's actual SVG file (n4glogo.svg)
+- June 14, 2025. Optimized logo display with large size (h-32) within constrained header container to prevent layout expansion
 
 ## User Preferences
 

@@ -194,8 +194,8 @@ export default function CDJInterface() {
       <div className="w-full max-w-[98vw] mx-auto relative z-20">
         {/* Header */}
         <div className="mb-4 lg:mb-8 relative">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-4">
+          <div className="flex justify-between items-center mb-4 h-16">
+            <div className="flex items-center space-x-4 overflow-visible">
               <img 
                 src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
                 alt="Need For Groove Logo" 
