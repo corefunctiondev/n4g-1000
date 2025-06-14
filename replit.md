@@ -202,6 +202,8 @@ Changelog:
 - June 14, 2025. Updated home page hero content to "New York Based" with authentic description about Kosovo producers bringing their sound to New York
 - June 14, 2025. Removed redundant "NEED FOR GROOVE INFO" section from home page for cleaner, more focused layout
 - June 14, 2025. Updated hero section to display "Need For Groove" as main title with "New York Based" as subtitle
+- June 14, 2025. Changed all "turntables" references to "players" throughout application for updated branding
+- June 14, 2025. Redesigned boot sequence buttons with terminal command styling (./launch_n4g.sh and ./explore_site.sh) to match OS theme
 
 ## User Preferences
 

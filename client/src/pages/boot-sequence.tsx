@@ -241,26 +241,32 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                 What would you like to do?
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Button
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <button
                   onClick={() => handleOptionSelect('dj')}
-                  className="h-24 bg-red-600 hover:bg-red-700 border-2 border-red-400 text-white font-bold text-lg transition-all duration-200 transform hover:scale-105"
+                  className="h-32 bg-black border-2 border-cyan-400 text-cyan-400 font-mono text-lg transition-all duration-200 hover:bg-cyan-400 hover:text-black hover:shadow-lg hover:shadow-cyan-400/50 relative group"
                 >
                   <div className="text-center">
-                    <div className="text-xl mb-1">🎧 LAUNCH DJ MODE</div>
-                    <div className="text-sm opacity-80">Access N4G-1000 Players</div>
+                    <div className="text-2xl mb-2 font-bold">$ ./launch_n4g.sh</div>
+                    <div className="text-sm opacity-80 group-hover:opacity-100">Initialize N4G-1000 Player Interface</div>
+                    <div className="absolute bottom-2 left-4 text-xs opacity-60 group-hover:opacity-80">
+                      [ENTER] to execute
+                    </div>
                   </div>
-                </Button>
+                </button>
                 
-                <Button
+                <button
                   onClick={() => handleOptionSelect('explore')}
-                  className="h-24 bg-blue-600 hover:bg-blue-700 border-2 border-blue-400 text-white font-bold text-lg transition-all duration-200 transform hover:scale-105"
+                  className="h-32 bg-black border-2 border-green-400 text-green-400 font-mono text-lg transition-all duration-200 hover:bg-green-400 hover:text-black hover:shadow-lg hover:shadow-green-400/50 relative group"
                 >
                   <div className="text-center">
-                    <div className="text-xl mb-1">🌐 EXPLORE SITE</div>
-                    <div className="text-sm opacity-80">Learn about Need For Groove</div>
+                    <div className="text-2xl mb-2 font-bold">$ ./explore_site.sh</div>
+                    <div className="text-sm opacity-80 group-hover:opacity-100">Browse Need For Groove Terminal</div>
+                    <div className="absolute bottom-2 left-4 text-xs opacity-60 group-hover:opacity-80">
+                      [ENTER] to execute
+                    </div>
                   </div>
-                </Button>
+                </button>
               </div>
               
               <div className="text-center text-xs text-gray-500 mt-8">
