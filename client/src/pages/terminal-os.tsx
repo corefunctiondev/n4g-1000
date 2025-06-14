@@ -5,6 +5,7 @@ import { DynamicContent, DynamicText, DynamicLink } from '@/components/dynamic-c
 import { VisualEditor } from '@/components/visual-editor';
 import { useContentBySection } from '@/hooks/use-content';
 import { useAudioFeedback } from '@/hooks/use-audio-feedback';
+import { GlobalBeatVisualizer } from '@/components/beat-visualizer';
 
 interface TerminalOSProps {}
 
@@ -20,6 +21,38 @@ export default function TerminalOS({}: TerminalOSProps) {
   const [glitchActive, setGlitchActive] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const audioFeedback = useAudioFeedback();
+  
+  // Beat visualizer states - synchronized with DJ interface
+  const [deckAPlaying, setDeckAPlaying] = useState(false);
+  const [deckBPlaying, setDeckBPlaying] = useState(false);
+  const [deckABpm, setDeckABpm] = useState<number>();
+  const [deckBBpm, setDeckBBpm] = useState<number>();
+
+  // Sync beat visualizer data from DJ interface
+  useEffect(() => {
+    const syncBeatData = () => {
+      try {
+        const djData = localStorage.getItem('dj_beat_data');
+        if (djData) {
+          const data = JSON.parse(djData);
+          setDeckAPlaying(data.deckAPlaying || false);
+          setDeckBPlaying(data.deckBPlaying || false);
+          setDeckABpm(data.deckABpm);
+          setDeckBBpm(data.deckBBpm);
+        }
+      } catch (error) {
+        console.log('No DJ beat data found');
+      }
+    };
+
+    // Initial sync
+    syncBeatData();
+
+    // Listen for changes
+    const interval = setInterval(syncBeatData, 100);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Initialize current section from URL
   useEffect(() => {
@@ -129,6 +162,16 @@ export default function TerminalOS({}: TerminalOSProps) {
 
   return (
     <div className={`min-h-screen bg-black text-white font-mono relative overflow-hidden ${glitchActive ? 'animate-pulse' : ''}`}>
+      {/* Beat Visualizer Background */}
+      <GlobalBeatVisualizer
+        deckAPlaying={deckAPlaying}
+        deckBPlaying={deckBPlaying}
+        deckABpm={deckABpm}
+        deckBBpm={deckBBpm}
+        deckAAnalyser={null}
+        deckBAnalyser={null}
+      />
+      
       {/* CRT Monitor Frame */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="w-full h-full border-8 border-gray-800 rounded-3xl shadow-2xl" 

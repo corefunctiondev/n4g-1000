@@ -223,6 +223,24 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     return `${tempo > 0 ? '+' : ''}${tempo.toFixed(1)}%`;
   };
 
+  // Update parent component with deck state including analyser for beat visualization
+  useEffect(() => {
+    const analyser = getAnalyser();
+    const state = {
+      ...deck,
+      analyser,
+      tempo: deck.tempo,
+      isPlaying: deck.isPlaying,
+      track: deck.track
+    };
+    onStateChange?.(state);
+  }, [deck, getAnalyser, onStateChange]);
+
+  // Update parent with playback changes for beat visualization
+  useEffect(() => {
+    onPlaybackChange?.(deckId, deck.isPlaying);
+  }, [deck.isPlaying, deckId, onPlaybackChange]);
+
   return (
     <div 
       className="pioneer-cdj p-2 flex-1 h-full flex flex-col"

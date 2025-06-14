@@ -67,6 +67,17 @@ export default function CDJInterface() {
     }
   }, []);
 
+  // Sync beat data to localStorage for cross-page visualization
+  useEffect(() => {
+    const beatData = {
+      deckAPlaying,
+      deckBPlaying,
+      deckABpm,
+      deckBBpm
+    };
+    localStorage.setItem('dj_beat_data', JSON.stringify(beatData));
+  }, [deckAPlaying, deckBPlaying, deckABpm, deckBBpm]);
+
   // Crossfader interaction
   const handleCrossfaderMouseDown = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
