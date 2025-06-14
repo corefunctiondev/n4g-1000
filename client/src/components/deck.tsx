@@ -38,6 +38,10 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     beatJump,
     sync,
     getAnalyser,
+    setReverb,
+    setDelay,
+    setEcho,
+    cutFX,
   } = useAudio(deckId);
   
   const audioFeedback = useAudioFeedback();

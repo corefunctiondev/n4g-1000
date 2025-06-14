@@ -32,6 +32,11 @@ export interface DeckState {
     mid: number;
     low: number;
   };
+  effects: {
+    reverb: number;
+    delay: number;
+    echo: number;
+  };
   cuePoints: number[];
   isLooping: boolean;
   loopStart: number;
@@ -59,5 +64,13 @@ export interface AudioNodeSetup {
     mid: BiquadFilterNode;
     low: BiquadFilterNode;
   };
+  effectsNodes?: {
+    reverbGain: GainNode;
+    delayGain: GainNode;
+    echoGain: GainNode;
+  };
+  reverbGain?: GainNode;
+  delayGain?: GainNode;
+  echoGain?: GainNode;
   analyser: AnalyserNode;
 }

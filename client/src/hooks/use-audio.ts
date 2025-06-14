@@ -13,6 +13,7 @@ export function useAudio(deckId: 'A' | 'B') {
     tempo: 0,
     pitch: 0,
     eq: { high: 0, mid: 0, low: 0 },
+    effects: { reverb: 0, delay: 0, echo: 0 },
     cuePoints: [],
     isLooping: false,
     loopStart: 0,
@@ -458,6 +459,68 @@ export function useAudio(deckId: 'A' | 'B') {
     console.log(`Target deck tempo: ${targetDeck.tempo.toFixed(1)}%, This deck new tempo: ${clampedTempo.toFixed(1)}%`);
   }, [deckId, deck.track, setTempo]);
 
+  // Effects functions
+  const setReverb = useCallback((level: number) => {
+    setDeck(prev => ({ 
+      ...prev, 
+      effects: { ...prev.effects, reverb: level }
+    }));
+    
+    if (audioNodes.current?.reverbGain) {
+      const normalizedLevel = level / 100;
+      audioNodes.current.reverbGain.gain.setValueAtTime(normalizedLevel, audioEngine.getCurrentTime());
+      console.log(`[${deckId}] Reverb set to ${level}%`);
+    }
+  }, [deckId]);
+
+  const setDelay = useCallback((level: number) => {
+    setDeck(prev => ({ 
+      ...prev, 
+      effects: { ...prev.effects, delay: level }
+    }));
+    
+    if (audioNodes.current?.delayGain) {
+      const normalizedLevel = level / 100;
+      audioNodes.current.delayGain.gain.setValueAtTime(normalizedLevel, audioEngine.getCurrentTime());
+      console.log(`[${deckId}] Delay set to ${level}%`);
+    }
+  }, [deckId]);
+
+  const setEcho = useCallback((level: number) => {
+    setDeck(prev => ({ 
+      ...prev, 
+      effects: { ...prev.effects, echo: level }
+    }));
+    
+    if (audioNodes.current?.echoGain) {
+      const normalizedLevel = level / 100;
+      audioNodes.current.echoGain.gain.setValueAtTime(normalizedLevel, audioEngine.getCurrentTime());
+      console.log(`[${deckId}] Echo set to ${level}%`);
+    }
+  }, [deckId]);
+
+  const cutFX = useCallback(() => {
+    setDeck(prev => ({ 
+      ...prev, 
+      effects: { reverb: 0, delay: 0, echo: 0 }
+    }));
+    
+    if (audioNodes.current) {
+      const currentTime = audioEngine.getCurrentTime();
+      if (audioNodes.current.reverbGain) {
+        audioNodes.current.reverbGain.gain.setValueAtTime(0, currentTime);
+      }
+      if (audioNodes.current.delayGain) {
+        audioNodes.current.delayGain.gain.setValueAtTime(0, currentTime);
+      }
+      if (audioNodes.current.echoGain) {
+        audioNodes.current.echoGain.gain.setValueAtTime(0, currentTime);
+      }
+    }
+    
+    console.log(`[${deckId}] All effects cut to 0%`);
+  }, [deckId]);
+
   return {
     deck,
     loadTrack,
@@ -476,5 +539,9 @@ export function useAudio(deckId: 'A' | 'B') {
     beatJump,
     sync,
     getAnalyser: () => audioNodes.current?.analyser || null,
+    setReverb,
+    setDelay,
+    setEcho,
+    cutFX,
   };
 }
