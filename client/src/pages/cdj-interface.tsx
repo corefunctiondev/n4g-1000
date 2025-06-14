@@ -199,7 +199,7 @@ export default function CDJInterface() {
               <img 
                 src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
                 alt="Need For Groove Logo" 
-                className="h-8 sm:h-10 lg:h-12 w-auto"
+                className="h-16 sm:h-20 lg:h-24 w-auto"
               />
             </div>
             <button
