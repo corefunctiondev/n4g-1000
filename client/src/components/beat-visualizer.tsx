@@ -66,10 +66,17 @@ export function BeatVisualizer({
         ...particle,
         x: particle.x + particle.velocityX,
         y: particle.y + particle.velocityY,
-        life: particle.life - 0.01,
+        life: particle.life - 0.008,
         opacity: particle.opacity * particle.life,
         size: particle.size * (1 + (1 - particle.life) * 0.1)
-      })).filter(particle => particle.life > 0 && particle.opacity > 0.05);
+      })).filter(particle => 
+        particle.life > 0 && 
+        particle.opacity > 0.05 &&
+        particle.x > -50 && 
+        particle.x < window.innerWidth + 50 &&
+        particle.y > -50 && 
+        particle.y < window.innerHeight + 50
+      );
       
       return updated;
     });
@@ -97,7 +104,7 @@ export function BeatVisualizer({
   useEffect(() => {
     if (isPlaying && bpm) {
       const createParticles = () => {
-        const particleCount = Math.floor(intensity * 15 + audioLevel * 20);
+        const particleCount = Math.floor(intensity * 25 + audioLevel * 35);
         const newParticles: Array<{
           id: number;
           x: number;
@@ -113,15 +120,44 @@ export function BeatVisualizer({
         for (let i = 0; i < particleCount; i++) {
           const currentColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
           
+          // Position-based particle spawning
+          let startX, startY, velX, velY;
+          
+          if (position === 'left') {
+            // Spawn from left edge, move right
+            startX = -20;
+            startY = Math.random() * window.innerHeight;
+            velX = Math.random() * 6 + 2; // Fast rightward movement
+            velY = (Math.random() - 0.5) * 2;
+          } else if (position === 'right') {
+            // Spawn from right edge, move left
+            startX = window.innerWidth + 20;
+            startY = Math.random() * window.innerHeight;
+            velX = -(Math.random() * 6 + 2); // Fast leftward movement
+            velY = (Math.random() - 0.5) * 2;
+          } else {
+            // Center: spawn from random edges and converge
+            const edge = Math.random() < 0.5 ? 'left' : 'right';
+            if (edge === 'left') {
+              startX = -20;
+              velX = Math.random() * 4 + 3;
+            } else {
+              startX = window.innerWidth + 20;
+              velX = -(Math.random() * 4 + 3);
+            }
+            startY = Math.random() * window.innerHeight;
+            velY = (Math.random() - 0.5) * 3;
+          }
+          
           newParticles.push({
             id: particleId.current++,
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            size: Math.random() * 4 + 1,
-            opacity: Math.random() * 0.8 + 0.2,
+            x: startX,
+            y: startY,
+            size: Math.random() * 6 + 2,
+            opacity: Math.random() * 0.9 + 0.3,
             color: currentColor,
-            velocityX: (Math.random() - 0.5) * 2,
-            velocityY: (Math.random() - 0.5) * 2,
+            velocityX: velX,
+            velocityY: velY,
             life: 1.0
           });
         }
