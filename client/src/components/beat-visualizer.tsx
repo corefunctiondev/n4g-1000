@@ -213,29 +213,53 @@ export function BeatVisualizer({
     for (let i = 0; i <= totalRevealSteps; i++) {
       let x, normalizedX;
       
-      // Calculate snake path around CDJ (flowing movement)
+      // Calculate snake path flowing around CDJ (front and back)
       const snakeProgress = (i / steps) + snakePosition;
+      const pathCycle = snakeProgress % 2; // 2-cycle for front/back movement
       
       if (position === 'left') {
-        // Left snake flows in curved path around left CDJ
-        const pathProgress = snakeProgress % 1;
-        const curveX = pathProgress * waveWidth;
-        const curveOffset = Math.sin(pathProgress * Math.PI * 3) * (waveWidth * 0.2);
-        x = startX + curveX + curveOffset;
+        // Left snake flows from left side, around front and back of CDJ
+        if (pathCycle < 1) {
+          // Front path - flowing left to right across front
+          const frontProgress = pathCycle;
+          x = startX + frontProgress * waveWidth;
+          // Add slight curve for natural snake movement
+          const frontCurve = Math.sin(frontProgress * Math.PI * 2) * (waveWidth * 0.1);
+          x += frontCurve;
+        } else {
+          // Back path - flowing right to left behind CDJ
+          const backProgress = pathCycle - 1;
+          x = startX + waveWidth - (backProgress * waveWidth);
+          // Add opposite curve for back movement
+          const backCurve = Math.sin(backProgress * Math.PI * 2) * (waveWidth * 0.15);
+          x += backCurve;
+        }
         normalizedX = (x - startX) / waveWidth;
       } else if (position === 'right') {
-        // Right snake flows in curved path around right CDJ (opposite direction)
-        const pathProgress = (-snakeProgress) % 1;
-        const curveX = Math.abs(pathProgress) * waveWidth;
-        const curveOffset = Math.sin(Math.abs(pathProgress) * Math.PI * 3) * (waveWidth * 0.2);
-        x = startX + waveWidth - curveX - curveOffset;
+        // Right snake flows from right side, around front and back of CDJ
+        if (pathCycle < 1) {
+          // Front path - flowing right to left across front
+          const frontProgress = pathCycle;
+          x = startX + waveWidth - (frontProgress * waveWidth);
+          // Add slight curve for natural snake movement
+          const frontCurve = Math.sin(frontProgress * Math.PI * 2) * (waveWidth * 0.1);
+          x -= frontCurve;
+        } else {
+          // Back path - flowing left to right behind CDJ
+          const backProgress = pathCycle - 1;
+          x = startX + backProgress * waveWidth;
+          // Add opposite curve for back movement
+          const backCurve = Math.sin(backProgress * Math.PI * 2) * (waveWidth * 0.15);
+          x -= backCurve;
+        }
         normalizedX = (x - startX) / waveWidth;
       } else {
-        // Center snakes flow in sinuous S-curves
+        // Center snakes flow connecting both sides
         const pathProgress = snakeProgress % 1;
-        const curveX = pathProgress * waveWidth;
-        const sineOffset = Math.sin(pathProgress * Math.PI * 4) * (waveWidth * 0.15);
-        x = startX + curveX + sineOffset;
+        x = startX + pathProgress * waveWidth;
+        // Add flowing S-curve for center connection
+        const centerCurve = Math.sin(pathProgress * Math.PI * 3) * (waveWidth * 0.12);
+        x += centerCurve;
         normalizedX = (x - startX) / waveWidth;
       }
       
@@ -332,11 +356,14 @@ export function BeatVisualizer({
     );
   });
 
+  // Calculate z-index based on snake position (front/back cycle)
+  const frontBackCycle = snakePosition % 2;
+  const isFrontPosition = frontBackCycle < 1;
+  const zIndex = isFrontPosition ? 'z-50' : 'z-0'; // Front: above CDJ, Back: behind CDJ
+
   return (
     <div 
-      className={`fixed inset-0 pointer-events-none ${
-        position === 'left' ? 'z-0' : position === 'right' ? 'z-0' : 'z-10'
-      }`}
+      className={`fixed inset-0 pointer-events-none ${zIndex}`}
       style={{
         mixBlendMode: 'screen',
         filter: `saturate(${2 + pulseIntensity}) brightness(${1.5 + pulseIntensity * 0.5})`
