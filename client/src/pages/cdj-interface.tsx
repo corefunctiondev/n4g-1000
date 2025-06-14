@@ -139,7 +139,7 @@ export default function CDJInterface() {
 
   useEffect(() => {
     // Set page title
-    document.title = 'N4G-1000 Digital Turntable Interface';
+    document.title = 'N4G-1000 Digital Player Interface';
     
     // Check if this is a direct navigation to DJ interface (not from boot sequence)
     const hasSeenBoot = localStorage.getItem('n4g_has_booted');

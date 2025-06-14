@@ -47,7 +47,7 @@ export function DJLaunchSequence({ onComplete }: DJLaunchSequenceProps) {
       '  ├─ Need For Groove Tracks...... ████████████ 100%',
       '  └─ Audio Processing Ready...... ████████████ 100%',
       '',
-      'N4G-1000 DIGITAL TURNTABLE INTERFACE READY',
+      'N4G-1000 DIGITAL PLAYER INTERFACE READY',
       '═══════════════════════════════════════════',
       '',
       'Welcome to the future of DJing.',

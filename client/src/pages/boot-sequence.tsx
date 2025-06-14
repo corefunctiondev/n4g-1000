@@ -50,7 +50,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
       'Detecting hardware...',
       'Audio Interface............ OK',
       'DJ Controllers............. OK', 
-      'Turntable Emulation........ OK',
+      'Player Emulation........... OK',
       'Beat Detection Engine...... OK',
       'Crossfader System.......... OK',
       'Waveform Analyzer.......... OK',
@@ -169,7 +169,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
       '  ├─ N4G-800 Mixer............... ████████████ 100%',
       '  └─ Vinyl Mode Simulation....... ████████████ 100%',
       '',
-      'Starting N4G-1000 Digital Turntable Interface...',
+      'Starting N4G-1000 Digital Player Interface...',
       '',
       'DJ SYSTEM READY',
       '════════════════',
@@ -248,7 +248,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
                 >
                   <div className="text-center">
                     <div className="text-xl mb-1">🎧 LAUNCH DJ MODE</div>
-                    <div className="text-sm opacity-80">Access N4G-1000 Turntables</div>
+                    <div className="text-sm opacity-80">Access N4G-1000 Players</div>
                   </div>
                 </Button>
                 
