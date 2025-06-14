@@ -171,6 +171,7 @@ Changelog:
 - June 14, 2025. Simplified to minimal lighting system - clean gradient overlays with subtle effects, low opacity, and smooth transitions for professional ambiance
 - June 14, 2025. Created gradient futuristic waves with precise beat synchronization - wave movement, scaling, and effects locked to exact BPM timing using requestAnimationFrame
 - June 14, 2025. Enhanced waves with real-time audio-reactive sizing - wave amplitude, effects, and colors respond to live audio fluctuations with frequency-separated analysis and improved color palette
+- June 14, 2025. Implemented beat drop detection with dynamic color changes - waves turn blue or black during intense musical moments, returning to white during normal playback
 
 ## User Preferences
 

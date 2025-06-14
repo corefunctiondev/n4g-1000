@@ -21,6 +21,8 @@ export function BeatVisualizer({
   const [colorCycle, setColorCycle] = useState(0);
   const [audioLevel, setAudioLevel] = useState(0);
   const [wavePhase, setWavePhase] = useState(0);
+  const [beatDropIntensity, setBeatDropIntensity] = useState(0);
+  const [lastAudioLevel, setLastAudioLevel] = useState(0);
   
   const lastBeatTime = useRef(0);
   const beatInterval = useRef<number | null>(null);
@@ -54,6 +56,16 @@ export function BeatVisualizer({
         const highFreq = dataArray.slice(170, 255).reduce((sum, value) => sum + value, 0) / 85 / 255;
         
         const overall = (lowFreq + midFreq + highFreq) / 3;
+        
+        // Beat drop detection - sudden audio level increases
+        const audioJump = overall - lastAudioLevel;
+        if (audioJump > 0.3 && overall > 0.6) {
+          setBeatDropIntensity(1.0);
+        } else {
+          setBeatDropIntensity(prev => Math.max(0, prev - 0.05)); // Fade out over time
+        }
+        
+        setLastAudioLevel(overall);
         setAudioLevel(overall);
       }
 
@@ -112,7 +124,9 @@ export function BeatVisualizer({
   const pulseIntensity = Math.max(beatPulse, audioLevel);
   const opacity = 0.2 + (pulseIntensity * 0.6);
   
-  const finalColor = '#FFFFFF';
+  // Dynamic color based on beat drop intensity
+  const beatDropColor = beatDropIntensity > 0.7 ? '#000000' : beatDropIntensity > 0.3 ? '#0066FF' : '#FFFFFF';
+  const finalColor = beatDropColor;
 
   // Audio-reactive wave parameters
   const baseAmplitude = 20 + (audioLevel * 80); // Wave size responds to audio fluctuations
@@ -202,7 +216,7 @@ export function BeatVisualizer({
         {audioLevel > 0.5 && (
           <path
             d={createBeatWavePath(layerY, i, direction)}
-            stroke="#FFFFFF"
+            stroke={finalColor}
             strokeWidth={2 + audioLevel * 3}
             fill="none"
             opacity={strokeOpacity * audioLevel * 0.4}
