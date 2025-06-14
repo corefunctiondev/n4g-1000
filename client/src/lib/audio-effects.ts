@@ -63,4 +63,54 @@ export class AudioEffects {
       this.filter.frequency.setValueAtTime(frequency, this.context.currentTime);
     }
   }
+
+  // Set reverb level (0-100)
+  setReverbLevel(level: number): void {
+    // Reverb is controlled by wet/dry mix in the audio chain
+    // This would be handled by gain nodes in the audio engine
+  }
+
+  // Set delay level and feedback for echo effect (0-100)
+  setDelayLevel(level: number): void {
+    if (this.delay) {
+      const delayTime = (level / 100) * 0.5; // 0 to 0.5 seconds
+      this.delay.delayTime.setValueAtTime(delayTime, this.context.currentTime);
+    }
+  }
+
+  // Set echo effect (similar to delay but with feedback)
+  setEchoLevel(level: number): void {
+    if (this.delay) {
+      const echoTime = (level / 100) * 0.3; // 0 to 0.3 seconds for echo
+      this.delay.delayTime.setValueAtTime(echoTime, this.context.currentTime);
+    }
+  }
+
+  // Create feedback delay chain for echo effect
+  createEchoChain(inputNode: AudioNode, outputNode: AudioNode): GainNode {
+    const feedbackGain = this.context.createGain();
+    const wetGain = this.context.createGain();
+    const dryGain = this.context.createGain();
+    
+    // Set initial values
+    feedbackGain.gain.setValueAtTime(0.3, this.context.currentTime);
+    wetGain.gain.setValueAtTime(0.5, this.context.currentTime);
+    dryGain.gain.setValueAtTime(0.5, this.context.currentTime);
+    
+    // Connect the echo chain
+    if (this.delay) {
+      inputNode.connect(this.delay);
+      inputNode.connect(dryGain);
+      
+      this.delay.connect(feedbackGain);
+      this.delay.connect(wetGain);
+      
+      feedbackGain.connect(this.delay);
+      
+      wetGain.connect(outputNode);
+      dryGain.connect(outputNode);
+    }
+    
+    return wetGain;
+  }
 }

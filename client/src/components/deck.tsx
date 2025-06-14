@@ -46,6 +46,11 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
   const [isLoadingTrack, setIsLoadingTrack] = useState(false);
+  
+  // Effects states
+  const [reverbLevel, setReverbLevel] = useState(0);
+  const [delayLevel, setDelayLevel] = useState(0);
+  const [echoLevel, setEchoLevel] = useState(0);
 
   // Fetch tracks from Supabase database
   const { data: tracks = [], isLoading: tracksLoading } = useQuery({
@@ -240,6 +245,31 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   useEffect(() => {
     onPlaybackChange?.(deckId, deck.isPlaying);
   }, [deck.isPlaying, deckId, onPlaybackChange]);
+
+  // Apply audio effects when knob values change
+  useEffect(() => {
+    if (deck.track) {
+      // Apply reverb effect
+      console.log(`[${deckId}] Reverb: ${reverbLevel}%`);
+      // TODO: Connect to audio engine effects chain when available
+    }
+  }, [reverbLevel, deck.track, deckId]);
+
+  useEffect(() => {
+    if (deck.track) {
+      // Apply delay effect
+      console.log(`[${deckId}] Delay: ${delayLevel}%`);
+      // TODO: Connect to audio engine effects chain when available
+    }
+  }, [delayLevel, deck.track, deckId]);
+
+  useEffect(() => {
+    if (deck.track) {
+      // Apply echo effect
+      console.log(`[${deckId}] Echo: ${echoLevel}%`);
+      // TODO: Connect to audio engine effects chain when available
+    }
+  }, [echoLevel, deck.track, deckId]);
 
   return (
     <div 
@@ -445,28 +475,41 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
 
 
 
-      {/* Bottom Controls - Compact */}
+      {/* Effects Controls */}
       <div className="grid grid-cols-3 gap-1">
-        <button 
-          className={`pioneer-button py-1 text-xs ${
-            deck.isLooping ? 'bg-blue-500 text-white' : 'text-blue-300 hover:bg-blue-500'
-          }`}
-          onClick={toggleLoop}
-        >
-          LOOP
-        </button>
-        <button 
-          className="pioneer-button py-1 text-xs text-blue-300 hover:bg-blue-500"
-          onClick={() => beatJump(-1)}
-        >
-          SLIP
-        </button>
-        <button 
-          className="pioneer-button py-1 text-xs text-orange-400 hover:bg-orange-500"
-          onClick={() => beatJump(1)}
-        >
-          BEAT
-        </button>
+        <div className="pioneer-button p-1 text-xs">
+          <div className="text-purple-300 text-center mb-1">REVERB</div>
+          <Knob
+            value={reverbLevel}
+            min={0}
+            max={100}
+            onChange={setReverbLevel}
+            size="sm"
+            className="mx-auto"
+          />
+        </div>
+        <div className="pioneer-button p-1 text-xs">
+          <div className="text-green-300 text-center mb-1">DELAY</div>
+          <Knob
+            value={delayLevel}
+            min={0}
+            max={100}
+            onChange={setDelayLevel}
+            size="sm"
+            className="mx-auto"
+          />
+        </div>
+        <div className="pioneer-button p-1 text-xs">
+          <div className="text-cyan-300 text-center mb-1">ECHO</div>
+          <Knob
+            value={echoLevel}
+            min={0}
+            max={100}
+            onChange={setEchoLevel}
+            size="sm"
+            className="mx-auto"
+          />
+        </div>
       </div>
     </div>
   );
