@@ -5,6 +5,8 @@ export class AudioEngine {
   private deckNodes: Map<string, any> = new Map();
   private crossfaderGainA: GainNode | null = null;
   private crossfaderGainB: GainNode | null = null;
+  private beatAlignment: Map<string, { nextBeat: number; bpm: number; isPlaying: boolean }> = new Map();
+  private syncEnabled: boolean = false;
 
   async initialize(): Promise<void> {
     try {
@@ -322,6 +324,109 @@ export class AudioEngine {
     // This will be called from the useAudio hook with actual deck state
     // For now, return default values - the hook will override with real values
     return { bpm: 120, tempo: 1 };
+  }
+
+  // Beat detection and alignment system
+  updateBeatInfo(deckId: string, bpm: number, currentTime: number, isPlaying: boolean): void {
+    if (!this.context) return;
+    
+    const beatDuration = 60 / bpm; // seconds per beat
+    const currentContextTime = this.context.currentTime;
+    
+    // Calculate next beat time based on current playback position
+    const beatsElapsed = Math.floor(currentTime / beatDuration);
+    const nextBeatOffset = (beatsElapsed + 1) * beatDuration - currentTime;
+    const nextBeat = currentContextTime + nextBeatOffset;
+    
+    this.beatAlignment.set(deckId, {
+      nextBeat,
+      bpm,
+      isPlaying
+    });
+    
+    // Check if both decks are playing and trigger auto-sync
+    this.checkDualPlaybackSync();
+  }
+
+  private checkDualPlaybackSync(): void {
+    const deckA = this.beatAlignment.get('A');
+    const deckB = this.beatAlignment.get('B');
+    
+    if (deckA?.isPlaying && deckB?.isPlaying && !this.syncEnabled) {
+      this.performBeatAlignment();
+      this.syncEnabled = true;
+      console.log('🎛️ AUTO-SYNC: Both decks playing - activating beat alignment');
+    } else if ((!deckA?.isPlaying || !deckB?.isPlaying) && this.syncEnabled) {
+      this.syncEnabled = false;
+      console.log('🎛️ AUTO-SYNC: Single deck playing - beat alignment disabled');
+    }
+  }
+
+  private performBeatAlignment(): void {
+    const deckA = this.beatAlignment.get('A');
+    const deckB = this.beatAlignment.get('B');
+    
+    if (!deckA || !deckB || !this.context) return;
+    
+    // Determine master and slave deck based on BPM stability or user preference
+    // For now, use deck A as master
+    const masterDeck = deckA;
+    const slaveDeck = deckB;
+    const slaveId = 'B';
+    
+    // Calculate BPM difference and apply tempo adjustment
+    const bpmDifference = masterDeck.bpm - slaveDeck.bpm;
+    const tempoAdjustment = (bpmDifference / slaveDeck.bpm) * 100;
+    
+    // Apply gradual tempo adjustment to slave deck
+    this.setTempo(slaveId, tempoAdjustment);
+    
+    // Calculate beat alignment offset
+    const beatTimeDiff = masterDeck.nextBeat - slaveDeck.nextBeat;
+    const maxOffset = 0.1; // Maximum 100ms adjustment
+    
+    if (Math.abs(beatTimeDiff) > 0.01 && Math.abs(beatTimeDiff) < maxOffset) {
+      // Apply micro-timing adjustment to align kicks
+      const nodes = this.deckNodes.get(slaveId);
+      if (nodes?.source?.playbackRate) {
+        const microAdjustment = beatTimeDiff * 0.02; // Subtle timing nudge
+        const currentRate = nodes.source.playbackRate.value;
+        nodes.source.playbackRate.setValueAtTime(
+          currentRate + microAdjustment, 
+          this.context.currentTime
+        );
+        
+        // Return to normal rate after adjustment
+        nodes.source.playbackRate.setValueAtTime(
+          currentRate, 
+          this.context.currentTime + 0.05
+        );
+      }
+    }
+    
+    console.log(`🎯 BEAT MATCH: Deck B synced to Deck A | BPM: ${masterDeck.bpm.toFixed(1)} | Offset: ${(beatTimeDiff * 1000).toFixed(1)}ms`);
+  }
+
+  // Manual sync trigger for SYNC button
+  syncToMasterDeck(slaveDeckId: string, masterDeckId: string): void {
+    const masterDeck = this.beatAlignment.get(masterDeckId);
+    const slaveDeck = this.beatAlignment.get(slaveDeckId);
+    
+    if (!masterDeck || !slaveDeck || !this.context) return;
+    
+    // Calculate and apply BPM matching
+    const bpmRatio = masterDeck.bpm / slaveDeck.bpm;
+    const tempoAdjustment = (bpmRatio - 1) * 100;
+    
+    this.setTempo(slaveDeckId, tempoAdjustment);
+    
+    console.log(`🔄 MANUAL SYNC: Deck ${slaveDeckId} synced to Deck ${masterDeckId} | Target BPM: ${masterDeck.bpm.toFixed(1)}`);
+  }
+
+  // Reset sync when tracks stop
+  resetBeatAlignment(deckId: string): void {
+    this.beatAlignment.delete(deckId);
+    this.syncEnabled = false;
   }
 
   setDelayEffect(deckId: string, level: number, delayTime?: number): void {

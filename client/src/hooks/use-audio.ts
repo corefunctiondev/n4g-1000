@@ -84,10 +84,16 @@ export function useAudio(deckId: 'A' | 'B') {
       
       setDeck(prev => ({ ...prev, currentTime }));
       
+      // Update beat alignment info for automatic sync
+      if (deck.track?.bpm) {
+        audioEngine.updateBeatInfo(deckId, deck.track.bpm, currentTime, deck.isPlaying);
+      }
+      
       if (deck.isPlaying && currentTime < deck.track.duration) {
         animationFrameRef.current = requestAnimationFrame(updateCurrentTime);
       } else if (currentTime >= deck.track.duration) {
-        // Track finished
+        // Track finished - reset beat alignment
+        audioEngine.resetBeatAlignment(deckId);
         setDeck(prev => ({ ...prev, isPlaying: false, currentTime: 0 }));
       }
     }
@@ -257,11 +263,14 @@ export function useAudio(deckId: 'A' | 'B') {
       pauseTimeRef.current = deck.currentTime;
       setDeck(prev => ({ ...prev, isPlaying: false, isPaused: true }));
       
+      // Reset beat alignment when pausing
+      audioEngine.resetBeatAlignment(deckId);
+      
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     }
-  }, [deck.isPlaying, deck.currentTime]);
+  }, [deck.isPlaying, deck.currentTime, deckId]);
 
   const stop = useCallback(() => {
     if (sourceRef.current) {
@@ -278,10 +287,13 @@ export function useAudio(deckId: 'A' | 'B') {
       currentTime: 0 
     }));
     
+    // Reset beat alignment when stopping
+    audioEngine.resetBeatAlignment(deckId);
+    
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
     }
-  }, []);
+  }, [deckId]);
 
   const cue = useCallback(() => {
     stop();
