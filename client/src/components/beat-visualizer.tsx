@@ -27,18 +27,18 @@ export function BeatVisualizer({
   // Calculate beat timing
   const beatDuration = (60 / bpm) * 1000; // milliseconds per beat
   
-  // Dynamic color palette for variety
+  // Dynamic color palette for variety (no pink)
   const colorPalette = [
-    '#ff0080', // Hot pink
     '#00ff80', // Bright green
     '#8000ff', // Electric purple
     '#ff8000', // Vivid orange
     '#0080ff', // Electric blue
     '#ff4000', // Red-orange
     '#40ff00', // Lime green
-    '#ff0040', // Rose
     '#00ffff', // Cyan
     '#ffff00', // Yellow
+    '#ff2000', // Bright red
+    '#4000ff', // Deep blue
   ];
 
   // Audio analysis for real-time beat detection
@@ -184,12 +184,12 @@ export function GlobalBeatVisualizer({
         position="left"
       />
       
-      {/* Deck B (Right) - Vivid hot pink/orange pulses */}
+      {/* Deck B (Right) - Vivid orange/red pulses */}
       <BeatVisualizer
         isPlaying={deckBPlaying}
         bpm={deckBBpm}
         analyser={deckBAnalyser}
-        color="#ff0080"
+        color="#ff4000"
         intensity={1.5}
         position="right"
       />
