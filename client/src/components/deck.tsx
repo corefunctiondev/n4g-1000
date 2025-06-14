@@ -46,6 +46,13 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
   const [isLoadingTrack, setIsLoadingTrack] = useState(false);
+  
+  // Effects state
+  const [reverbLevel, setReverbLevel] = useState(0);
+  const [delayLevel, setDelayLevel] = useState(0);
+  const [delayTime, setDelayTime] = useState(0.25);
+  const [delayFeedback, setDelayFeedback] = useState(0.3);
+  const [filterFreq, setFilterFreq] = useState(20000);
 
   // Fetch tracks from Supabase database
   const { data: tracks = [], isLoading: tracksLoading } = useQuery({
@@ -385,7 +392,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           </button>
         </div>
 
-        {/* Tempo Control - Compact */}
+        {/* Tempo Control - Extended */}
         <div className="pioneer-eq-section p-1">
           <div className="text-xs text-center mb-1 text-gray-300">TEMPO</div>
           <div className="text-center mb-1">
@@ -394,19 +401,17 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             </div>
           </div>
           <div className="flex justify-center">
-            <div 
-              className="pioneer-fader-track h-10 w-4 relative cursor-pointer"
-              onMouseDown={handleTempoMouseDown}
-            >
-              <div 
-                className={`pioneer-fader-handle w-6 h-3 absolute -left-1 transition-colors ${
-                  isDraggingTempo ? 'bg-blue-400' : ''
-                }`}
-                style={{ 
-                  top: `${((tempoRange - deck.tempo) / (tempoRange * 2)) * (40 - 12)}px`,
-                }}
-              />
-            </div>
+            <Fader
+              value={deck.tempo}
+              min={-tempoRange}
+              max={tempoRange}
+              step={0.1}
+              onChange={setTempo}
+              orientation="vertical"
+              length={80}
+              thickness={20}
+              className="mx-auto"
+            />
           </div>
           <div className="grid grid-cols-2 gap-2 mt-3">
             <button 
@@ -421,6 +426,29 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             >
               RESET
             </button>
+          </div>
+        </div>
+
+        {/* Volume Control - Extended */}
+        <div className="pioneer-eq-section p-1">
+          <div className="text-xs text-center mb-1 text-gray-300">VOLUME</div>
+          <div className="text-center mb-1">
+            <div className="text-xs font-mono pioneer-led" style={{ color }}>
+              {Math.round(deck.volume * 100)}%
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <Fader
+              value={deck.volume * 100}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(value) => setVolume(value / 100)}
+              orientation="vertical"
+              length={80}
+              thickness={20}
+              className="mx-auto"
+            />
           </div>
         </div>
       </div>
