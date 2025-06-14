@@ -113,16 +113,17 @@ export function BeatVisualizer({
   const waveFrequency = 0.01 + (audioLevel * 0.005); // Wave ripple density
   const waveSpeed = waveOffset + (beatPulse * 3); // Wave movement speed
 
-  // Create multiple wave paths
+  // Create multiple wave paths with smoother curves
   const createWavePath = (baseY: number, direction: number, waveIndex: number) => {
     const points: string[] = [];
-    const steps = 120;
-    const phaseShift = waveIndex * 0.5; // Offset each wave
+    const steps = 60; // Reduced for smoother performance
+    const phaseShift = waveIndex * 0.8; // Better wave separation
     
     for (let i = 0; i <= steps; i++) {
       const x = (window.innerWidth / steps) * i;
-      const waveY = baseY + Math.sin((x * waveFrequency) + (waveSpeed * direction) + phaseShift) * waveAmplitude;
-      points.push(`${x},${waveY}`);
+      const normalizedX = x / window.innerWidth;
+      const waveY = baseY + Math.sin((normalizedX * Math.PI * 3) + (waveSpeed * direction * 0.1) + phaseShift) * waveAmplitude;
+      points.push(`${Math.round(x)},${Math.round(waveY)}`);
     }
     
     return `M ${points.join(' L ')}`;
@@ -250,37 +251,56 @@ export function GlobalBeatVisualizer({
   deckAAnalyser,
   deckBAnalyser
 }: GlobalBeatVisualizerProps) {
+  // Only show waves for the deck that's actually playing
   return (
     <>
-      {deckAPlaying && (
+      {deckAPlaying && !deckBPlaying && (
         <BeatVisualizer
           isPlaying={deckAPlaying}
           bpm={deckABpm}
           analyser={deckAAnalyser}
           color="#00FFFF"
-          intensity={0.7}
+          intensity={0.8}
           position="left"
         />
       )}
-      {deckBPlaying && (
+      {deckBPlaying && !deckAPlaying && (
         <BeatVisualizer
           isPlaying={deckBPlaying}
           bpm={deckBBpm}
           analyser={deckBAnalyser}
           color="#FF0040"
-          intensity={0.7}
+          intensity={0.8}
           position="right"
         />
       )}
       {deckAPlaying && deckBPlaying && (
-        <BeatVisualizer
-          isPlaying={true}
-          bpm={Math.max(deckABpm || 120, deckBBpm || 120)}
-          analyser={deckAAnalyser || deckBAnalyser}
-          color="#8000FF"
-          intensity={0.9}
-          position="center"
-        />
+        <>
+          <BeatVisualizer
+            isPlaying={deckAPlaying}
+            bpm={deckABpm}
+            analyser={deckAAnalyser}
+            color="#00FFFF"
+            intensity={0.6}
+            position="left"
+          />
+          <BeatVisualizer
+            isPlaying={deckBPlaying}
+            bpm={deckBBpm}
+            analyser={deckBAnalyser}
+            color="#FF0040"
+            intensity={0.6}
+            position="right"
+          />
+          <BeatVisualizer
+            isPlaying={true}
+            bpm={Math.max(deckABpm || 120, deckBBpm || 120)}
+            analyser={deckAAnalyser || deckBAnalyser}
+            color="#8000FF"
+            intensity={0.4}
+            position="center"
+          />
+        </>
       )}
     </>
   );
