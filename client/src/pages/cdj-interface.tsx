@@ -192,16 +192,18 @@ export default function CDJInterface() {
       
       {/* Pioneer DJ Setup Layout */}
       <div className="w-full max-w-[98vw] mx-auto relative z-20">
+        {/* Background Logo */}
+        <div className="absolute inset-0 flex items-center justify-center z-0 opacity-20">
+          <img 
+            src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
+            alt="Need For Groove Logo Background" 
+            className="h-96 w-auto"
+          />
+        </div>
+
         {/* Header */}
-        <div className="mb-4 lg:mb-8 relative">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-4">
-              <img 
-                src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
-                alt="Need For Groove Logo" 
-                className="h-36 w-auto"
-              />
-            </div>
+        <div className="mb-2 relative z-10">
+          <div className="flex justify-end items-center mb-2">
             <button
               onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
               className="p-2 hover:bg-gray-800 border border-cyan-400 rounded transition-all duration-200 bg-gray-900"
