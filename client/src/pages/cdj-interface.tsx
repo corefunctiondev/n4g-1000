@@ -317,9 +317,11 @@ export default function CDJInterface() {
             </div>
             <div className="flex justify-center">
               <div 
-                className="n4g-fader-track w-48 h-6 relative cursor-pointer border border-gray-400 rounded"
+                className="n4g-fader-track w-48 h-6 relative cursor-pointer border border-gray-400 rounded bg-gray-900"
                 onMouseDown={handleCrossfaderMouseDown}
               >
+                {/* Center line indicator */}
+                <div className="absolute top-0 left-1/2 w-px h-full bg-gray-400 transform -translate-x-px"></div>
                 <div 
                   className={`n4g-fader-handle w-5 h-10 absolute -top-2 transition-colors border border-gray-500 rounded ${
                     isDraggingCrossfader ? 'bg-purple-400' : 'bg-gray-300'

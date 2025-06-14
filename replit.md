@@ -192,6 +192,8 @@ Changelog:
 - June 14, 2025. Added complete N4G CSS variable system with authentic hardware colors and component styling for buttons, knobs, faders, screens, and deck bodies
 - June 14, 2025. Simplified website page structure - removed About page completely, podcasts and mixes pages show only "Coming Soon", bookings page shows only email and social media
 - June 14, 2025. Cleaned contact page to display only essential contact information without duplication, organized home page to prominently feature next gig information
+- June 14, 2025. Fixed crossfader branding from DJM-750MK2 to N4G-800, updated all CSS classes from pioneer- to n4g-, added center line indicator to crossfader
+- June 14, 2025. Completely cleared website pages of all mock data - bookings shows only email and social links, sets/podcasts/mixes show only "Coming Soon"
 
 ## User Preferences
 
