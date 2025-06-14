@@ -9,6 +9,8 @@ export function AudioFeedbackProvider({ children }: { children: React.ReactNode 
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       
+      if (!target || typeof target.matches !== 'function') return;
+      
       // Different sounds for different elements
       if (target.matches('button, [role="button"]')) {
         audioFeedback.playClick();
@@ -20,7 +22,7 @@ export function AudioFeedbackProvider({ children }: { children: React.ReactNode 
         audioFeedback.playEdit();
       } else if (target.matches('.live-editor-highlight')) {
         audioFeedback.playEdit();
-      } else if (target.closest('button, a, [role="button"], [role="link"]')) {
+      } else if (target.closest && target.closest('button, a, [role="button"], [role="link"]')) {
         // If clicking inside a button/link
         if (target.closest('button, [role="button"]')) {
           audioFeedback.playClick();
@@ -32,6 +34,8 @@ export function AudioFeedbackProvider({ children }: { children: React.ReactNode 
 
     const handleGlobalHover = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+      
+      if (!target || typeof target.matches !== 'function') return;
       
       // Subtle hover sounds for interactive elements
       if (target.matches('button, [role="button"], a, [role="link"]') && 
