@@ -638,14 +638,20 @@ function MixesSection() {
     return item?.title || item?.content || '';
   };
 
+  const isDevelopment = getContent('mixes_coming_soon').includes('Development');
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ./mix_archive.sh --browse</div>
       
       <div className="space-y-4">
-        <div className="text-2xl font-bold text-cyan-400">
-          {getContent('mixes_coming_soon')}
-        </div>
+        {isDevelopment ? (
+          <BuildingBlocks text={getContent('mixes_coming_soon')} />
+        ) : (
+          <div className="text-2xl font-bold text-cyan-400">
+            {getContent('mixes_coming_soon')}
+          </div>
+        )}
       </div>
     </div>
   );
