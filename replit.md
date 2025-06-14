@@ -165,6 +165,7 @@ Changelog:
 - June 14, 2025. Enhanced particle system to millions of futuristic dust particles with directional movement (left deck particles flow right, right deck particles flow left, center convergence effect)
 - June 14, 2025. Replaced particle system with dynamic wave-based lighting - flexible SVG wave paths that curve and flow with the beat instead of straight lines
 - June 14, 2025. Fixed glitchy wave rendering and improved display logic to show waves only on the side that's currently playing music
+- June 14, 2025. Completely redesigned wave shapes - left deck uses lightning bolts, right deck uses spiral energy, center uses DNA helix patterns for connecting waves
 
 ## User Preferences
 

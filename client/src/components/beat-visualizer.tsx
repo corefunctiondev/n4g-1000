@@ -133,17 +133,23 @@ export function BeatVisualizer({
   let waveElements;
   
   if (position === 'left') {
-    // Waves start from left edge and flow rightward only
-    const createLeftWavePath = (baseY: number, waveIndex: number) => {
+    // Lightning-style jagged waves from left
+    const createLeftLightningPath = (baseY: number, waveIndex: number) => {
       const points: string[] = [];
-      const steps = 60;
-      const phaseShift = waveIndex * 0.8;
-      const maxWidth = window.innerWidth * 0.6; // Only cover left 60% of screen
+      const steps = 40;
+      const phaseShift = waveIndex * 1.2;
+      const maxWidth = window.innerWidth * 0.6;
       
       for (let i = 0; i <= steps; i++) {
         const x = (maxWidth / steps) * i;
         const normalizedX = x / maxWidth;
-        const waveY = baseY + Math.sin((normalizedX * Math.PI * 3) + (waveSpeed * 0.15) + phaseShift) * waveAmplitude;
+        
+        // Create jagged lightning effect
+        const primaryWave = Math.sin((normalizedX * Math.PI * 2) + (waveSpeed * 0.2) + phaseShift) * waveAmplitude;
+        const secondaryWave = Math.sin((normalizedX * Math.PI * 6) + (waveSpeed * 0.3)) * (waveAmplitude * 0.3);
+        const randomJitter = (Math.random() - 0.5) * (pulseIntensity * 20);
+        
+        const waveY = baseY + primaryWave + secondaryWave + randomJitter;
         points.push(`${Math.round(x)},${Math.round(waveY)}`);
       }
       
@@ -151,18 +157,18 @@ export function BeatVisualizer({
     };
 
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(1px)' }}>
-        {[0, 1, 2, 3, 4, 5].map(i => (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.5px)' }}>
+        {[0, 1, 2, 3, 4].map(i => (
           <path
             key={i}
-            d={createLeftWavePath(window.innerHeight * (0.15 + i * 0.14), i)}
+            d={createLeftLightningPath(window.innerHeight * (0.2 + i * 0.16), i)}
             stroke={finalColor}
-            strokeWidth={10 + pulseIntensity * 15}
+            strokeWidth={6 + pulseIntensity * 10}
             fill="none"
-            opacity={opacity * (1 - i * 0.08)}
+            opacity={opacity * (1 - i * 0.1)}
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 ${20 + pulseIntensity * 25}px ${finalColor})`,
+              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
               transform: `scale(${scale})`,
               transformOrigin: 'left center'
             }}
@@ -171,18 +177,24 @@ export function BeatVisualizer({
       </svg>
     );
   } else if (position === 'right') {
-    // Waves start from right edge and flow leftward only
-    const createRightWavePath = (baseY: number, waveIndex: number) => {
+    // Spiral energy waves from right
+    const createRightSpiralPath = (baseY: number, waveIndex: number) => {
       const points: string[] = [];
-      const steps = 60;
-      const phaseShift = waveIndex * 0.8;
-      const startX = window.innerWidth * 0.4; // Start from right 40% mark
-      const maxWidth = window.innerWidth * 0.6; // Cover right 60% of screen
+      const steps = 50;
+      const phaseShift = waveIndex * 0.6;
+      const startX = window.innerWidth * 0.4;
+      const maxWidth = window.innerWidth * 0.6;
       
       for (let i = 0; i <= steps; i++) {
         const x = startX + (maxWidth / steps) * i;
         const normalizedX = (x - startX) / maxWidth;
-        const waveY = baseY + Math.sin((normalizedX * Math.PI * 3) + (waveSpeed * -0.15) + phaseShift) * waveAmplitude;
+        
+        // Create spiral/helix effect
+        const spiralWave = Math.sin((normalizedX * Math.PI * 4) + (waveSpeed * -0.25) + phaseShift) * waveAmplitude;
+        const helixWave = Math.cos((normalizedX * Math.PI * 8) + (waveSpeed * -0.15)) * (waveAmplitude * 0.4);
+        const pulseEffect = Math.sin(waveSpeed * 0.5 + phaseShift) * (pulseIntensity * 30);
+        
+        const waveY = baseY + spiralWave + helixWave + pulseEffect;
         points.push(`${Math.round(x)},${Math.round(waveY)}`);
       }
       
@@ -190,18 +202,18 @@ export function BeatVisualizer({
     };
 
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(1px)' }}>
-        {[0, 1, 2, 3, 4, 5].map(i => (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.5px)' }}>
+        {[0, 1, 2, 3, 4].map(i => (
           <path
             key={i}
-            d={createRightWavePath(window.innerHeight * (0.15 + i * 0.14), i)}
+            d={createRightSpiralPath(window.innerHeight * (0.2 + i * 0.16), i)}
             stroke={finalColor}
-            strokeWidth={10 + pulseIntensity * 15}
+            strokeWidth={6 + pulseIntensity * 10}
             fill="none"
-            opacity={opacity * (1 - i * 0.08)}
+            opacity={opacity * (1 - i * 0.1)}
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 ${20 + pulseIntensity * 25}px ${finalColor})`,
+              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
               transform: `scale(${scale})`,
               transformOrigin: 'right center'
             }}
@@ -210,18 +222,24 @@ export function BeatVisualizer({
       </svg>
     );
   } else {
-    // Center: connecting waves that bridge left and right
-    const createConnectingWavePath = (baseY: number, waveIndex: number) => {
+    // Center: DNA double helix connecting waves
+    const createHelixPath = (baseY: number, waveIndex: number, isTopHelix: boolean) => {
       const points: string[] = [];
-      const steps = 60;
-      const phaseShift = waveIndex * 0.8;
-      const centerStart = window.innerWidth * 0.3;
-      const centerWidth = window.innerWidth * 0.4;
+      const steps = 80;
+      const phaseShift = waveIndex * 1.0 + (isTopHelix ? 0 : Math.PI);
+      const centerStart = window.innerWidth * 0.25;
+      const centerWidth = window.innerWidth * 0.5;
       
       for (let i = 0; i <= steps; i++) {
         const x = centerStart + (centerWidth / steps) * i;
         const normalizedX = (x - centerStart) / centerWidth;
-        const waveY = baseY + Math.sin((normalizedX * Math.PI * 4) + (waveSpeed * 0.2) + phaseShift) * (waveAmplitude * 0.8);
+        
+        // DNA helix pattern
+        const helixWave = Math.sin((normalizedX * Math.PI * 6) + (waveSpeed * 0.3) + phaseShift) * (waveAmplitude * 0.6);
+        const twistEffect = Math.cos((normalizedX * Math.PI * 12) + (waveSpeed * 0.2)) * (waveAmplitude * 0.2);
+        const convergence = Math.sin(normalizedX * Math.PI) * (pulseIntensity * 15);
+        
+        const waveY = baseY + helixWave + twistEffect + convergence;
         points.push(`${Math.round(x)},${Math.round(waveY)}`);
       }
       
@@ -229,22 +247,36 @@ export function BeatVisualizer({
     };
 
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(1px)' }}>
-        {[0, 1, 2, 3, 4, 5].map(i => (
-          <path
-            key={i}
-            d={createConnectingWavePath(window.innerHeight * (0.15 + i * 0.14), i)}
-            stroke={finalColor}
-            strokeWidth={8 + pulseIntensity * 12}
-            fill="none"
-            opacity={opacity * (1 - i * 0.1)}
-            strokeLinecap="round"
-            style={{
-              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
-              transform: `scale(${scale})`,
-              transformOrigin: 'center'
-            }}
-          />
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.8px)' }}>
+        {[0, 1, 2, 3].map(i => (
+          <g key={i}>
+            <path
+              d={createHelixPath(window.innerHeight * (0.25 + i * 0.18), i, true)}
+              stroke={finalColor}
+              strokeWidth={5 + pulseIntensity * 8}
+              fill="none"
+              opacity={opacity * (1 - i * 0.12)}
+              strokeLinecap="round"
+              style={{
+                filter: `drop-shadow(0 0 ${12 + pulseIntensity * 18}px ${finalColor})`,
+                transform: `scale(${scale})`,
+                transformOrigin: 'center'
+              }}
+            />
+            <path
+              d={createHelixPath(window.innerHeight * (0.25 + i * 0.18), i, false)}
+              stroke={finalColor}
+              strokeWidth={5 + pulseIntensity * 8}
+              fill="none"
+              opacity={opacity * (1 - i * 0.12) * 0.7}
+              strokeLinecap="round"
+              style={{
+                filter: `drop-shadow(0 0 ${12 + pulseIntensity * 18}px ${finalColor})`,
+                transform: `scale(${scale})`,
+                transformOrigin: 'center'
+              }}
+            />
+          </g>
         ))}
       </svg>
     );
