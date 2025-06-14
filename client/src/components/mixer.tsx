@@ -352,7 +352,7 @@ export function Mixer() {
 
 
         {/* Channel B */}
-        <div className="pioneer-eq-section p-1 flex-1">
+        <div className="n4g-eq-section p-1 flex-1">
           <div className="text-center mb-1">
             <div className="text-xs font-bold text-orange-400">CH B</div>
           </div>
@@ -361,7 +361,7 @@ export function Mixer() {
           <div className="flex flex-col items-center gap-1 mb-1">
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
+                className={`n4g-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'high-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.high - 50) * 2.7}deg)` }}
@@ -371,7 +371,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
+                className={`n4g-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'mid-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.mid - 50) * 2.7}deg)` }}
@@ -381,7 +381,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
+                className={`n4g-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'low-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.low - 50) * 2.7}deg)` }}
@@ -394,7 +394,7 @@ export function Mixer() {
           {/* Channel Fader - Longer */}
           <div className="flex justify-center mb-1">
             <div 
-              className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+              className="n4g-fader-track h-16 w-4 relative cursor-pointer"
               onMouseDown={handleFaderMouseDown('volume', 'B')}
             >
               <div 

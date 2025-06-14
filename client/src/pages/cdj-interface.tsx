@@ -199,7 +199,7 @@ export default function CDJInterface() {
         />
       </div>
 
-      {/* Pioneer DJ Setup Layout */}
+      {/* N4G Setup Layout */}
       <div className="w-full max-w-[98vw] mx-auto relative z-20">
 
         {/* Header */}

@@ -48,6 +48,11 @@
   --n4g-screen: hsl(0, 0%, 5%);
   --n4g-jog: hsl(0, 0%, 8%);
   --n4g-jog-ring: hsl(0, 0%, 25%);
+  
+  /* Legacy CDJ Variables for Compatibility */
+  --cdj-body: hsl(0, 0%, 12%);
+  --cdj-panel: hsl(0, 0%, 15%);
+  --cdj-screen: hsl(0, 0%, 5%);
 }
 
 .dark {
@@ -82,10 +87,10 @@
   }
 }
 
-/* Pioneer CDJ Hardware Styling with Responsive Scaling */
-.pioneer-cdj {
-  background: linear-gradient(145deg, var(--cdj-body), var(--pioneer-dark-gray));
-  border: 2px solid var(--pioneer-light-gray);
+/* N4G Hardware Styling with Responsive Scaling */
+.n4g-cdj {
+  background: linear-gradient(145deg, var(--cdj-body), var(--n4g-dark-gray));
+  border: 2px solid var(--n4g-light-gray);
   border-radius: 12px;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.8),
@@ -95,9 +100,9 @@
 
 /* Clean responsive design without complex scaling */
 
-.pioneer-screen {
+.n4g-screen {
   background: linear-gradient(to bottom, var(--cdj-screen), hsl(0, 0%, 3%));
-  border: 3px solid var(--pioneer-light-gray);
+  border: 3px solid var(--n4g-light-gray);
   border-radius: 8px;
   box-shadow: 
     inset 0 4px 8px rgba(0, 0, 0, 0.8),
@@ -202,42 +207,96 @@
   box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.7);
 }
 
-.pioneer-fader-handle {
-  background: linear-gradient(145deg, var(--pioneer-silver), var(--pioneer-light-gray));
-  border: 2px solid var(--pioneer-dark-gray);
+.n4g-fader-handle {
+  background: linear-gradient(145deg, var(--n4g-silver), var(--n4g-light-gray));
+  border: 2px solid var(--n4g-dark-gray);
   border-radius: 4px;
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.5),
     inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
-.pioneer-led {
+.n4g-led {
   text-shadow: 0 0 12px currentColor;
   filter: drop-shadow(0 0 6px currentColor);
   animation: pulse 2s ease-in-out infinite alternate;
 }
 
-.pioneer-waveform {
+.n4g-waveform {
   background: var(--cdj-screen);
-  border: 3px solid var(--pioneer-light-gray);
+  border: 3px solid var(--n4g-light-gray);
   border-radius: 6px;
   box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.8);
 }
 
-.pioneer-eq-section {
-  background: linear-gradient(145deg, var(--cdj-panel), var(--pioneer-dark-gray));
-  border: 1px solid var(--pioneer-light-gray);
+.n4g-eq-section {
+  background: linear-gradient(145deg, var(--cdj-panel), var(--n4g-dark-gray));
+  border: 1px solid var(--n4g-light-gray);
   border-radius: 8px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.pioneer-mixer {
-  background: linear-gradient(145deg, var(--cdj-body), var(--pioneer-dark-gray));
-  border: 2px solid var(--pioneer-light-gray);
+.n4g-mixer {
+  background: linear-gradient(145deg, var(--cdj-body), var(--n4g-dark-gray));
+  border: 2px solid var(--n4g-light-gray);
   border-radius: 12px;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.8),
     inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+/* N4G Additional Component Styles */
+.n4g-button {
+  background: linear-gradient(145deg, var(--n4g-button), var(--n4g-dark-gray));
+  border: 1px solid var(--n4g-light-gray);
+  color: var(--n4g-silver);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.n4g-button:hover {
+  background: linear-gradient(145deg, var(--n4g-button-pressed), var(--n4g-button));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.n4g-knob {
+  background: radial-gradient(circle, var(--n4g-silver), var(--n4g-dark-gray));
+  border: 2px solid var(--n4g-light-gray);
+  border-radius: 50%;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.n4g-knob::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 8px;
+  background: var(--n4g-cyan);
+  border-radius: 1px;
+  box-shadow: 0 0 4px var(--n4g-cyan);
+}
+
+.n4g-deck {
+  background: linear-gradient(145deg, var(--n4g-body), var(--n4g-dark-gray));
+  border: 2px solid var(--n4g-light-gray);
+  border-radius: 12px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.n4g-fader-track {
+  background: linear-gradient(to bottom, var(--n4g-dark-gray), var(--n4g-black));
+  border: 2px solid var(--n4g-light-gray);
+  border-radius: 8px;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.7);
 }
 
 /* Animation classes */
