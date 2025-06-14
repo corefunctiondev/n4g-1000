@@ -543,9 +543,9 @@ function AboutSection() {
 function SetsSection() {
   const { data: setsContent = [] } = useContentBySection('sets');
   
-  const getContent = (key: string, fallback: string = '') => {
+  const getContent = (key: string) => {
     const item = setsContent.find((c: any) => c.key === key);
-    return item?.title || item?.content || fallback;
+    return item?.title || item?.content || '';
   };
 
   return (
@@ -554,18 +554,7 @@ function SetsSection() {
       
       <div className="space-y-4">
         <div className="text-2xl font-bold text-cyan-400">
-          {getContent('sets_title', 'DJ Sets & Performances')}
-        </div>
-        <div className="text-sm leading-relaxed">
-          <DynamicText contentKey="sets_description" fallback="Live performances where we tell stories through sound." />
-        </div>
-      </div>
-      
-      <div className="border border-cyan-400 p-4 rounded">
-        <div className="text-cyan-400 font-bold mb-2">Live Venue Performances</div>
-        <div className="text-xs space-y-1 text-gray-300">
-          <div><DynamicText contentKey="venue_experience" fallback="Performed at: Williamsburg Hotel, Virgo, Musica, Blue, and 16+ more NYC venues" /></div>
-          <div><DynamicText contentKey="next_gig" fallback="Next Performance: Saturday 06/14 at Virgo, Manhattan" /></div>
+          {getContent('sets_coming_soon')}
         </div>
       </div>
     </div>
@@ -575,9 +564,9 @@ function SetsSection() {
 function PodcastsSection() {
   const { data: podcastsContent = [] } = useContentBySection('podcasts');
   
-  const getContent = (key: string, fallback: string = '') => {
+  const getContent = (key: string) => {
     const item = podcastsContent.find((c: any) => c.key === key);
-    return item?.title || item?.content || fallback;
+    return item?.title || item?.content || '';
   };
 
   return (
@@ -586,17 +575,7 @@ function PodcastsSection() {
       
       <div className="space-y-4">
         <div className="text-2xl font-bold text-cyan-400">
-          {getContent('podcasts_title', 'N4G Podcast Series')}
-        </div>
-        <div className="text-sm leading-relaxed">
-          <DynamicText contentKey="podcasts_description" fallback="Monthly audio journeys featuring tracks that inspire us." />
-        </div>
-      </div>
-      
-      <div className="border border-cyan-400 p-4 rounded">
-        <div className="text-cyan-400 font-bold mb-2">Monthly Podcast Series</div>
-        <div className="text-xs text-gray-300">
-          <DynamicText contentKey="podcasts_description" fallback="Monthly deep dives into electronic music culture from our decade of experience in the Kosovo and New York underground scenes." />
+          {getContent('podcasts_coming_soon')}
         </div>
       </div>
     </div>
@@ -606,9 +585,9 @@ function PodcastsSection() {
 function BookingsSection() {
   const { data: bookingsContent = [] } = useContentBySection('bookings');
   
-  const getContent = (key: string, fallback: string = '') => {
+  const getContent = (key: string) => {
     const item = bookingsContent.find((c: any) => c.key === key);
-    return item?.title || item?.content || fallback;
+    return item?.title || item?.content || '';
   };
 
   return (
@@ -617,38 +596,10 @@ function BookingsSection() {
       
       <div className="space-y-4">
         <div className="text-2xl font-bold text-cyan-400">
-          {getContent('bookings_title', 'Book Need For Groove')}
+          {getContent('bookings_email')}
         </div>
         <div className="text-sm leading-relaxed">
-          <DynamicText contentKey="bookings_description" fallback="Ready to bring the energy to your event?" />
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="text-cyan-400 font-bold">
-          {getContent('booking_services_title', 'AVAILABLE SERVICES:')}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border border-cyan-400 p-4 rounded">
-            <div className="text-cyan-400 font-bold">
-              Club Events & Nightlife
-            </div>
-          </div>
-          <div className="border border-orange-400 p-4 rounded">
-            <div className="text-orange-400 font-bold">
-              Private Events & Parties
-            </div>
-          </div>
-          <div className="border border-green-400 p-4 rounded">
-            <div className="text-green-400 font-bold">
-              Music Festivals
-            </div>
-          </div>
-          <div className="border border-purple-400 p-4 rounded">
-            <div className="text-purple-400 font-bold">
-              Studio Collaborations
-            </div>
-          </div>
+          {getContent('bookings_social')}
         </div>
       </div>
     </div>
@@ -658,54 +609,10 @@ function BookingsSection() {
 function ReleasesSection() {
   const { data: releasesContent = [] } = useContentBySection('releases');
   
-  const getContent = (key: string, fallback: string = '') => {
-    const item = releasesContent.find((c: any) => c.key === key);
-    return item?.title || item?.content || fallback;
-  };
-
+  // Show empty section since releases should not display anything
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ find ./releases/ -type f</div>
-      
-      <div className="space-y-4">
-        <div className="text-2xl font-bold text-cyan-400">
-          {getContent('releases_title', 'Music Releases')}
-        </div>
-        <div className="text-sm leading-relaxed">
-          <DynamicText contentKey="releases_description" fallback="Our original productions and carefully crafted remixes." />
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="text-cyan-400 font-bold">
-          {getContent('latest_releases_title', 'LATEST RELEASES:')}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="border border-cyan-400 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
-            <div className="text-cyan-400 font-bold mb-2">TUTTO PASSA</div>
-            <div className="text-xs space-y-1 text-gray-300">
-              <div>Releasing: June 18, 2025</div>
-              <div>27 Tracks - House, Techno, Minimal</div>
-            </div>
-          </div>
-          
-          <div className="border border-orange-400 p-4 rounded hover:border-orange-400 transition-colors cursor-pointer">
-            <div className="text-orange-400 font-bold mb-2">Previous Releases</div>
-            <div className="text-xs space-y-1 text-gray-300">
-              <div>Collection of singles and EPs</div>
-              <div>Available on major platforms</div>
-            </div>
-          </div>
-          
-          <div className="border border-green-400 p-4 rounded hover:border-green-400 transition-colors cursor-pointer">
-            <div className="text-green-400 font-bold mb-2">Collaborations</div>
-            <div className="text-xs space-y-1 text-gray-300">
-              <div>Remixes & features with NYC artists</div>
-              <div>Underground scene connections</div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -713,9 +620,9 @@ function ReleasesSection() {
 function MixesSection() {
   const { data: mixesContent = [] } = useContentBySection('mixes');
   
-  const getContent = (key: string, fallback: string = '') => {
+  const getContent = (key: string) => {
     const item = mixesContent.find((c: any) => c.key === key);
-    return item?.title || item?.content || fallback;
+    return item?.title || item?.content || '';
   };
 
   return (
@@ -724,44 +631,7 @@ function MixesSection() {
       
       <div className="space-y-4">
         <div className="text-2xl font-bold text-cyan-400">
-          {getContent('mixes_title', 'DJ Mixes')}
-        </div>
-        <div className="text-sm leading-relaxed">
-          <DynamicText contentKey="mixes_description" fallback="Signature mixes that capture different moods and moments." />
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="text-cyan-400 font-bold">
-          {getContent('featured_mixes_title', 'FEATURED MIXES:')}
-        </div>
-        <div className="space-y-4">
-          <div className="border border-cyan-400 p-4 rounded">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="text-cyan-400 font-bold">Kosovo Deep Sessions</div>
-                <div className="text-sm text-gray-300">House & Minimal | 60 minutes</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border border-orange-400 p-4 rounded">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="text-orange-400 font-bold">NYC Underground</div>
-                <div className="text-sm text-gray-300">Techno Journey | 75 minutes</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border border-green-400 p-4 rounded">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="text-green-400 font-bold">TUTTO PASSA Preview</div>
-                <div className="text-sm text-gray-300">Album Highlights | 45 minutes</div>
-              </div>
-            </div>
-          </div>
+          {getContent('mixes_coming_soon')}
         </div>
       </div>
     </div>
