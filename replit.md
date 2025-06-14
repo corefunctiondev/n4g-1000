@@ -135,6 +135,10 @@ Changelog:
 - June 14, 2025. Implemented direct DJ launch pathway - choosing DJ mode runs code loading sequence and launches directly into N4G-1000 interface
 - June 14, 2025. Added dynamic beat visualization system with gradient color pulses matching music tempo and real-time audio analysis for immersive background effects
 - June 14, 2025. Replaced loop/slip/beat buttons with professional audio effects controls - reverb, delay, and echo knobs for enhanced DJ mixing capabilities
+- June 14, 2025. Fixed audio effects system to properly connect reverb, delay, and echo to Web Audio API processing chain for real audio processing
+- June 14, 2025. Reorganized CDJ layout - moved all overflowing elements inside black screen boundaries and placed transport controls in gray CDJ area
+- June 14, 2025. Enhanced mixer controls - made knobs bigger (32x32px) and sliders longer (64px height) for improved usability and touch interaction
+- June 14, 2025. Expanded CDJ gray area to properly contain tempo slider and play/stop buttons outside black screen but within CDJ frame
 
 ## User Preferences
 
