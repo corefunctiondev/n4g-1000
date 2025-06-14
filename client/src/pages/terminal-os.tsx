@@ -662,41 +662,14 @@ function MixesSection() {
 function ContactSection() {
   return (
     <div className="space-y-6 text-blue-300">
-      <DynamicText 
-        contentKey="contact_info" 
-        fallback="$ cat ./contact.info"
-        className="text-xl font-bold text-cyan-400"
-        as="div"
-      />
+      <div className="text-xl font-bold text-cyan-400">$ cat ./contact.info</div>
       
-      <DynamicContent 
-        section="contact"
-        fallbackText=""
-        className="space-y-6"
-      />
-      
-      <div className="space-y-6">
-        <div className="border border-cyan-400 p-4 rounded">
-          <div className="text-cyan-400 font-bold mb-3">BOOKING INQUIRIES</div>
-          <div className="space-y-2 text-sm">
-            <div>Email: <DynamicText contentKey="contact_email" fallback="n4gsounds@gmail.com" /></div>
-            <div>Phone: <DynamicText contentKey="contact_phone" fallback="+1 475 419 5769" /></div>
-            <div>Instagram: <DynamicText contentKey="contact_instagram" fallback="@needforgroove" /></div>
-          </div>
-        </div>
-        
-        <div className="border border-orange-400 p-4 rounded">
-          <div className="text-orange-400 font-bold mb-3">NEXT GIG</div>
-          <div className="space-y-2 text-sm">
-            <DynamicText contentKey="next_gig" fallback="Saturday 06/14 at Virgo, Manhattan" />
-          </div>
-        </div>
-        
-        <div className="border border-gray-600 p-4 rounded">
-          <div className="text-gray-300 font-bold mb-3">ALBUM RELEASE</div>
-          <div className="space-y-2 text-sm">
-            <DynamicText contentKey="album_info" fallback="TUTTO PASSA - Album (27 tracks) - Release: 06/18/2025" />
-          </div>
+      <div className="border border-cyan-400 p-6 rounded">
+        <div className="text-cyan-400 font-bold mb-4 text-lg">CONTACT INFORMATION</div>
+        <div className="space-y-3 text-base">
+          <div>Email: <span className="text-white">n4gsounds@gmail.com</span></div>
+          <div>Phone: <span className="text-white">+1 475 419 5769</span></div>
+          <div>Instagram: <span className="text-white">@needforgroove</span></div>
         </div>
       </div>
     </div>
