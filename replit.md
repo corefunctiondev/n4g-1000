@@ -143,6 +143,7 @@ Changelog:
 - June 14, 2025. Fixed CDJ body color to proper gray and implemented fully functional tempo sliders with real-time audio playback rate adjustment, mouse drag interaction, and live percentage display
 - June 14, 2025. Restored CUT FX button to gray CDJ area next to STOP button for complete transport control set
 - June 14, 2025. Updated CDJ body color to authentic dark gray (bg-gray-800) matching real Pioneer hardware appearance
+- June 14, 2025. Removed MASTER OUTPUT section with Monitoring/Main Out/Booth Out options for cleaner interface layout
 
 ## User Preferences
 

@@ -335,26 +335,7 @@ export default function CDJInterface() {
           </div>
         </div>
 
-        {/* Footer Info */}
-        <div className="mt-8 text-center">
-          <div className="pioneer-eq-section inline-block p-4">
-            <div className="text-xs text-gray-300 mb-2">MASTER OUTPUT</div>
-            <div className="flex items-center justify-center space-x-4 text-sm">
-              <div className="flex items-center space-x-2">
-                <i className="fas fa-headphones text-blue-300" />
-                <span className="text-gray-300">Monitoring</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <i className="fas fa-volume-up text-blue-300" />
-                <span className="text-gray-300">Main Out</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <i className="fas fa-microphone text-orange-400" />
-                <span className="text-gray-300">Booth Out</span>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Burger Menu - File Tree Navigation */}
         {isBurgerMenuOpen && (
