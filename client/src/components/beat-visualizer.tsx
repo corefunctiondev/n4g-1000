@@ -20,12 +20,31 @@ export function BeatVisualizer({
   const [beatPulse, setBeatPulse] = useState(0);
   const [colorCycle, setColorCycle] = useState(0);
   const [audioLevel, setAudioLevel] = useState(0);
-  const [waveOffset, setWaveOffset] = useState(0);
+  const [pulseRings, setPulseRings] = useState<Array<{
+    id: number;
+    x: number;
+    y: number;
+    radius: number;
+    opacity: number;
+    life: number;
+  }>>([]);
+  const [energyBeams, setEnergyBeams] = useState<Array<{
+    id: number;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    opacity: number;
+    life: number;
+    intensity: number;
+  }>>([]);
   
   const lastBeatTime = useRef(0);
   const beatInterval = useRef<number | null>(null);
+  const pulseId = useRef(0);
+  const beamId = useRef(0);
 
-  // Vivid color palette (no pink per user preference)
+  // Futuristic color palette
   const colorPalette = [
     '#00FFFF', // Cyan
     '#FF0040', // Red
@@ -39,13 +58,17 @@ export function BeatVisualizer({
     '#FF4000'  // Red-Orange
   ];
 
-  const beatDuration = 60000 / bpm; // Beat duration in milliseconds
+  const beatDuration = 60000 / bpm;
 
-  // Real-time audio analysis
+  // Real-time audio analysis and animation updates
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying) {
+      setPulseRings([]);
+      setEnergyBeams([]);
+      return;
+    }
 
-    // Audio analysis for real-time beat detection
+    // Audio analysis
     if (analyser) {
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(dataArray);
@@ -55,15 +78,25 @@ export function BeatVisualizer({
       setAudioLevel(normalizedLevel);
     }
 
-    // Faster wave animation synced to beat
-    const waveAnimation = setInterval(() => {
-      setWaveOffset(prev => prev + 0.3 + (audioLevel * 0.2));
-    }, 16); // 60fps
+    // Update pulse rings
+    setPulseRings(prev => prev.map(ring => ({
+      ...ring,
+      radius: ring.radius + 8,
+      life: ring.life - 0.02,
+      opacity: ring.opacity * ring.life
+    })).filter(ring => ring.life > 0 && ring.radius < 500));
 
-    return () => clearInterval(waveAnimation);
+    // Update energy beams
+    setEnergyBeams(prev => prev.map(beam => ({
+      ...beam,
+      life: beam.life - 0.015,
+      opacity: beam.opacity * beam.life,
+      intensity: beam.intensity * beam.life
+    })).filter(beam => beam.life > 0));
+
   }, [isPlaying, analyser]);
 
-  // Beat timing for pulse effects
+  // Beat timing for effects
   useEffect(() => {
     if (isPlaying && bpm) {
       const startBeat = () => {
@@ -73,10 +106,14 @@ export function BeatVisualizer({
           setColorCycle(prev => (prev + 1) % colorPalette.length);
           lastBeatTime.current = now;
           
+          // Create pulse effects
+          createPulseRings();
+          createEnergyBeams();
+          
           // Fade out the pulse
-          setTimeout(() => setBeatPulse(0.8), 50);
-          setTimeout(() => setBeatPulse(0.5), 100);
-          setTimeout(() => setBeatPulse(0.2), 150);
+          setTimeout(() => setBeatPulse(0.7), 50);
+          setTimeout(() => setBeatPulse(0.4), 100);
+          setTimeout(() => setBeatPulse(0.1), 150);
           setTimeout(() => setBeatPulse(0), 200);
         }
       };
@@ -97,190 +134,81 @@ export function BeatVisualizer({
     }
   }, [isPlaying, bpm, intensity, audioLevel, position]);
 
+  const createPulseRings = () => {
+    const pulseIntensity = Math.max(beatPulse, audioLevel);
+    const ringCount = Math.floor(3 + pulseIntensity * 5);
+    
+    for (let i = 0; i < ringCount; i++) {
+      let centerX, centerY;
+      
+      if (position === 'left') {
+        centerX = Math.random() * (window.innerWidth * 0.4);
+        centerY = Math.random() * window.innerHeight;
+      } else if (position === 'right') {
+        centerX = window.innerWidth * 0.6 + Math.random() * (window.innerWidth * 0.4);
+        centerY = Math.random() * window.innerHeight;
+      } else {
+        centerX = window.innerWidth * 0.3 + Math.random() * (window.innerWidth * 0.4);
+        centerY = Math.random() * window.innerHeight;
+      }
+
+      setPulseRings(prev => [...prev, {
+        id: pulseId.current++,
+        x: centerX,
+        y: centerY,
+        radius: 20,
+        opacity: 0.8 + Math.random() * 0.2,
+        life: 1.0
+      }]);
+    }
+  };
+
+  const createEnergyBeams = () => {
+    const pulseIntensity = Math.max(beatPulse, audioLevel);
+    const beamCount = Math.floor(8 + pulseIntensity * 12);
+    
+    for (let i = 0; i < beamCount; i++) {
+      let startX, startY, endX, endY;
+      
+      if (position === 'left') {
+        // Beams emanate from left side
+        startX = Math.random() * 100;
+        startY = Math.random() * window.innerHeight;
+        endX = Math.random() * (window.innerWidth * 0.6);
+        endY = Math.random() * window.innerHeight;
+      } else if (position === 'right') {
+        // Beams emanate from right side  
+        startX = window.innerWidth - Math.random() * 100;
+        startY = Math.random() * window.innerHeight;
+        endX = window.innerWidth * 0.4 + Math.random() * (window.innerWidth * 0.6);
+        endY = Math.random() * window.innerHeight;
+      } else {
+        // Center beams connect across
+        startX = window.innerWidth * 0.2 + Math.random() * (window.innerWidth * 0.2);
+        startY = Math.random() * window.innerHeight;
+        endX = window.innerWidth * 0.6 + Math.random() * (window.innerWidth * 0.2);
+        endY = Math.random() * window.innerHeight;
+      }
+
+      setEnergyBeams(prev => [...prev, {
+        id: beamId.current++,
+        startX,
+        startY,
+        endX,
+        endY,
+        opacity: 0.6 + Math.random() * 0.4,
+        life: 1.0,
+        intensity: pulseIntensity
+      }]);
+    }
+  };
+
   if (!isPlaying) return null;
 
   const pulseIntensity = Math.max(beatPulse, audioLevel);
-  const opacity = 0.2 + (pulseIntensity * 0.8);
-  const scale = 1 + (pulseIntensity * 0.6);
-  
-  // Dynamic color based on cycle and audio level
   const dynamicColor = colorPalette[colorCycle];
   const audioColorShift = Math.floor(audioLevel * 3) % colorPalette.length;
   const finalColor = audioLevel > 0.3 ? colorPalette[audioColorShift] : dynamicColor;
-
-  // Wave parameters for flexible light movement
-  const waveAmplitude = 60 + (pulseIntensity * 80); // How much the wave curves
-  const waveFrequency = 0.01 + (audioLevel * 0.005); // Wave ripple density
-  const waveSpeed = waveOffset + (beatPulse * 3); // Wave movement speed
-
-  // Create multiple wave paths with smoother curves
-  const createWavePath = (baseY: number, direction: number, waveIndex: number) => {
-    const points: string[] = [];
-    const steps = 60; // Reduced for smoother performance
-    const phaseShift = waveIndex * 0.8; // Better wave separation
-    
-    for (let i = 0; i <= steps; i++) {
-      const x = (window.innerWidth / steps) * i;
-      const normalizedX = x / window.innerWidth;
-      const waveY = baseY + Math.sin((normalizedX * Math.PI * 3) + (waveSpeed * direction * 0.1) + phaseShift) * waveAmplitude;
-      points.push(`${Math.round(x)},${Math.round(waveY)}`);
-    }
-    
-    return `M ${points.join(' L ')}`;
-  };
-
-  // Position-based wave configuration
-  let waveElements;
-  
-  if (position === 'left') {
-    // Lightning-style jagged waves from left
-    const createLeftLightningPath = (baseY: number, waveIndex: number) => {
-      const points: string[] = [];
-      const steps = 40;
-      const phaseShift = waveIndex * 1.2;
-      const maxWidth = window.innerWidth * 0.6;
-      
-      for (let i = 0; i <= steps; i++) {
-        const x = (maxWidth / steps) * i;
-        const normalizedX = x / maxWidth;
-        
-        // Create jagged lightning effect
-        const primaryWave = Math.sin((normalizedX * Math.PI * 2) + (waveSpeed * 0.2) + phaseShift) * waveAmplitude;
-        const secondaryWave = Math.sin((normalizedX * Math.PI * 6) + (waveSpeed * 0.3)) * (waveAmplitude * 0.3);
-        const randomJitter = (Math.random() - 0.5) * (pulseIntensity * 20);
-        
-        const waveY = baseY + primaryWave + secondaryWave + randomJitter;
-        points.push(`${Math.round(x)},${Math.round(waveY)}`);
-      }
-      
-      return `M ${points.join(' L ')}`;
-    };
-
-    waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.3px)' }}>
-        {Array.from({ length: 12 }, (_, i) => (
-          <path
-            key={i}
-            d={createLeftLightningPath(window.innerHeight * (0.1 + i * 0.07), i)}
-            stroke={finalColor}
-            strokeWidth={2 + pulseIntensity * 4}
-            fill="none"
-            opacity={opacity * (1 - i * 0.06)}
-            strokeLinecap="round"
-            style={{
-              filter: `drop-shadow(0 0 ${8 + pulseIntensity * 12}px ${finalColor})`,
-              transform: `scale(${scale})`,
-              transformOrigin: 'left center'
-            }}
-          />
-        ))}
-      </svg>
-    );
-  } else if (position === 'right') {
-    // Spiral energy waves from right
-    const createRightSpiralPath = (baseY: number, waveIndex: number) => {
-      const points: string[] = [];
-      const steps = 50;
-      const phaseShift = waveIndex * 0.6;
-      const startX = window.innerWidth * 0.4;
-      const maxWidth = window.innerWidth * 0.6;
-      
-      for (let i = 0; i <= steps; i++) {
-        const x = startX + (maxWidth / steps) * i;
-        const normalizedX = (x - startX) / maxWidth;
-        
-        // Create spiral/helix effect
-        const spiralWave = Math.sin((normalizedX * Math.PI * 4) + (waveSpeed * -0.25) + phaseShift) * waveAmplitude;
-        const helixWave = Math.cos((normalizedX * Math.PI * 8) + (waveSpeed * -0.15)) * (waveAmplitude * 0.4);
-        const pulseEffect = Math.sin(waveSpeed * 0.5 + phaseShift) * (pulseIntensity * 30);
-        
-        const waveY = baseY + spiralWave + helixWave + pulseEffect;
-        points.push(`${Math.round(x)},${Math.round(waveY)}`);
-      }
-      
-      return `M ${points.join(' L ')}`;
-    };
-
-    waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.3px)' }}>
-        {Array.from({ length: 12 }, (_, i) => (
-          <path
-            key={i}
-            d={createRightSpiralPath(window.innerHeight * (0.1 + i * 0.07), i)}
-            stroke={finalColor}
-            strokeWidth={2 + pulseIntensity * 4}
-            fill="none"
-            opacity={opacity * (1 - i * 0.06)}
-            strokeLinecap="round"
-            style={{
-              filter: `drop-shadow(0 0 ${8 + pulseIntensity * 12}px ${finalColor})`,
-              transform: `scale(${scale})`,
-              transformOrigin: 'right center'
-            }}
-          />
-        ))}
-      </svg>
-    );
-  } else {
-    // Center: DNA double helix connecting waves
-    const createHelixPath = (baseY: number, waveIndex: number, isTopHelix: boolean) => {
-      const points: string[] = [];
-      const steps = 80;
-      const phaseShift = waveIndex * 1.0 + (isTopHelix ? 0 : Math.PI);
-      const centerStart = window.innerWidth * 0.25;
-      const centerWidth = window.innerWidth * 0.5;
-      
-      for (let i = 0; i <= steps; i++) {
-        const x = centerStart + (centerWidth / steps) * i;
-        const normalizedX = (x - centerStart) / centerWidth;
-        
-        // DNA helix pattern
-        const helixWave = Math.sin((normalizedX * Math.PI * 6) + (waveSpeed * 0.3) + phaseShift) * (waveAmplitude * 0.6);
-        const twistEffect = Math.cos((normalizedX * Math.PI * 12) + (waveSpeed * 0.2)) * (waveAmplitude * 0.2);
-        const convergence = Math.sin(normalizedX * Math.PI) * (pulseIntensity * 15);
-        
-        const waveY = baseY + helixWave + twistEffect + convergence;
-        points.push(`${Math.round(x)},${Math.round(waveY)}`);
-      }
-      
-      return `M ${points.join(' L ')}`;
-    };
-
-    waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.3px)' }}>
-        {Array.from({ length: 8 }, (_, i) => (
-          <g key={i}>
-            <path
-              d={createHelixPath(window.innerHeight * (0.15 + i * 0.1), i, true)}
-              stroke={finalColor}
-              strokeWidth={2 + pulseIntensity * 3}
-              fill="none"
-              opacity={opacity * (1 - i * 0.08)}
-              strokeLinecap="round"
-              style={{
-                filter: `drop-shadow(0 0 ${6 + pulseIntensity * 10}px ${finalColor})`,
-                transform: `scale(${scale})`,
-                transformOrigin: 'center'
-              }}
-            />
-            <path
-              d={createHelixPath(window.innerHeight * (0.15 + i * 0.1), i, false)}
-              stroke={finalColor}
-              strokeWidth={2 + pulseIntensity * 3}
-              fill="none"
-              opacity={opacity * (1 - i * 0.08) * 0.7}
-              strokeLinecap="round"
-              style={{
-                filter: `drop-shadow(0 0 ${6 + pulseIntensity * 10}px ${finalColor})`,
-                transform: `scale(${scale})`,
-                transformOrigin: 'center'
-              }}
-            />
-          </g>
-        ))}
-      </svg>
-    );
-  }
 
   return (
     <div 
@@ -289,15 +217,79 @@ export function BeatVisualizer({
       }`}
       style={{
         mixBlendMode: 'screen',
-        filter: `saturate(${1.8 + pulseIntensity}) brightness(${1.4 + pulseIntensity * 0.6})`
+        filter: `saturate(${2 + pulseIntensity}) brightness(${1.5 + pulseIntensity * 0.5})`
       }}
     >
-      {waveElements}
+      <svg className="absolute inset-0 w-full h-full">
+        <defs>
+          <radialGradient id={`pulse-${position}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor={finalColor} stopOpacity="0.8" />
+            <stop offset="70%" stopColor={finalColor} stopOpacity="0.3" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+          <linearGradient id={`beam-${position}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={finalColor} stopOpacity="0.8" />
+            <stop offset="50%" stopColor={finalColor} stopOpacity="0.6" />
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+        </defs>
+        
+        {/* Pulse Rings */}
+        {pulseRings.map(ring => (
+          <circle
+            key={ring.id}
+            cx={ring.x}
+            cy={ring.y}
+            r={ring.radius}
+            fill={`url(#pulse-${position})`}
+            stroke={finalColor}
+            strokeWidth={2 + pulseIntensity * 3}
+            fillOpacity={ring.opacity * 0.3}
+            strokeOpacity={ring.opacity}
+            style={{
+              filter: `drop-shadow(0 0 ${10 + ring.opacity * 15}px ${finalColor})`
+            }}
+          />
+        ))}
+        
+        {/* Energy Beams */}
+        {energyBeams.map(beam => (
+          <line
+            key={beam.id}
+            x1={beam.startX}
+            y1={beam.startY}
+            x2={beam.endX}
+            y2={beam.endY}
+            stroke={finalColor}
+            strokeWidth={1 + beam.intensity * 4}
+            opacity={beam.opacity}
+            strokeLinecap="round"
+            style={{
+              filter: `drop-shadow(0 0 ${5 + beam.intensity * 10}px ${finalColor})`,
+              animation: 'pulse 0.1s ease-in-out'
+            }}
+          />
+        ))}
+        
+        {/* Central Energy Core (only for center position) */}
+        {position === 'center' && pulseIntensity > 0.3 && (
+          <circle
+            cx={window.innerWidth / 2}
+            cy={window.innerHeight / 2}
+            r={30 + pulseIntensity * 50}
+            fill={`url(#pulse-${position})`}
+            fillOpacity={pulseIntensity * 0.4}
+            style={{
+              filter: `drop-shadow(0 0 ${30 + pulseIntensity * 40}px ${finalColor})`
+            }}
+          />
+        )}
+      </svg>
     </div>
   );
 }
 
-// Global background visualizer that combines all deck effects
+// Global background visualizer
 interface GlobalBeatVisualizerProps {
   deckAPlaying: boolean;
   deckBPlaying: boolean;
@@ -315,7 +307,6 @@ export function GlobalBeatVisualizer({
   deckAAnalyser,
   deckBAnalyser
 }: GlobalBeatVisualizerProps) {
-  // Only show waves for the deck that's actually playing
   return (
     <>
       {deckAPlaying && !deckBPlaying && (
@@ -324,7 +315,7 @@ export function GlobalBeatVisualizer({
           bpm={deckABpm}
           analyser={deckAAnalyser}
           color="#00FFFF"
-          intensity={0.8}
+          intensity={0.9}
           position="left"
         />
       )}
@@ -334,7 +325,7 @@ export function GlobalBeatVisualizer({
           bpm={deckBBpm}
           analyser={deckBAnalyser}
           color="#FF0040"
-          intensity={0.8}
+          intensity={0.9}
           position="right"
         />
       )}
@@ -345,7 +336,7 @@ export function GlobalBeatVisualizer({
             bpm={deckABpm}
             analyser={deckAAnalyser}
             color="#00FFFF"
-            intensity={0.6}
+            intensity={0.7}
             position="left"
           />
           <BeatVisualizer
@@ -353,7 +344,7 @@ export function GlobalBeatVisualizer({
             bpm={deckBBpm}
             analyser={deckBAnalyser}
             color="#FF0040"
-            intensity={0.6}
+            intensity={0.7}
             position="right"
           />
           <BeatVisualizer
@@ -361,7 +352,7 @@ export function GlobalBeatVisualizer({
             bpm={Math.max(deckABpm || 120, deckBBpm || 120)}
             analyser={deckAAnalyser || deckBAnalyser}
             color="#8000FF"
-            intensity={0.4}
+            intensity={0.5}
             position="center"
           />
         </>
