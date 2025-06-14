@@ -169,6 +169,7 @@ Changelog:
 - June 14, 2025. Made waves much thinner (2-6px stroke) and multiplied count to 12 waves per deck for dense, detailed lighting coverage on playing side only
 - June 14, 2025. Rebuilt wave system with complex futuristic design - 16 layered waves with multiple frequency components, audio-reactive distortion, and glow effects for satisfying visual experience
 - June 14, 2025. Simplified to minimal lighting system - clean gradient overlays with subtle effects, low opacity, and smooth transitions for professional ambiance
+- June 14, 2025. Created gradient futuristic waves with precise beat synchronization - wave movement, scaling, and effects locked to exact BPM timing using requestAnimationFrame
 
 ## User Preferences
 
