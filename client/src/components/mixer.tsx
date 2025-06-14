@@ -31,6 +31,11 @@ export function Mixer() {
     cue: false,
   });
 
+  const [tempoA, setTempoA] = useState(0);
+  const [tempoB, setTempoB] = useState(0);
+  const [tempoRangeA, setTempoRangeA] = useState(8);
+  const [tempoRangeB, setTempoRangeB] = useState(8);
+  
   const [isDragging, setIsDragging] = useState<string | null>(null);
 
   const handleCrossfader = useCallback((value: number) => {
@@ -46,6 +51,64 @@ export function Mixer() {
   const handleCueVolume = useCallback((value: number) => {
     setMixer(prev => ({ ...prev, cueVolume: value }));
   }, []);
+
+  const handleTempoA = useCallback((value: number) => {
+    setTempoA(value);
+    audioEngine.setTempo('A', value);
+  }, []);
+
+  const handleTempoB = useCallback((value: number) => {
+    setTempoB(value);
+    audioEngine.setTempo('B', value);
+  }, []);
+
+  const resetTempoA = useCallback(() => {
+    setTempoA(0);
+    audioEngine.setTempo('A', 0);
+  }, []);
+
+  const resetTempoB = useCallback(() => {
+    setTempoB(0);
+    audioEngine.setTempo('B', 0);
+  }, []);
+
+  const cycleTempoRangeA = useCallback(() => {
+    setTempoRangeA(prev => prev === 8 ? 16 : prev === 16 ? 32 : 8);
+  }, []);
+
+  const cycleTempoRangeB = useCallback(() => {
+    setTempoRangeB(prev => prev === 8 ? 16 : prev === 16 ? 32 : 8);
+  }, []);
+
+  const handleTempoMouseDown = useCallback((deck: 'A' | 'B') => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(`tempo-${deck}`);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = (e.target as HTMLElement).closest('.pioneer-fader-track')?.getBoundingClientRect();
+      if (!rect) return;
+      
+      const y = e.clientY - rect.top;
+      const range = deck === 'A' ? tempoRangeA : tempoRangeB;
+      const percentage = Math.max(0, Math.min(1, y / rect.height));
+      const value = (1 - percentage) * range * 2 - range; // -range to +range
+      
+      if (deck === 'A') {
+        handleTempoA(value);
+      } else {
+        handleTempoB(value);
+      }
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      setIsDragging(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [tempoRangeA, tempoRangeB, handleTempoA, handleTempoB]);
 
   const toggleEffect = useCallback((effect: keyof MixerState['effects']) => {
     setMixer(prev => ({
@@ -359,36 +422,66 @@ export function Mixer() {
             {/* Deck A Tempo */}
             <div className="flex flex-col items-center">
               <div className="text-xs text-blue-300 mb-1">DECK A</div>
-              <div className="text-xs text-blue-300 mb-2">+0.0%</div>
+              <div className="text-xs text-blue-300 mb-2">{tempoA >= 0 ? '+' : ''}{tempoA.toFixed(1)}%</div>
               <div 
                 className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+                onMouseDown={handleTempoMouseDown('A')}
               >
                 <div 
-                  className="pioneer-fader-handle w-6 h-4 absolute -left-1"
-                  style={{ top: '24px' }}
+                  className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
+                    isDragging === 'tempo-A' ? 'bg-blue-400' : ''
+                  }`}
+                  style={{ 
+                    top: `${((tempoRangeA - tempoA) / (tempoRangeA * 2)) * (64 - 16)}px` 
+                  }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-1 mt-2">
-                <button className="pioneer-button py-1 px-1 text-xs">±8%</button>
-                <button className="pioneer-button py-1 px-1 text-xs">RST</button>
+                <button 
+                  className="pioneer-button py-1 px-1 text-xs hover:bg-blue-500"
+                  onClick={cycleTempoRangeA}
+                >
+                  ±{tempoRangeA}%
+                </button>
+                <button 
+                  className="pioneer-button py-1 px-1 text-xs hover:bg-blue-500"
+                  onClick={resetTempoA}
+                >
+                  RST
+                </button>
               </div>
             </div>
             
             {/* Deck B Tempo */}
             <div className="flex flex-col items-center">
               <div className="text-xs text-orange-400 mb-1">DECK B</div>
-              <div className="text-xs text-orange-400 mb-2">+0.0%</div>
+              <div className="text-xs text-orange-400 mb-2">{tempoB >= 0 ? '+' : ''}{tempoB.toFixed(1)}%</div>
               <div 
                 className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+                onMouseDown={handleTempoMouseDown('B')}
               >
                 <div 
-                  className="pioneer-fader-handle w-6 h-4 absolute -left-1"
-                  style={{ top: '24px' }}
+                  className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
+                    isDragging === 'tempo-B' ? 'bg-orange-400' : ''
+                  }`}
+                  style={{ 
+                    top: `${((tempoRangeB - tempoB) / (tempoRangeB * 2)) * (64 - 16)}px` 
+                  }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-1 mt-2">
-                <button className="pioneer-button py-1 px-1 text-xs">±8%</button>
-                <button className="pioneer-button py-1 px-1 text-xs">RST</button>
+                <button 
+                  className="pioneer-button py-1 px-1 text-xs hover:bg-orange-500"
+                  onClick={cycleTempoRangeB}
+                >
+                  ±{tempoRangeB}%
+                </button>
+                <button 
+                  className="pioneer-button py-1 px-1 text-xs hover:bg-orange-500"
+                  onClick={resetTempoB}
+                >
+                  RST
+                </button>
               </div>
             </div>
           </div>

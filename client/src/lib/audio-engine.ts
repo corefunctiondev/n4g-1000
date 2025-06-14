@@ -261,6 +261,17 @@ export class AudioEngine {
     }
   }
 
+  setTempo(deckId: string, tempoPercent: number): void {
+    const nodes = this.deckNodes.get(deckId);
+    if (nodes && nodes.source && this.context) {
+      // Apply tempo change by adjusting playback rate
+      const tempoMultiplier = 1 + (tempoPercent / 100);
+      if (nodes.source.playbackRate) {
+        nodes.source.playbackRate.setValueAtTime(tempoMultiplier, this.context.currentTime);
+      }
+    }
+  }
+
   getCurrentTime(): number {
     return this.context?.currentTime || 0;
   }
