@@ -70,7 +70,7 @@ export default function CDJInterface() {
     }
   }, []);
 
-  // Sync beat data to localStorage for cross-page visualization
+  // Sync beat data and lighting state to localStorage for cross-page synchronization
   useEffect(() => {
     const beatData = {
       deckAPlaying,
@@ -80,6 +80,11 @@ export default function CDJInterface() {
     };
     localStorage.setItem('dj_beat_data', JSON.stringify(beatData));
   }, [deckAPlaying, deckBPlaying, deckABpm, deckBBpm]);
+
+  // Sync lighting state to localStorage
+  useEffect(() => {
+    localStorage.setItem('dj_lights_state', JSON.stringify(lightsOn));
+  }, [lightsOn]);
 
   // Crossfader interaction
   const handleCrossfaderMouseDown = useCallback((event: React.MouseEvent) => {
