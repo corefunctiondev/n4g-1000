@@ -198,6 +198,7 @@ Changelog:
 - June 14, 2025. Fixed Supabase integration - now properly using service role key for direct database operations instead of local API calls
 - June 14, 2025. Completely restructured page components to display only authentic Supabase content without any fallback text or mock data
 - June 14, 2025. Updated email to n4gsounds@gmail.com and added animated building blocks for "Under Development..." sections with colorful floating animations and progress indicators
+- June 14, 2025. Added releases section content with TUTTO PASSA album information and N4G-1000 reference for playing songs
 
 ## User Preferences
 

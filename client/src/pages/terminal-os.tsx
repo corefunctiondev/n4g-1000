@@ -622,10 +622,20 @@ function BookingsSection() {
 function ReleasesSection() {
   const { data: releasesContent = [] } = useContentBySection('releases');
   
-  // Show empty section since releases should not display anything
+  const getContent = (key: string) => {
+    const item = releasesContent.find((c: any) => c.key === key);
+    return item?.title || item?.content || '';
+  };
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ find ./releases/ -type f</div>
+      
+      <div className="space-y-4">
+        <div className="text-lg text-cyan-400">
+          {getContent('releases_album_info')}
+        </div>
+      </div>
     </div>
   );
 }
