@@ -141,6 +141,7 @@ Changelog:
 - June 14, 2025. Expanded CDJ gray area to properly contain tempo slider and play/stop buttons outside black screen but within CDJ frame
 - June 14, 2025. Corrected CDJ layout structure - separated black LCD screen (waveform/digital info only) from gray CDJ body (physical controls), moved tempo controls to mixer center below volume knobs
 - June 14, 2025. Fixed CDJ body color to proper gray and implemented fully functional tempo sliders with real-time audio playback rate adjustment, mouse drag interaction, and live percentage display
+- June 14, 2025. Restored CUT FX button to gray CDJ area next to STOP button for complete transport control set
 
 ## User Preferences
 

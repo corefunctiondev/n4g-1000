@@ -433,7 +433,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           </div>
         </div>
 
-        {/* Play/Stop Controls - Gray Area */}
+        {/* Play/Stop/CUT FX Controls - Gray Area */}
         <div className="flex justify-center gap-2">
           <button 
             onClick={handlePlayPause}
@@ -449,6 +449,18 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           >
             <div className="text-sm">⏹</div>
             <div className="text-xs">STOP</div>
+          </button>
+          
+          <button 
+            className="pioneer-button py-2 px-3 text-xs text-red-400 hover:text-red-300"
+            onClick={() => {
+              cutFX();
+              audioFeedback?.playClick();
+            }}
+            type="button"
+          >
+            <div className="text-sm">✂</div>
+            <div className="text-xs">CUT FX</div>
           </button>
         </div>
       </div>
