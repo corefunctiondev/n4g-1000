@@ -103,18 +103,18 @@ This is a full-stack web application that replicates the functionality of profes
 Changelog:
 - June 13, 2025. Initial setup
 - June 13, 2025. Successfully connected Supabase database with music_tracks table
-- June 13, 2025. Moved track selectors to top of CDJ interfaces for better UX
+- June 13, 2025. Moved track selectors to top of N4G-1000 interfaces for better UX
 - June 13, 2025. Fixed audio loading timing issue - tracks now load and play successfully from Supabase storage
 - June 13, 2025. Optimized track switching - selecting new track while playing auto-stops current and starts new track
 - June 13, 2025. Fixed track switching race condition - completely reset audio timing when loading new tracks to prevent old track resumption
 - June 13, 2025. Changed track switching behavior - new tracks load but don't auto-play, user must manually press PLAY button
-- June 13, 2025. Removed .wav extension from track display names and replaced zoom controls with helpful DJ instructions above CDJs
+- June 13, 2025. Removed .wav extension from track display names and replaced zoom controls with helpful DJ instructions above N4G-1000s
 - June 13, 2025. Implemented proper beatmatching for sync button - automatically adjusts tempo to match BPM between decks
 - June 13, 2025. Added secure admin authentication system with content management capabilities for site administration
 - June 13, 2025. Created complete database schema in Supabase with all tables: site_content, users, admin_sessions, tracks, playlists, playlist_tracks, dj_sessions
 - June 13, 2025. Connected dynamic content system - admin-managed content now displays live on main Terminal OS website
 - June 13, 2025. Resolved database connectivity issues and migrated all 25 authentic Need For Groove tracks from Supabase to local PostgreSQL database
-- June 13, 2025. Successfully integrated complete music collection with CDJ interface - all tracks now accessible with proper BPM data for beatmatching
+- June 13, 2025. Successfully integrated complete music collection with N4G-1000 interface - all tracks now accessible with proper BPM data for beatmatching
 - June 13, 2025. Implemented complete visual editing system - users can click "Edit Page" button then click any website content to edit directly without coding knowledge
 - June 13, 2025. Fixed database connection issues caused by malformed DATABASE_URL environment variable - reconstructed proper PostgreSQL connection string
 - June 13, 2025. Created admin user "talentin4g" in local PostgreSQL database with proper password hashing for authentication system
@@ -136,29 +136,29 @@ Changelog:
 - June 14, 2025. Added dynamic beat visualization system with gradient color pulses matching music tempo and real-time audio analysis for immersive background effects
 - June 14, 2025. Replaced loop/slip/beat buttons with professional audio effects controls - reverb, delay, and echo knobs for enhanced DJ mixing capabilities
 - June 14, 2025. Fixed audio effects system to properly connect reverb, delay, and echo to Web Audio API processing chain for real audio processing
-- June 14, 2025. Reorganized CDJ layout - moved all overflowing elements inside black screen boundaries and placed transport controls in gray CDJ area
+- June 14, 2025. Reorganized N4G-1000 layout - moved all overflowing elements inside black screen boundaries and placed transport controls in gray deck area
 - June 14, 2025. Enhanced mixer controls - made knobs bigger (32x32px) and sliders longer (64px height) for improved usability and touch interaction
-- June 14, 2025. Expanded CDJ gray area to properly contain tempo slider and play/stop buttons outside black screen but within CDJ frame
-- June 14, 2025. Corrected CDJ layout structure - separated black LCD screen (waveform/digital info only) from gray CDJ body (physical controls), moved tempo controls to mixer center below volume knobs
-- June 14, 2025. Fixed CDJ body color to proper gray and implemented fully functional tempo sliders with real-time audio playback rate adjustment, mouse drag interaction, and live percentage display
-- June 14, 2025. Restored CUT FX button to gray CDJ area next to STOP button for complete transport control set
-- June 14, 2025. Updated CDJ body color to authentic dark gray (bg-gray-800) matching real Pioneer hardware appearance
+- June 14, 2025. Expanded N4G-1000 gray area to properly contain tempo slider and play/stop buttons outside black screen but within deck frame
+- June 14, 2025. Corrected N4G-1000 layout structure - separated black LCD screen (waveform/digital info only) from gray deck body (physical controls), moved tempo controls to mixer center below volume knobs
+- June 14, 2025. Fixed N4G-1000 body color to proper gray and implemented fully functional tempo sliders with real-time audio playback rate adjustment, mouse drag interaction, and live percentage display
+- June 14, 2025. Restored CUT FX button to gray N4G-1000 area next to STOP button for complete transport control set
+- June 14, 2025. Updated N4G-1000 body color to authentic dark gray (bg-gray-800) matching professional hardware appearance
 - June 14, 2025. Removed MASTER OUTPUT section with Monitoring/Main Out/Booth Out options for cleaner interface layout
 - June 14, 2025. Replaced header text with Need For Groove logo, uploaded to Supabase storage for proper asset management
 - June 14, 2025. Updated to blue "NEED FOR GROOVE" text logo with proper layout matching user design - "NEED" and "FOR" on top line, "GROOVE" centered below
 - June 14, 2025. Created dedicated images bucket in Supabase storage with organized folders and replaced logo with user's actual SVG file (n4glogo.svg)
 - June 14, 2025. Optimized logo display with large size (h-32) within constrained header container to prevent layout expansion
-- June 14, 2025. Repositioned logo as large background watermark (h-96, 20% opacity) behind CDJ interface with minimal header space for clean professional layout
+- June 14, 2025. Repositioned logo as large background watermark (h-96, 20% opacity) behind N4G-1000 interface with minimal header space for clean professional layout
 - June 14, 2025. Positioned logo on left side of header area (600px height, 40% opacity) with absolute positioning to prevent header expansion while maintaining professional branding
 - June 14, 2025. Fixed logo positioning in top left corner of page using fixed positioning (h-24) with highest z-index for consistent visibility
 - June 14, 2025. Enlarged logo to h-40 (160px) and positioned closer to top edge (top-2) for prominent branding display
-- June 14, 2025. Final logo positioning with negative top margin (-top-4) and larger size (h-48, 192px) for optimal visual integration with CDJ interface
+- June 14, 2025. Final logo positioning with negative top margin (-top-4) and larger size (h-48, 192px) for optimal visual integration with N4G-1000 interface
 - June 14, 2025. Perfected logo display with -top-8 positioning and h-56 size (224px) for maximum brand impact while preserving interface functionality
 - June 14, 2025. Completely rebuilt audio effects system with musical timing - delay uses 1/4 note, echo uses 3/8 note timing that syncs to track BPM and tempo changes for professional DJ effects
 - June 14, 2025. Fixed logo positioning to absolute instead of fixed - logo now stays in place and doesn't move when scrolling, restored original h-56 size
-- June 14, 2025. Added SYNC button to gray CDJ transport control area alongside PLAY, STOP, and CUT FX buttons for consistent control layout on both decks
+- June 14, 2025. Added SYNC button to gray N4G-1000 transport control area alongside PLAY, STOP, and CUT FX buttons for consistent control layout on both decks
 - June 14, 2025. Removed duplicate SYNC button from black LCD area, keeping only the one in gray transport controls for cleaner interface
-- June 14, 2025. Removed duplicate CUT FX button from black LCD area, maintaining only transport controls in gray hardware section for authentic CDJ layout
+- June 14, 2025. Removed duplicate CUT FX button from black LCD area, maintaining only transport controls in gray hardware section for authentic N4G-1000 layout
 - June 14, 2025. Enhanced beat visualizer with vivid 10-color palette, dynamic color cycling, audio-responsive shifts, enhanced saturation/brightness filters, and multi-layer gradients for immersive club lighting experience
 - June 14, 2025. Removed all pink colors from beat visualizer palette, replaced with additional vibrant blues, reds, and greens per user preference
 - June 14, 2025. Transformed beat visualizer from gradient backgrounds to floating dust particle system with realistic movement, life cycles, audio responsiveness, and atmospheric glow effects
@@ -184,6 +184,7 @@ Changelog:
 - June 14, 2025. Removed all remaining mock content from website pages - replaced fake release titles, mix names, booking services, and corporate descriptions with authentic NEED FOR GROOVE information throughout all sections
 - June 14, 2025. Implemented circular wave visualization for dual deck mixing - when both CDJs play simultaneously, linear snake waves transform into dynamic circular pattern with 12 concentric rings, beat-synchronized pulsing, and real-time audio analysis from both decks
 - June 14, 2025. Added automatic beat matching and kick alignment system - when both tracks play simultaneously, Deck B instantly syncs to Deck A's tempo with real-time BPM matching, micro-timing adjustments for kick alignment, and continuous beat monitoring for seamless DJ mixing
+- June 14, 2025. Updated all CDJ-3000 references to N4G-1000 and DJM references to N4G-800 throughout application for authentic NEED FOR GROOVE branding
 
 ## User Preferences
 
