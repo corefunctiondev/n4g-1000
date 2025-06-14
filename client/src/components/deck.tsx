@@ -392,7 +392,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       </div>
 
       {/* Gray CDJ Area - Effects and Transport Controls */}
-      <div className="p-3 bg-gray-800 rounded border border-gray-700 mt-4">
+      <div className="p-3 bg-gray-800 rounded border border-gray-700 mt-8">
         {/* Effects Controls - Gray Area */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
