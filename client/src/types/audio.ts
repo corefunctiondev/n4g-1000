@@ -64,13 +64,11 @@ export interface AudioNodeSetup {
     mid: BiquadFilterNode;
     low: BiquadFilterNode;
   };
-  effectsNodes?: {
-    reverbGain: GainNode;
-    delayGain: GainNode;
-    echoGain: GainNode;
-  };
-  reverbGain?: GainNode;
-  delayGain?: GainNode;
-  echoGain?: GainNode;
+  reverbGain: GainNode;
+  delayGain: GainNode;
+  echoGain: GainNode;
+  reverbNode: ConvolverNode;
+  delayNode: DelayNode;
+  echoNode: DelayNode;
   analyser: AnalyserNode;
 }

@@ -358,50 +358,81 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               </div>
             </div>
             
-            {/* Additional CDJ Info */}
-            <div className="flex justify-between items-center mt-2 text-xs text-gray-300">
-              <span>A.HOT CUE</span>
-              <span>{deck.track ? `${formatTempo(deck.tempo)}` : '+0.0%'}</span>
-              <span>02:34</span>
+            {/* Controls Row - Inside Screen */}
+            <div className="flex justify-between items-center mt-2 text-xs">
+              <div className="flex flex-col gap-1">
+                <button 
+                  className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
+                  onClick={handleSync}
+                  type="button"
+                >
+                  SYNC
+                </button>
+                <button 
+                  className="pioneer-button py-1 px-2 text-xs text-red-400 hover:text-red-300"
+                  onClick={() => {
+                    cutFX();
+                    audioFeedback?.playClick();
+                  }}
+                  type="button"
+                >
+                  CUT FX
+                </button>
+              </div>
+              
+              <div className="text-gray-300">
+                <span>A.HOT CUE</span>
+              </div>
+              
+              <div className="text-orange-400 font-mono">
+                {deck.track ? `${formatTempo(deck.tempo)}` : '+0.0%'}
+              </div>
+              
+              <div className="text-blue-300 font-mono">
+                02:34
+              </div>
+            </div>
+
+            {/* Effects Controls - Inside Screen */}
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
+                <div className="text-purple-300 text-center mb-1 font-bold text-[10px]">REVERB</div>
+                <Knob
+                  value={deck.effects.reverb}
+                  min={0}
+                  max={100}
+                  onChange={setReverb}
+                  size="sm"
+                  className="mb-1"
+                />
+                <div className="text-purple-200 text-[8px]">{deck.effects.reverb}%</div>
+              </div>
+              <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
+                <div className="text-green-300 text-center mb-1 font-bold text-[10px]">DELAY</div>
+                <Knob
+                  value={deck.effects.delay}
+                  min={0}
+                  max={100}
+                  onChange={setDelay}
+                  size="sm"
+                  className="mb-1"
+                />
+                <div className="text-green-200 text-[8px]">{deck.effects.delay}%</div>
+              </div>
+              <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
+                <div className="text-cyan-300 text-center mb-1 font-bold text-[10px]">ECHO</div>
+                <Knob
+                  value={deck.effects.echo}
+                  min={0}
+                  max={100}
+                  onChange={setEcho}
+                  size="sm"
+                  className="mb-1"
+                />
+                <div className="text-cyan-200 text-[8px]">{deck.effects.echo}%</div>
+              </div>
             </div>
           </div>
-        </div>
-
-
-
-        {/* Controls Row */}
-        <div className="flex flex-col gap-1 mb-2 items-center" style={{ zIndex: 10, position: 'relative' }}>
-          <button 
-            className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
-            onClick={handleSync}
-            style={{ 
-              zIndex: 11, 
-              pointerEvents: 'auto',
-              position: 'relative',
-              userSelect: 'none',
-              touchAction: 'manipulation'
-            }}
-            type="button"
-          >
-            SYNC
-          </button>
-          <button 
-            className="pioneer-button py-1 px-2 text-xs text-red-400 hover:text-red-300"
-            onClick={() => {
-              cutFX();
-              audioFeedback?.playClick();
-            }}
-            style={{ 
-              zIndex: 11, 
-              pointerEvents: 'auto',
-              position: 'relative',
-              userSelect: 'none',
-              touchAction: 'manipulation'
-            }}
-            type="button"
-          >
-            CUT FX
-          </button>
         </div>
       </div>
 

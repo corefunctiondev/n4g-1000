@@ -73,6 +73,12 @@ export class AudioEngine {
       mid: BiquadFilterNode;
       low: BiquadFilterNode;
     };
+    reverbGain: GainNode;
+    delayGain: GainNode;
+    echoGain: GainNode;
+    reverbNode: ConvolverNode;
+    delayNode: DelayNode;
+    echoNode: DelayNode;
     analyser: AnalyserNode;
   } {
     if (!this.context) {
@@ -86,6 +92,33 @@ export class AudioEngine {
     const highShelf = this.context.createBiquadFilter();
     const midPeaking = this.context.createBiquadFilter();
     const lowShelf = this.context.createBiquadFilter();
+
+    // Create effects nodes
+    const reverbGain = this.context.createGain();
+    const delayGain = this.context.createGain();
+    const echoGain = this.context.createGain();
+    const reverbNode = this.context.createConvolver();
+    const delayNode = this.context.createDelay(1.0);
+    const echoNode = this.context.createDelay(1.0);
+    
+    // Create reverb impulse response
+    const impulseLength = this.context.sampleRate * 2; // 2 seconds
+    const impulse = this.context.createBuffer(2, impulseLength, this.context.sampleRate);
+    
+    for (let channel = 0; channel < 2; channel++) {
+      const channelData = impulse.getChannelData(channel);
+      for (let i = 0; i < impulseLength; i++) {
+        const decay = Math.pow(1 - i / impulseLength, 2);
+        channelData[i] = (Math.random() * 2 - 1) * decay * 0.5;
+      }
+    }
+    reverbNode.buffer = impulse;
+    
+    // Configure delay
+    delayNode.delayTime.setValueAtTime(0.25, this.context.currentTime);
+    
+    // Configure echo (longer delay)
+    echoNode.delayTime.setValueAtTime(0.5, this.context.currentTime);
 
     // Configure EQ
     highShelf.type = 'highshelf';
@@ -105,11 +138,26 @@ export class AudioEngine {
     analyser.fftSize = 2048;
     analyser.smoothingTimeConstant = 0.8;
 
-    // Connect the chain (deck will connect to crossfader gain, not directly to master)
+    // Initialize effects to 0
+    reverbGain.gain.setValueAtTime(0, this.context.currentTime);
+    delayGain.gain.setValueAtTime(0, this.context.currentTime);
+    echoGain.gain.setValueAtTime(0, this.context.currentTime);
+
+    // Connect the main chain: source → gain → EQ → analyser
     gainNode.connect(lowShelf);
     lowShelf.connect(midPeaking);
     midPeaking.connect(highShelf);
     highShelf.connect(analyser);
+    
+    // Connect effects sends from EQ output
+    highShelf.connect(reverbNode);
+    reverbNode.connect(reverbGain);
+    
+    highShelf.connect(delayNode);
+    delayNode.connect(delayGain);
+    
+    highShelf.connect(echoNode);
+    echoNode.connect(echoGain);
 
     return {
       source: null,
@@ -119,6 +167,12 @@ export class AudioEngine {
         mid: midPeaking,
         low: lowShelf,
       },
+      reverbGain,
+      delayGain,
+      echoGain,
+      reverbNode,
+      delayNode,
+      echoNode,
       analyser,
     };
   }
@@ -141,6 +195,9 @@ export class AudioEngine {
     if (existingNodes) {
       try {
         existingNodes.analyser.disconnect();
+        existingNodes.reverbGain.disconnect();
+        existingNodes.delayGain.disconnect();
+        existingNodes.echoGain.disconnect();
       } catch (e) {
         // Ignore disconnect errors
       }
@@ -150,11 +207,21 @@ export class AudioEngine {
     
     // Connect each deck to its dedicated crossfader gain node
     if (deckId === 'A' && this.crossfaderGainA) {
+      // Connect main signal
       nodes.analyser.connect(this.crossfaderGainA);
-      console.log('Deck A connected to crossfader A');
+      // Connect effects
+      nodes.reverbGain.connect(this.crossfaderGainA);
+      nodes.delayGain.connect(this.crossfaderGainA);
+      nodes.echoGain.connect(this.crossfaderGainA);
+      console.log('Deck A connected to crossfader A with effects');
     } else if (deckId === 'B' && this.crossfaderGainB) {
+      // Connect main signal
       nodes.analyser.connect(this.crossfaderGainB);
-      console.log('Deck B connected to crossfader B');
+      // Connect effects
+      nodes.reverbGain.connect(this.crossfaderGainB);
+      nodes.delayGain.connect(this.crossfaderGainB);
+      nodes.echoGain.connect(this.crossfaderGainB);
+      console.log('Deck B connected to crossfader B with effects');
     }
   }
 
