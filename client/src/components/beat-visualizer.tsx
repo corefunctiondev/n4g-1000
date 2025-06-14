@@ -157,18 +157,18 @@ export function BeatVisualizer({
     };
 
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.5px)' }}>
-        {[0, 1, 2, 3, 4].map(i => (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.3px)' }}>
+        {Array.from({ length: 12 }, (_, i) => (
           <path
             key={i}
-            d={createLeftLightningPath(window.innerHeight * (0.2 + i * 0.16), i)}
+            d={createLeftLightningPath(window.innerHeight * (0.1 + i * 0.07), i)}
             stroke={finalColor}
-            strokeWidth={6 + pulseIntensity * 10}
+            strokeWidth={2 + pulseIntensity * 4}
             fill="none"
-            opacity={opacity * (1 - i * 0.1)}
+            opacity={opacity * (1 - i * 0.06)}
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
+              filter: `drop-shadow(0 0 ${8 + pulseIntensity * 12}px ${finalColor})`,
               transform: `scale(${scale})`,
               transformOrigin: 'left center'
             }}
@@ -202,18 +202,18 @@ export function BeatVisualizer({
     };
 
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.5px)' }}>
-        {[0, 1, 2, 3, 4].map(i => (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.3px)' }}>
+        {Array.from({ length: 12 }, (_, i) => (
           <path
             key={i}
-            d={createRightSpiralPath(window.innerHeight * (0.2 + i * 0.16), i)}
+            d={createRightSpiralPath(window.innerHeight * (0.1 + i * 0.07), i)}
             stroke={finalColor}
-            strokeWidth={6 + pulseIntensity * 10}
+            strokeWidth={2 + pulseIntensity * 4}
             fill="none"
-            opacity={opacity * (1 - i * 0.1)}
+            opacity={opacity * (1 - i * 0.06)}
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
+              filter: `drop-shadow(0 0 ${8 + pulseIntensity * 12}px ${finalColor})`,
               transform: `scale(${scale})`,
               transformOrigin: 'right center'
             }}
@@ -247,31 +247,31 @@ export function BeatVisualizer({
     };
 
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.8px)' }}>
-        {[0, 1, 2, 3].map(i => (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.3px)' }}>
+        {Array.from({ length: 8 }, (_, i) => (
           <g key={i}>
             <path
-              d={createHelixPath(window.innerHeight * (0.25 + i * 0.18), i, true)}
+              d={createHelixPath(window.innerHeight * (0.15 + i * 0.1), i, true)}
               stroke={finalColor}
-              strokeWidth={5 + pulseIntensity * 8}
+              strokeWidth={2 + pulseIntensity * 3}
               fill="none"
-              opacity={opacity * (1 - i * 0.12)}
+              opacity={opacity * (1 - i * 0.08)}
               strokeLinecap="round"
               style={{
-                filter: `drop-shadow(0 0 ${12 + pulseIntensity * 18}px ${finalColor})`,
+                filter: `drop-shadow(0 0 ${6 + pulseIntensity * 10}px ${finalColor})`,
                 transform: `scale(${scale})`,
                 transformOrigin: 'center'
               }}
             />
             <path
-              d={createHelixPath(window.innerHeight * (0.25 + i * 0.18), i, false)}
+              d={createHelixPath(window.innerHeight * (0.15 + i * 0.1), i, false)}
               stroke={finalColor}
-              strokeWidth={5 + pulseIntensity * 8}
+              strokeWidth={2 + pulseIntensity * 3}
               fill="none"
-              opacity={opacity * (1 - i * 0.12) * 0.7}
+              opacity={opacity * (1 - i * 0.08) * 0.7}
               strokeLinecap="round"
               style={{
-                filter: `drop-shadow(0 0 ${12 + pulseIntensity * 18}px ${finalColor})`,
+                filter: `drop-shadow(0 0 ${6 + pulseIntensity * 10}px ${finalColor})`,
                 transform: `scale(${scale})`,
                 transformOrigin: 'center'
               }}
