@@ -193,11 +193,11 @@ export default function CDJInterface() {
       {/* Pioneer DJ Setup Layout */}
       <div className="w-full max-w-[98vw] mx-auto relative z-20">
         {/* Background Logo */}
-        <div className="absolute inset-0 flex items-center justify-center z-0 opacity-20">
+        <div className="absolute inset-0 flex items-center justify-center z-0 opacity-40">
           <img 
             src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
             alt="Need For Groove Logo Background" 
-            className="h-96 w-auto"
+            className="h-[600px] w-auto"
           />
         </div>
 
