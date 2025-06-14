@@ -1,3 +1,5 @@
+import { AudioEffects } from './audio-effects';
+
 export class AudioEngine {
   private context: AudioContext | null = null;
   private masterGain: GainNode | null = null;
@@ -109,7 +111,7 @@ export class AudioEngine {
     lowShelf.gain.setValueAtTime(0, this.context.currentTime);
 
     // Create effects
-    const audioEffects = new (require('./audio-effects').AudioEffects)(this.context);
+    const audioEffects = new AudioEffects(this.context);
 
     // Configure analyser
     analyser.fftSize = 2048;

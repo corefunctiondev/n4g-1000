@@ -470,7 +470,10 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               min={200}
               max={20000}
               step={100}
-              onChange={setFilterFreq}
+              onChange={(value) => {
+                setFilterFreq(value);
+                setFilterFrequencyAudio(value);
+              }}
               size="lg"
               className="mx-auto mb-1"
             />
@@ -487,7 +490,10 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               min={0}
               max={100}
               step={1}
-              onChange={setReverbLevel}
+              onChange={(value) => {
+                setReverbLevel(value);
+                setReverbLevelAudio(value);
+              }}
               size="lg"
               className="mx-auto mb-1"
             />
@@ -504,7 +510,10 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               min={0}
               max={100}
               step={1}
-              onChange={setDelayLevel}
+              onChange={(value) => {
+                setDelayLevel(value);
+                setDelayLevelAudio(value);
+              }}
               size="lg"
               className="mx-auto mb-1"
             />
@@ -523,7 +532,11 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               min={50}
               max={1000}
               step={10}
-              onChange={(value) => setDelayTime(value / 1000)}
+              onChange={(value) => {
+                const time = value / 1000;
+                setDelayTime(time);
+                setDelayTimeAudio(time);
+              }}
               size="md"
               className="mx-auto"
             />
@@ -539,7 +552,11 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
               min={0}
               max={90}
               step={1}
-              onChange={(value) => setDelayFeedback(value / 100)}
+              onChange={(value) => {
+                const feedback = value / 100;
+                setDelayFeedback(feedback);
+                setDelayFeedbackAudio(feedback);
+              }}
               size="md"
               className="mx-auto"
             />
