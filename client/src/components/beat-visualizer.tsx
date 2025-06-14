@@ -92,13 +92,8 @@ export function BeatVisualizer({
         setAudioLevel(overall);
       }
 
-      // Discrete beat-based wave phase (only changes on beat)
-      const timeSinceLastBeat = Date.now() - lastBeatTime.current;
-      const beatNumber = Math.floor(timeSinceLastBeat / beatDuration);
-      setWavePhase(beatNumber * Math.PI * 0.5); // Beat-based jumps
-      
-      // Ultra-smooth continuous shape evolution with more flexibility
-      setShapePhase(Date.now() * 0.0002); // Even slower for maximum smoothness
+      // Wave phase only updates on detected beats (no continuous movement)
+      // wavePhase and shapePhase are only updated when beats are detected
       
       animationFrame.current = requestAnimationFrame(animate);
     };
@@ -149,6 +144,10 @@ export function BeatVisualizer({
         lastBeatDetected = now;
         lastBeatTime.current = now;
         setBeatPulse(1.0);
+        
+        // Update wave phase only on detected beats
+        setWavePhase(prev => prev + Math.PI * 0.5);
+        setShapePhase(prev => prev + 0.1);
         
         // Smoother beat pulse decay with more responsiveness
         setTimeout(() => setBeatPulse(0.8), 50);
@@ -233,27 +232,27 @@ export function BeatVisualizer({
       const beatBounce = beatPulse * 0.25; // More reactive to beats but controlled
       const beatReactivity = beatPulse * 0.15; // Additional beat responsiveness
       
-      // Ultra-smooth flexible easing functions
-      const flexEase1 = (Math.sin(shapePhase * 0.07) + 1) * 0.5; // Slow flexible movement
-      const flexEase2 = (Math.cos(shapePhase * 0.05) + 1) * 0.5; // Even more flexible
-      const flexEase3 = (Math.sin(shapePhase * 0.04) + 1) * 0.5; // Maximum flexibility
+      // Static base values (no continuous movement)
+      const flexEase1 = 0.5; // Static value
+      const flexEase2 = 0.5; // Static value  
+      const flexEase3 = 0.5; // Static value
       
-      // Enhanced beat-reactive main wave with smooth response
-      const mainWaveFreq = 2 + flexEase1 * 0.2 + beatReactivity * 0.1; // Beat affects frequency slightly
-      const beatWave = Math.sin((normalizedX * Math.PI * mainWaveFreq) + wavePhase + phaseShift) * (waveAmplitude * (0.5 + audioIntensity + beatBounce));
+      // Beat-only reactive main wave (no continuous movement)
+      const mainWaveFreq = 2.1 + beatReactivity * 0.2; // Only changes on beats
+      const beatWave = Math.sin((normalizedX * Math.PI * mainWaveFreq) + wavePhase + phaseShift) * (waveAmplitude * (0.6 + audioIntensity + beatBounce));
       
-      // Beat-responsive secondary waves with enhanced reactivity
-      const morphFreq1 = 2.8 + flexEase2 * 0.3 + beatPulse * 0.05; // Beat affects secondary frequency
-      const morphFreq2 = 1.2 + flexEase3 * 0.25 + beatPulse * 0.03; // Subtle beat response
-      const morphingWave1 = Math.sin((normalizedX * Math.PI * morphFreq1) + shapePhase * 0.1) * (waveAmplitude * 0.08 * (0.2 + audioIntensity + beatReactivity) * flexEase1);
-      const morphingWave2 = Math.cos((normalizedX * Math.PI * morphFreq2) + shapePhase * 0.08) * (waveAmplitude * 0.06 * (0.15 + audioIntensity + beatReactivity) * flexEase2);
+      // Beat-only secondary waves (static between beats)
+      const morphFreq1 = 2.9 + beatPulse * 0.1; // Only beat response
+      const morphFreq2 = 1.3 + beatPulse * 0.08; // Only beat response
+      const morphingWave1 = Math.sin((normalizedX * Math.PI * morphFreq1) + shapePhase) * (waveAmplitude * 0.1 * (0.3 + audioIntensity + beatReactivity));
+      const morphingWave2 = Math.cos((normalizedX * Math.PI * morphFreq2) + shapePhase * 0.8) * (waveAmplitude * 0.08 * (0.25 + audioIntensity + beatReactivity));
       
-      // Enhanced beat-responsive elements with smooth reaction
-      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase + beatPulse * 0.3) * (6 + audioLevel * 8 + beatPulse * 4) * flexEase3;
-      const audioReactive = Math.sin(normalizedX * Math.PI * (2.2 + flexEase1 * 0.1 + beatPulse * 0.05) + shapePhase * 0.06) * (audioLevel * 10 + beatPulse * 8) * flexEase2;
+      // Beat-triggered elements only (no independent movement)
+      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase + beatPulse * 0.5) * (8 + audioLevel * 10 + beatPulse * 6);
+      const audioReactive = Math.sin(normalizedX * Math.PI * (2.3 + beatPulse * 0.1) + shapePhase) * (audioLevel * 12 + beatPulse * 10);
       
-      // Beat-enhanced shape variation with controlled response
-      const shapeVariation = Math.sin(normalizedX * Math.PI * (3.5 + flexEase2 * 0.2 + beatReactivity * 0.1) + shapePhase * 0.03) * (3 + audioLevel * 4 + beatPulse * 2) * flexEase3;
+      // Beat-synchronized shape variation only
+      const shapeVariation = Math.sin(normalizedX * Math.PI * (3.6 + beatReactivity * 0.2) + shapePhase * 0.5) * (4 + audioLevel * 5 + beatPulse * 3);
       
       const waveY = baseY + beatWave + morphingWave1 + morphingWave2 + beatOffset + audioReactive + shapeVariation;
       points.push(`${Math.round(x)},${Math.round(waveY)}`);
