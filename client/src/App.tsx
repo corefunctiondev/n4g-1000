@@ -9,11 +9,12 @@ import CDJInterface from "@/pages/cdj-interface";
 import AdminLogin from "@/pages/admin-login";
 import SimpleAdmin from "@/pages/simple-admin";
 import { LiveAdmin } from "@/pages/live-admin";
+import { AppWrapper } from "@/pages/app-wrapper";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={TerminalOS} />
+      <Route path="/" component={AppWrapper} />
       <Route path="/home" component={TerminalOS} />
       <Route path="/about" component={TerminalOS} />
       <Route path="/sets" component={TerminalOS} />
@@ -28,7 +29,7 @@ function Router() {
       <Route path="/admin/simple" component={SimpleAdmin} />
       <Route path="/admin" component={AdminLogin} />
       <Route>
-        <TerminalOS />
+        <AppWrapper />
       </Route>
     </Switch>
   );

@@ -131,6 +131,8 @@ Changelog:
 - June 13, 2025. Added missing Home section content items to database - all text including system status, member info, and notifications now fully admin-editable (14 total home content items)
 - June 14, 2025. Implemented Wix-style live editing system - admin can click "Edit Mode" and then click directly on any website text to edit it inline with visual highlighting
 - June 14, 2025. Added comprehensive audio feedback system - all clicks, hovers, and interactions now produce satisfying sound effects throughout the interface
+- June 14, 2025. Created complete first-time boot experience - blank screen startup with BIOS sequence, ASCII logo, and choice between DJ mode or site exploration
+- June 14, 2025. Implemented direct DJ launch pathway - choosing DJ mode runs code loading sequence and launches directly into N4G-1000 interface
 
 ## User Preferences
 
