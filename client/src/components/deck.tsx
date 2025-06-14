@@ -50,11 +50,6 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
   const [selectedTrackId, setSelectedTrackId] = useState<string>('');
   const [isLoadingTrack, setIsLoadingTrack] = useState(false);
-  
-  // Effects states
-  const [reverbLevel, setReverbLevel] = useState(0);
-  const [delayLevel, setDelayLevel] = useState(0);
-  const [echoLevel, setEchoLevel] = useState(0);
 
   // Fetch tracks from Supabase database
   const { data: tracks = [], isLoading: tracksLoading } = useQuery({
@@ -250,30 +245,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     onPlaybackChange?.(deckId, deck.isPlaying);
   }, [deck.isPlaying, deckId, onPlaybackChange]);
 
-  // Apply audio effects when knob values change
-  useEffect(() => {
-    if (deck.track) {
-      // Apply reverb effect
-      console.log(`[${deckId}] Reverb: ${reverbLevel}%`);
-      // TODO: Connect to audio engine effects chain when available
-    }
-  }, [reverbLevel, deck.track, deckId]);
 
-  useEffect(() => {
-    if (deck.track) {
-      // Apply delay effect
-      console.log(`[${deckId}] Delay: ${delayLevel}%`);
-      // TODO: Connect to audio engine effects chain when available
-    }
-  }, [delayLevel, deck.track, deckId]);
-
-  useEffect(() => {
-    if (deck.track) {
-      // Apply echo effect
-      console.log(`[${deckId}] Echo: ${echoLevel}%`);
-      // TODO: Connect to audio engine effects chain when available
-    }
-  }, [echoLevel, deck.track, deckId]);
 
   return (
     <div 
@@ -398,7 +370,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
 
 
         {/* Controls Row */}
-        <div className="flex gap-1 mb-2 justify-center" style={{ zIndex: 10, position: 'relative' }}>
+        <div className="flex flex-col gap-1 mb-2 items-center" style={{ zIndex: 10, position: 'relative' }}>
           <button 
             className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
             onClick={handleSync}
@@ -412,6 +384,23 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             type="button"
           >
             SYNC
+          </button>
+          <button 
+            className="pioneer-button py-1 px-2 text-xs text-red-400 hover:text-red-300"
+            onClick={() => {
+              cutFX();
+              audioFeedback?.playClick();
+            }}
+            style={{ 
+              zIndex: 11, 
+              pointerEvents: 'auto',
+              position: 'relative',
+              userSelect: 'none',
+              touchAction: 'manipulation'
+            }}
+            type="button"
+          >
+            CUT FX
           </button>
         </div>
       </div>
@@ -484,38 +473,38 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
           <div className="text-purple-300 text-center mb-2 font-bold">REVERB</div>
           <Knob
-            value={reverbLevel}
+            value={deck.effects.reverb}
             min={0}
             max={100}
-            onChange={setReverbLevel}
+            onChange={setReverb}
             size="sm"
             className="mb-1"
           />
-          <div className="text-purple-200 text-[10px]">{reverbLevel}%</div>
+          <div className="text-purple-200 text-[10px]">{deck.effects.reverb}%</div>
         </div>
         <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
           <div className="text-green-300 text-center mb-2 font-bold">DELAY</div>
           <Knob
-            value={delayLevel}
+            value={deck.effects.delay}
             min={0}
             max={100}
-            onChange={setDelayLevel}
+            onChange={setDelay}
             size="sm"
             className="mb-1"
           />
-          <div className="text-green-200 text-[10px]">{delayLevel}%</div>
+          <div className="text-green-200 text-[10px]">{deck.effects.delay}%</div>
         </div>
         <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
           <div className="text-cyan-300 text-center mb-2 font-bold">ECHO</div>
           <Knob
-            value={echoLevel}
+            value={deck.effects.echo}
             min={0}
             max={100}
-            onChange={setEchoLevel}
+            onChange={setEcho}
             size="sm"
             className="mb-1"
           />
-          <div className="text-cyan-200 text-[10px]">{echoLevel}%</div>
+          <div className="text-cyan-200 text-[10px]">{deck.effects.echo}%</div>
         </div>
       </div>
     </div>
