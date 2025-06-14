@@ -196,17 +196,11 @@ export default function CDJInterface() {
         <div className="mb-4 lg:mb-8 relative">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-4">
-              <div className="h-8 sm:h-10 lg:h-12 flex items-center">
-                <div className="text-blue-500 font-black text-sm sm:text-base lg:text-lg tracking-wider leading-tight">
-                  <div className="flex justify-between items-start w-48 sm:w-56 lg:w-64">
-                    <span>NEED</span>
-                    <span>FOR</span>
-                  </div>
-                  <div className="text-center -mt-1">
-                    <span>GROOVE</span>
-                  </div>
-                </div>
-              </div>
+              <img 
+                src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/logos/n4glogo.svg" 
+                alt="Need For Groove Logo" 
+                className="h-8 sm:h-10 lg:h-12 w-auto"
+              />
             </div>
             <button
               onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
