@@ -356,19 +356,6 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           
           {/* Controls Row - Inside Black Screen */}
           <div className="flex justify-between items-center mt-2 text-xs">
-            <div className="flex gap-2">
-              <button 
-                className="pioneer-button py-1 px-2 text-xs text-red-400 hover:text-red-300"
-                onClick={() => {
-                  cutFX();
-                  audioFeedback?.playClick();
-                }}
-                type="button"
-              >
-                CUT FX
-              </button>
-            </div>
-            
             <div className="text-gray-300">
               <span>A.HOT CUE</span>
             </div>
