@@ -477,16 +477,19 @@ function HomeSection() {
       </div>
       
       <div className="space-y-4">
-        <div className="text-cyan-400">{getContent('active_members_title', 'ACTIVE MEMBERS:')}</div>
+        <div className="text-cyan-400">NEED FOR GROOVE INFO:</div>
         <div className="pl-4 space-y-1 text-sm">
-          <div>{getContent('member_alex', 'alex@brooklyn.nyc - ONLINE')}</div>
-          <div>{getContent('member_jordan', 'jordan@manhattan.nyc - ONLINE')}</div>
+          <div>Location: <DynamicText contentKey="location" fallback="New York, NY" /></div>
+          <div>Origin: <DynamicText contentKey="origin" fallback="Kosovo" /></div>
+          <div>Genres: <DynamicText contentKey="genres" fallback="House, Techno, Minimal" /></div>
+          <div>Experience: <DynamicText contentKey="experience" fallback="Almost a decade producing and playing" /></div>
         </div>
       </div>
       
       <div className="border border-cyan-400 p-4 rounded">
-        <div className="text-orange-400 mb-2">{getContent('notification_title', 'LATEST NOTIFICATION:')}</div>
-        <div className="text-sm">{getContent('latest_notification', 'New booking confirmed: Brooklyn Warehouse, Saturday 11PM')}</div>
+        <div className="text-orange-400 mb-2">UPCOMING:</div>
+        <div className="text-sm"><DynamicText contentKey="next_gig" fallback="Saturday 06/14 at Virgo, Manhattan" /></div>
+        <div className="text-sm mt-1"><DynamicText contentKey="upcoming_album" fallback="Album TUTTO PASSA releasing 06/18 with 27 tracks" /></div>
       </div>
     </div>
   );
