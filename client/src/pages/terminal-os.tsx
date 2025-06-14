@@ -518,31 +518,16 @@ function AboutSection() {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="border border-cyan-400 p-4 rounded">
-          <div className="text-cyan-400 font-bold mb-3">{getContent('alex_name', 'ALEX RODRIGUEZ')}</div>
-          <div className="space-y-2 text-sm">
-            <div>{getContent('alex_location', 'Location: Brooklyn, NY')}</div>
-            <div>{getContent('alex_style', 'Style: Deep House, Progressive')}</div>
-            <div>{getContent('alex_experience', 'Experience: 8+ years')}</div>
-            <div>Status: <span className="text-blue-300">{getContent('alex_status', 'ACTIVE')}</span></div>
-          </div>
-          <div className="mt-3 text-xs text-gray-300">
-            {getContent('alex_bio', 'Specializes in underground warehouse vibes and late-night deep sets.')}
-          </div>
+      <div className="border border-cyan-400 p-4 rounded">
+        <div className="text-cyan-400 font-bold mb-3">NEED FOR GROOVE</div>
+        <div className="space-y-2 text-sm">
+          <div>Location: <DynamicText contentKey="location" fallback="New York, NY" /></div>
+          <div>Origin: <DynamicText contentKey="origin" fallback="Kosovo" /></div>
+          <div>Genres: <DynamicText contentKey="genres" fallback="House, Techno, Minimal" /></div>
+          <div>Experience: <DynamicText contentKey="experience" fallback="Almost a decade producing and playing" /></div>
         </div>
-        
-        <div className="border border-orange-400 p-4 rounded">
-          <div className="text-orange-400 font-bold mb-3">{getContent('jordan_name', 'JORDAN CHEN')}</div>
-          <div className="space-y-2 text-sm">
-            <div>{getContent('jordan_location', 'Location: Manhattan, NY')}</div>
-            <div>{getContent('jordan_style', 'Style: Techno, Minimal')}</div>
-            <div>{getContent('jordan_experience', 'Experience: 6+ years')}</div>
-            <div>Status: <span className="text-blue-300">{getContent('jordan_status', 'ACTIVE')}</span></div>
-          </div>
-          <div className="mt-3 text-xs text-gray-300">
-            {getContent('jordan_bio', 'Known for precise mixing and driving techno beats that keep crowds moving.')}
-          </div>
+        <div className="mt-3 text-xs text-gray-300">
+          <DynamicText contentKey="venues_played" fallback="Nearly 20 acknowledged NY venues including Williamsburg Hotel, Virgo, Musica, Blue" />
         </div>
       </div>
     </div>
@@ -570,32 +555,11 @@ function SetsSection() {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="border border-cyan-400 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
-          <div className="text-cyan-400 font-bold mb-2">{getContent('set_0_title', 'Warehouse Sessions #1')}</div>
-          <div className="text-xs space-y-1 text-gray-300">
-            <div>{getContent('set_0_date', 'Date: 2024-01-15')}</div>
-            <div>{getContent('set_0_duration', 'Duration: 2:30:00')}</div>
-            <div>{getContent('set_0_plays', 'Plays: 1248')}</div>
-          </div>
-        </div>
-        
-        <div className="border border-orange-400 p-4 rounded hover:border-orange-400 transition-colors cursor-pointer">
-          <div className="text-orange-400 font-bold mb-2">{getContent('set_1_title', 'Rooftop Sunset Mix')}</div>
-          <div className="text-xs space-y-1 text-gray-300">
-            <div>{getContent('set_1_date', 'Date: 2024-01-10')}</div>
-            <div>{getContent('set_1_duration', 'Duration: 1:45:00')}</div>
-            <div>{getContent('set_1_plays', 'Plays: 892')}</div>
-          </div>
-        </div>
-        
-        <div className="border border-green-400 p-4 rounded hover:border-green-400 transition-colors cursor-pointer">
-          <div className="text-green-400 font-bold mb-2">{getContent('set_2_title', 'Deep Underground')}</div>
-          <div className="text-xs space-y-1 text-gray-300">
-            <div>{getContent('set_2_date', 'Date: 2024-01-05')}</div>
-            <div>{getContent('set_2_duration', 'Duration: 3:00:00')}</div>
-            <div>{getContent('set_2_plays', 'Plays: 2156')}</div>
-          </div>
+      <div className="border border-cyan-400 p-4 rounded">
+        <div className="text-cyan-400 font-bold mb-2">Live Venue Performances</div>
+        <div className="text-xs space-y-1 text-gray-300">
+          <div><DynamicText contentKey="venue_experience" fallback="Performed at: Williamsburg Hotel, Virgo, Musica, Blue, and 16+ more NYC venues" /></div>
+          <div><DynamicText contentKey="next_gig" fallback="Next Performance: Saturday 06/14 at Virgo, Manhattan" /></div>
         </div>
       </div>
     </div>
@@ -623,35 +587,10 @@ function PodcastsSection() {
         </div>
       </div>
       
-      <div className="space-y-4">
-        <div className="border border-cyan-400 p-4 rounded">
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="text-cyan-400 font-bold">{getContent('podcast_0_title', 'EP001: NYC Underground Scene')}</div>
-              <div className="text-sm text-gray-300 mt-1">{getContent('podcast_0_date', 'Released: 2024-01-20')}</div>
-            </div>
-            <div className="text-sm text-orange-400">{getContent('podcast_0_duration', 'Duration: 45:30')}</div>
-          </div>
-        </div>
-        
-        <div className="border border-orange-400 p-4 rounded">
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="text-orange-400 font-bold">{getContent('podcast_1_title', 'EP002: House Music Evolution')}</div>
-              <div className="text-sm text-gray-300 mt-1">{getContent('podcast_1_date', 'Released: 2024-01-13')}</div>
-            </div>
-            <div className="text-sm text-orange-400">{getContent('podcast_1_duration', 'Duration: 52:15')}</div>
-          </div>
-        </div>
-        
-        <div className="border border-green-400 p-4 rounded">
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="text-green-400 font-bold">{getContent('podcast_2_title', 'EP003: Techno Production Tips')}</div>
-              <div className="text-sm text-gray-300 mt-1">{getContent('podcast_2_date', 'Released: 2024-01-06')}</div>
-            </div>
-            <div className="text-sm text-green-400">{getContent('podcast_2_duration', 'Duration: 38:45')}</div>
-          </div>
+      <div className="border border-cyan-400 p-4 rounded">
+        <div className="text-cyan-400 font-bold mb-2">Monthly Podcast Series</div>
+        <div className="text-xs text-gray-300">
+          <DynamicText contentKey="podcasts_description" fallback="Monthly deep dives into electronic music culture from our decade of experience in the Kosovo and New York underground scenes." />
         </div>
       </div>
     </div>
@@ -840,25 +779,23 @@ function ContactSection() {
         <div className="border border-cyan-400 p-4 rounded">
           <div className="text-cyan-400 font-bold mb-3">BOOKING INQUIRIES</div>
           <div className="space-y-2 text-sm">
-            <div>Email: bookings@needforgroove.nyc</div>
-            <div>Phone: +1 (555) 123-4567</div>
-            <div>Response Time: 24-48 hours</div>
+            <div>Email: <DynamicText contentKey="contact_email" fallback="n4gsounds@gmail.com" /></div>
+            <div>Phone: <DynamicText contentKey="contact_phone" fallback="+1 475 419 5769" /></div>
+            <div>Instagram: <DynamicText contentKey="contact_instagram" fallback="@needforgroove" /></div>
           </div>
         </div>
         
         <div className="border border-orange-400 p-4 rounded">
-          <div className="text-orange-400 font-bold mb-3">MANAGEMENT</div>
+          <div className="text-orange-400 font-bold mb-3">NEXT GIG</div>
           <div className="space-y-2 text-sm">
-            <div>Email: management@needforgroove.nyc</div>
-            <div>Phone: +1 (555) 987-6543</div>
+            <DynamicText contentKey="next_gig" fallback="Saturday 06/14 at Virgo, Manhattan" />
           </div>
         </div>
         
         <div className="border border-gray-600 p-4 rounded">
-          <div className="text-gray-300 font-bold mb-3">PRESS & MEDIA</div>
+          <div className="text-gray-300 font-bold mb-3">ALBUM RELEASE</div>
           <div className="space-y-2 text-sm">
-            <div>Email: press@needforgroove.nyc</div>
-            <div>High-res photos and press kit available upon request</div>
+            <DynamicText contentKey="album_info" fallback="TUTTO PASSA - Album (27 tracks) - Release: 06/18/2025" />
           </div>
         </div>
       </div>
