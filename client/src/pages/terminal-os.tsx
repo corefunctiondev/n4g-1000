@@ -512,7 +512,7 @@ function AboutSection() {
           {getContent('about_title', 'About Need For Groove')}
         </div>
         <div className="text-sm leading-relaxed">
-          {getContent('about_description', 'Need For Groove represents the intersection of technology and musical artistry. Our digital platform recreates the authentic feel of professional DJ equipment while providing access to our music library.')}
+          <DynamicText contentKey="about_description" fallback="We're NEED FOR GROOVE - started making music in Kosovo, now calling New York home." />
         </div>
       </div>
       
@@ -521,7 +521,7 @@ function AboutSection() {
           {getContent('features_title', 'Professional Features')}
         </div>
         <div className="text-sm leading-relaxed">
-          {getContent('features_description', 'Real-time BPM analysis, beatmatching, 3-band EQ, crossfading, waveform visualization, and seamless track switching - all powered by N4G.')}
+          <DynamicText contentKey="features_description" fallback="Deep house grooves, driving techno rhythms, stripped-down minimal beats." />
         </div>
       </div>
       
@@ -558,7 +558,7 @@ function SetsSection() {
           {getContent('sets_title', 'DJ Sets & Performances')}
         </div>
         <div className="text-sm leading-relaxed">
-          {getContent('sets_description', 'Explore our collection of live DJ sets and recorded performances featuring the N4G-1000 digital turntable system.')}
+          <DynamicText contentKey="sets_description" fallback="Live performances where we tell stories through sound." />
         </div>
       </div>
       
@@ -590,7 +590,7 @@ function PodcastsSection() {
           {getContent('podcasts_title', 'N4G Podcast Series')}
         </div>
         <div className="text-sm leading-relaxed">
-          {getContent('podcasts_description', 'Deep dives into electronic music production, DJ techniques, and the future of digital music technology.')}
+          <DynamicText contentKey="podcasts_description" fallback="Monthly audio journeys featuring tracks that inspire us." />
         </div>
       </div>
       
@@ -621,7 +621,7 @@ function BookingsSection() {
           {getContent('bookings_title', 'Book Need For Groove')}
         </div>
         <div className="text-sm leading-relaxed">
-          {getContent('bookings_description', 'Available for live performances, club bookings, private events, and music production collaborations.')}
+          <DynamicText contentKey="bookings_description" fallback="Ready to bring the energy to your event?" />
         </div>
       </div>
       
@@ -632,22 +632,22 @@ function BookingsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="border border-cyan-400 p-4 rounded">
             <div className="text-cyan-400 font-bold">
-              {getContent('booking_club_events', '🎧 Club Events & Nightlife')}
+              Club Events & Nightlife
             </div>
           </div>
           <div className="border border-orange-400 p-4 rounded">
             <div className="text-orange-400 font-bold">
-              {getContent('booking_private_parties', '🎉 Private Parties & Corporate Events')}
+              Private Events & Parties
             </div>
           </div>
           <div className="border border-green-400 p-4 rounded">
             <div className="text-green-400 font-bold">
-              {getContent('booking_festivals', '🎪 Music Festivals & Outdoor Events')}
+              Music Festivals
             </div>
           </div>
           <div className="border border-purple-400 p-4 rounded">
             <div className="text-purple-400 font-bold">
-              {getContent('booking_production', '🎵 Music Production & Collaboration')}
+              Studio Collaborations
             </div>
           </div>
         </div>
@@ -673,7 +673,7 @@ function ReleasesSection() {
           {getContent('releases_title', 'Music Releases')}
         </div>
         <div className="text-sm leading-relaxed">
-          {getContent('releases_description', 'Original tracks, remixes, and collaborative works from the Need For Groove collective.')}
+          <DynamicText contentKey="releases_description" fallback="Our original productions and carefully crafted remixes." />
         </div>
       </div>
       
@@ -683,21 +683,23 @@ function ReleasesSection() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="border border-cyan-400 p-4 rounded hover:border-cyan-400 transition-colors cursor-pointer">
-            <div className="text-cyan-400 font-bold mb-2">{getContent('release_0_title', 'Underground Frequencies EP')}</div>
+            <div className="text-cyan-400 font-bold mb-2">TUTTO PASSA</div>
             <div className="text-xs space-y-1 text-gray-300">
-              <div>{getContent('release_0_date', 'Released: January 2024')}</div>
+              <div>Releasing: June 18, 2025</div>
+              <div>27 Tracks - House, Techno, Minimal</div>
             </div>
           </div>
           
           <div className="border border-orange-400 p-4 rounded hover:border-orange-400 transition-colors cursor-pointer">
-            <div className="text-orange-400 font-bold mb-2">{getContent('release_1_title', 'Brooklyn Nights (Remix)')}</div>
+            <div className="text-orange-400 font-bold mb-2">Previous Releases</div>
             <div className="text-xs space-y-1 text-gray-300">
-              <div>{getContent('release_1_date', 'Released: December 2023')}</div>
+              <div>Collection of singles and EPs</div>
+              <div>Available on major platforms</div>
             </div>
           </div>
           
           <div className="border border-green-400 p-4 rounded hover:border-green-400 transition-colors cursor-pointer">
-            <div className="text-green-400 font-bold mb-2">{getContent('release_2_title', 'Digital Dreams Album')}</div>
+            <div className="text-green-400 font-bold mb-2">Collaborations</div>
             <div className="text-xs space-y-1 text-gray-300">
               <div>{getContent('release_2_date', 'Released: November 2023')}</div>
             </div>
