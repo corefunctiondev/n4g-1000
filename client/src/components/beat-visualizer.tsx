@@ -26,16 +26,18 @@ export function BeatVisualizer({
   const beatInterval = useRef<number | null>(null);
   const animationFrame = useRef<number | null>(null);
 
-  // Futuristic color palette
+  // Enhanced futuristic color palette with better contrast
   const colorPalette = [
-    '#00FFFF', // Cyan
-    '#FF0040', // Red
-    '#00FF80', // Green
-    '#4080FF', // Blue
-    '#FF8000', // Orange
-    '#8000FF', // Purple
-    '#40FF00', // Lime
-    '#FF0080', // Magenta
+    '#00E5FF', // Electric Blue
+    '#FF1744', // Vibrant Red
+    '#00FF41', // Neon Green
+    '#3D5AFE', // Deep Blue
+    '#FF6D00', // Electric Orange
+    '#D500F9', // Electric Purple
+    '#76FF03', // Acid Green
+    '#E91E63', // Hot Pink
+    '#00B8D4', // Cyan Blue
+    '#FFAB00', // Amber
   ];
 
   const beatDuration = 60000 / bpm;
@@ -49,17 +51,21 @@ export function BeatVisualizer({
       return;
     }
 
-    if (analyser) {
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(dataArray);
-      
-      const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
-      const normalizedLevel = average / 255;
-      setAudioLevel(normalizedLevel);
-    }
-
-    // Beat-synchronized wave animation
+    // Beat-synchronized wave animation with real-time audio analysis
     const animate = () => {
+      if (analyser) {
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+        
+        // Get different frequency ranges for more detailed response
+        const lowFreq = dataArray.slice(0, 85).reduce((sum, value) => sum + value, 0) / 85 / 255;
+        const midFreq = dataArray.slice(85, 170).reduce((sum, value) => sum + value, 0) / 85 / 255;
+        const highFreq = dataArray.slice(170, 255).reduce((sum, value) => sum + value, 0) / 85 / 255;
+        
+        const overall = (lowFreq + midFreq + highFreq) / 3;
+        setAudioLevel(overall);
+      }
+
       const beatProgress = ((Date.now() - lastBeatTime.current) % beatDuration) / beatDuration;
       setWavePhase(beatProgress * Math.PI * 2);
       animationFrame.current = requestAnimationFrame(animate);
@@ -116,10 +122,11 @@ export function BeatVisualizer({
   const audioColorShift = Math.floor(audioLevel * 3) % colorPalette.length;
   const finalColor = audioLevel > 0.3 ? colorPalette[audioColorShift] : dynamicColor;
 
-  // Beat-synchronized wave parameters
-  const waveAmplitude = 30 + (pulseIntensity * 50);
-  const beatSyncedOffset = Math.sin(wavePhase) * 100;
-  const secondaryOffset = Math.sin(wavePhase * 2) * 50;
+  // Audio-reactive wave parameters
+  const baseAmplitude = 20 + (audioLevel * 80); // Wave size responds to audio fluctuations
+  const waveAmplitude = baseAmplitude + (pulseIntensity * 40);
+  const beatSyncedOffset = Math.sin(wavePhase) * (50 + audioLevel * 100);
+  const secondaryOffset = Math.sin(wavePhase * 2) * (30 + audioLevel * 60);
 
   // Create beat-matched wave path
   const createBeatWavePath = (baseY: number, waveIndex: number, direction: number) => {
@@ -145,13 +152,15 @@ export function BeatVisualizer({
       const x = startX + (waveWidth / steps) * i;
       const normalizedX = (x - startX) / waveWidth;
       
-      // Beat-synchronized wave components
-      const beatWave = Math.sin((normalizedX * Math.PI * 2) + (wavePhase * direction) + phaseShift) * waveAmplitude;
-      const subBeat = Math.sin((normalizedX * Math.PI * 4) + (wavePhase * direction * 2)) * (waveAmplitude * 0.3);
-      const beatOffset = beatSyncedOffset * Math.sin(normalizedX * Math.PI);
-      const audioReactive = Math.sin(normalizedX * Math.PI * 3 + wavePhase) * (audioLevel * 40);
+      // Audio-reactive wave components with dynamic sizing
+      const audioIntensity = audioLevel * 2; // Amplify audio response
+      const beatWave = Math.sin((normalizedX * Math.PI * 2) + (wavePhase * direction) + phaseShift) * (waveAmplitude * (0.5 + audioIntensity));
+      const subBeat = Math.sin((normalizedX * Math.PI * 4) + (wavePhase * direction * 2)) * (waveAmplitude * 0.3 * (0.3 + audioIntensity));
+      const beatOffset = beatSyncedOffset * Math.sin(normalizedX * Math.PI) * (0.4 + audioIntensity);
+      const audioReactive = Math.sin(normalizedX * Math.PI * 6 + wavePhase * 3) * (audioLevel * 80);
+      const dynamicVariation = Math.cos(normalizedX * Math.PI * 8 + wavePhase * 1.5) * (audioLevel * 30);
       
-      const waveY = baseY + beatWave + subBeat + beatOffset + audioReactive;
+      const waveY = baseY + beatWave + subBeat + beatOffset + audioReactive + dynamicVariation;
       points.push(`${Math.round(x)},${Math.round(waveY)}`);
     }
     
@@ -171,31 +180,48 @@ export function BeatVisualizer({
         <path
           d={createBeatWavePath(layerY, i, direction)}
           stroke={`url(#waveGradient-${position}-${i})`}
-          strokeWidth={2 + pulseIntensity * 4}
+          strokeWidth={1.5 + pulseIntensity * 3 + audioLevel * 2}
           fill="none"
           opacity={strokeOpacity}
           strokeLinecap="round"
           style={{
-            filter: `drop-shadow(0 0 ${6 + pulseIntensity * 12}px ${finalColor})`,
-            transform: `scale(${1 + beatPulse * 0.1})`,
+            filter: `drop-shadow(0 0 ${8 + pulseIntensity * 15 + audioLevel * 10}px ${finalColor})`,
+            transform: `scale(${1 + beatPulse * 0.15 + audioLevel * 0.1})`,
             transformOrigin: position === 'left' ? 'left center' : position === 'right' ? 'right center' : 'center'
           }}
         />
         
-        {/* Glow layer */}
+        {/* Enhanced glow layer that responds to audio */}
         <path
           d={createBeatWavePath(layerY, i, direction)}
           stroke={finalColor}
-          strokeWidth={4 + pulseIntensity * 6}
+          strokeWidth={3 + pulseIntensity * 8 + audioLevel * 4}
           fill="none"
-          opacity={strokeOpacity * 0.3}
+          opacity={strokeOpacity * (0.2 + audioLevel * 0.3)}
           strokeLinecap="round"
           style={{
-            filter: `blur(${3 + pulseIntensity * 4}px)`,
-            transform: `scale(${1 + beatPulse * 0.1})`,
+            filter: `blur(${2 + pulseIntensity * 6 + audioLevel * 4}px)`,
+            transform: `scale(${1 + beatPulse * 0.15 + audioLevel * 0.1})`,
             transformOrigin: position === 'left' ? 'left center' : position === 'right' ? 'right center' : 'center'
           }}
         />
+        
+        {/* Extra bright layer for high audio levels */}
+        {audioLevel > 0.5 && (
+          <path
+            d={createBeatWavePath(layerY, i, direction)}
+            stroke={colorPalette[(colorCycle + 1) % colorPalette.length]}
+            strokeWidth={2 + audioLevel * 3}
+            fill="none"
+            opacity={strokeOpacity * audioLevel * 0.4}
+            strokeLinecap="round"
+            style={{
+              filter: `blur(${1 + audioLevel * 3}px) brightness(1.5)`,
+              transform: `scale(${1 + beatPulse * 0.2 + audioLevel * 0.15})`,
+              transformOrigin: position === 'left' ? 'left center' : position === 'right' ? 'right center' : 'center'
+            }}
+          />
+        )}
       </g>
     );
   });

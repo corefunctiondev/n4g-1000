@@ -170,6 +170,7 @@ Changelog:
 - June 14, 2025. Rebuilt wave system with complex futuristic design - 16 layered waves with multiple frequency components, audio-reactive distortion, and glow effects for satisfying visual experience
 - June 14, 2025. Simplified to minimal lighting system - clean gradient overlays with subtle effects, low opacity, and smooth transitions for professional ambiance
 - June 14, 2025. Created gradient futuristic waves with precise beat synchronization - wave movement, scaling, and effects locked to exact BPM timing using requestAnimationFrame
+- June 14, 2025. Enhanced waves with real-time audio-reactive sizing - wave amplitude, effects, and colors respond to live audio fluctuations with frequency-separated analysis and improved color palette
 
 ## User Preferences
 
