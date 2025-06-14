@@ -201,6 +201,7 @@ Changelog:
 - June 14, 2025. Added releases section content with TUTTO PASSA album information and N4G-1000 reference for playing songs
 - June 14, 2025. Updated home page hero content to "New York Based" with authentic description about Kosovo producers bringing their sound to New York
 - June 14, 2025. Removed redundant "NEED FOR GROOVE INFO" section from home page for cleaner, more focused layout
+- June 14, 2025. Updated hero section to display "Need For Groove" as main title with "New York Based" as subtitle
 
 ## User Preferences
 
