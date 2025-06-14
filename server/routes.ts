@@ -183,129 +183,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Enhanced migration endpoint for complete content seeding
+  // Migration endpoint - disabled to prevent mock data seeding
   app.post("/api/migrate-content", async (req, res) => {
     try {
-      const content = [
-        // Home/Hero section
-        {key: 'hero_title', section: 'home', title: 'Welcome to N4G Terminal OS', position: 1, is_active: true},
-        {key: 'hero_subtitle', section: 'home', title: 'Digital DJ Experience', position: 2, is_active: true},
-        {key: 'hero_description', section: 'home', content: 'Experience DJ Stimulator in your browser with our authentic N4G-1000 featuring our complete music collection.', position: 3, is_active: true},
-        {key: 'cta_button', section: 'home', button_text: 'Launch N4G-1000', link_url: '/n4g-1000', position: 4, is_active: true},
-        {key: 'system_status_title', section: 'home', title: 'SYSTEM STATUS:', position: 5, is_active: true},
-        {key: 'audio_engine_status', section: 'home', content: '✓ Audio Engine: ONLINE', position: 6, is_active: true},
-        {key: 'dj_equipment_status', section: 'home', content: '✓ DJ Equipment: READY', position: 7, is_active: true},
-        {key: 'music_library_status', section: 'home', content: '✓ Music Library: LOADED', position: 8, is_active: true},
-        {key: 'network_status', section: 'home', content: '✓ Network: CONNECTED', position: 9, is_active: true},
-        {key: 'active_members_title', section: 'home', title: 'ACTIVE MEMBERS:', position: 10, is_active: true},
-        {key: 'member_alex', section: 'home', content: 'alex@brooklyn.nyc - ONLINE', position: 11, is_active: true},
-        {key: 'member_jordan', section: 'home', content: 'jordan@manhattan.nyc - ONLINE', position: 12, is_active: true},
-        {key: 'notification_title', section: 'home', title: 'LATEST NOTIFICATION:', position: 13, is_active: true},
-        {key: 'latest_notification', section: 'home', content: 'New booking confirmed: Brooklyn Warehouse, Saturday 11PM', position: 14, is_active: true},
-        
-        // About section
-        {key: 'about_title', section: 'about', title: 'About Need For Groove', position: 1, is_active: true},
-        {key: 'about_description', section: 'about', content: 'Need For Groove represents the intersection of technology and musical artistry. Our digital platform recreates the authentic feel of professional DJ equipment while providing access to our music library.', position: 2, is_active: true},
-        {key: 'features_title', section: 'about', title: 'Professional Features', position: 3, is_active: true},
-        {key: 'features_description', section: 'about', content: 'Real-time BPM analysis, beatmatching, 3-band EQ, crossfading, waveform visualization, and seamless track switching - all powered by N4G.', position: 4, is_active: true},
-        {key: 'mixing_title', section: 'about', title: 'Live Mixing', position: 5, is_active: true},
-        {key: 'mixing_description', section: 'about', content: 'Professional mixing capabilities with dual-deck control, tempo adjustment, and real-time effects.', position: 6, is_active: true},
-        {key: 'library_title', section: 'about', title: 'Music Library', position: 7, is_active: true},
-        {key: 'library_description', section: 'about', content: 'Access our music collection of 25 Need For Groove tracks.', position: 8, is_active: true},
-        {key: 'alex_name', section: 'about', title: 'ALEX RODRIGUEZ', position: 9, is_active: true},
-        {key: 'alex_location', section: 'about', content: 'Location: Brooklyn, NY', position: 10, is_active: true},
-        {key: 'alex_style', section: 'about', content: 'Style: Deep House, Progressive', position: 11, is_active: true},
-        {key: 'alex_experience', section: 'about', content: 'Experience: 8+ years', position: 12, is_active: true},
-        {key: 'alex_status', section: 'about', content: 'ACTIVE', position: 13, is_active: true},
-        {key: 'alex_bio', section: 'about', content: 'Specializes in underground warehouse vibes and late-night deep sets.', position: 14, is_active: true},
-        {key: 'jordan_name', section: 'about', title: 'JORDAN CHEN', position: 15, is_active: true},
-        {key: 'jordan_location', section: 'about', content: 'Location: Manhattan, NY', position: 16, is_active: true},
-        {key: 'jordan_style', section: 'about', content: 'Style: Techno, Minimal', position: 17, is_active: true},
-        {key: 'jordan_experience', section: 'about', content: 'Experience: 6+ years', position: 18, is_active: true},
-        {key: 'jordan_status', section: 'about', content: 'ACTIVE', position: 19, is_active: true},
-        {key: 'jordan_bio', section: 'about', content: 'Known for precise mixing and driving techno beats that keep crowds moving.', position: 20, is_active: true},
-        
-        // Contact section
-        {key: 'contact_title', section: 'contact', title: 'Get In Touch', position: 1, is_active: true},
-        {key: 'contact_description', section: 'contact', content: 'Ready to experience the future of digital DJing? Connect with Need For Groove today.', position: 2, is_active: true},
-        {key: 'contact_email', section: 'contact', content: '📧 Email: bookings@needforgroove.com', position: 3, is_active: true},
-        {key: 'contact_location', section: 'contact', content: '📍 Location: New York City', position: 4, is_active: true},
-        {key: 'contact_response', section: 'contact', content: '⏱️ Response Time: 24-48 hours', position: 5, is_active: true},
-        {key: 'contact_availability', section: 'contact', content: '🗓️ Availability: Available for events', position: 6, is_active: true},
-        
-        // Sets section
-        {key: 'sets_title', section: 'sets', title: 'DJ Sets & Performances', position: 1, is_active: true},
-        {key: 'sets_description', section: 'sets', content: 'Explore our collection of live DJ sets and recorded performances featuring the N4G-1000 digital turntable system.', position: 2, is_active: true},
-        {key: 'set_0_title', section: 'sets', title: 'Warehouse Sessions #1', position: 3, is_active: true},
-        {key: 'set_0_date', section: 'sets', content: 'Date: 2024-01-15', position: 4, is_active: true},
-        {key: 'set_0_duration', section: 'sets', content: 'Duration: 2:30:00', position: 5, is_active: true},
-        {key: 'set_0_plays', section: 'sets', content: 'Plays: 1248', position: 6, is_active: true},
-        {key: 'set_1_title', section: 'sets', title: 'Rooftop Sunset Mix', position: 7, is_active: true},
-        {key: 'set_1_date', section: 'sets', content: 'Date: 2024-01-10', position: 8, is_active: true},
-        {key: 'set_1_duration', section: 'sets', content: 'Duration: 1:45:00', position: 9, is_active: true},
-        {key: 'set_1_plays', section: 'sets', content: 'Plays: 892', position: 10, is_active: true},
-        {key: 'set_2_title', section: 'sets', title: 'Deep Underground', position: 11, is_active: true},
-        {key: 'set_2_date', section: 'sets', content: 'Date: 2024-01-05', position: 12, is_active: true},
-        {key: 'set_2_duration', section: 'sets', content: 'Duration: 3:00:00', position: 13, is_active: true},
-        {key: 'set_2_plays', section: 'sets', content: 'Plays: 2156', position: 14, is_active: true},
-        
-        // Podcasts section
-        {key: 'podcasts_title', section: 'podcasts', title: 'N4G Podcast Series', position: 1, is_active: true},
-        {key: 'podcasts_description', section: 'podcasts', content: 'Deep dives into electronic music production, DJ techniques, and the future of digital music technology.', position: 2, is_active: true},
-        {key: 'podcast_0_title', section: 'podcasts', title: 'EP001: NYC Underground Scene', position: 3, is_active: true},
-        {key: 'podcast_0_date', section: 'podcasts', content: 'Released: 2024-01-20', position: 4, is_active: true},
-        {key: 'podcast_0_duration', section: 'podcasts', content: 'Duration: 45:30', position: 5, is_active: true},
-        {key: 'podcast_1_title', section: 'podcasts', title: 'EP002: House Music Evolution', position: 6, is_active: true},
-        {key: 'podcast_1_date', section: 'podcasts', content: 'Released: 2024-01-13', position: 7, is_active: true},
-        {key: 'podcast_1_duration', section: 'podcasts', content: 'Duration: 52:15', position: 8, is_active: true},
-        {key: 'podcast_2_title', section: 'podcasts', title: 'EP003: Techno Production Tips', position: 9, is_active: true},
-        {key: 'podcast_2_date', section: 'podcasts', content: 'Released: 2024-01-06', position: 10, is_active: true},
-        {key: 'podcast_2_duration', section: 'podcasts', content: 'Duration: 38:45', position: 11, is_active: true},
-        
-        // Bookings section
-        {key: 'bookings_title', section: 'bookings', title: 'Book Need For Groove', position: 1, is_active: true},
-        {key: 'bookings_description', section: 'bookings', content: 'Available for live performances, club bookings, private events, and music production collaborations.', position: 2, is_active: true},
-        {key: 'booking_services_title', section: 'bookings', title: 'AVAILABLE SERVICES:', position: 3, is_active: true},
-        {key: 'booking_club_events', section: 'bookings', content: '🎧 Club Events & Nightlife', position: 4, is_active: true},
-        {key: 'booking_private_parties', section: 'bookings', content: '🎉 Private Parties & Corporate Events', position: 5, is_active: true},
-        {key: 'booking_festivals', section: 'bookings', content: '🎪 Music Festivals & Outdoor Events', position: 6, is_active: true},
-        {key: 'booking_production', section: 'bookings', content: '🎵 Music Production & Collaboration', position: 7, is_active: true},
-        
-        // Releases section
-        {key: 'releases_title', section: 'releases', title: 'Music Releases', position: 1, is_active: true},
-        {key: 'releases_description', section: 'releases', content: 'Original tracks, remixes, and collaborative works from the Need For Groove collective.', position: 2, is_active: true},
-        {key: 'latest_releases_title', section: 'releases', title: 'LATEST RELEASES:', position: 3, is_active: true},
-        {key: 'release_0_title', section: 'releases', title: 'Underground Frequencies EP', position: 4, is_active: true},
-        {key: 'release_0_date', section: 'releases', content: 'Released: January 2024', position: 5, is_active: true},
-        {key: 'release_1_title', section: 'releases', title: 'Brooklyn Nights (Remix)', position: 6, is_active: true},
-        {key: 'release_1_date', section: 'releases', content: 'Released: December 2023', position: 7, is_active: true},
-        {key: 'release_2_title', section: 'releases', title: 'Digital Dreams Album', position: 8, is_active: true},
-        {key: 'release_2_date', section: 'releases', content: 'Released: November 2023', position: 9, is_active: true},
-        
-        // Mixes section
-        {key: 'mixes_title', section: 'mixes', title: 'DJ Mixes', position: 1, is_active: true},
-        {key: 'mixes_description', section: 'mixes', content: 'Curated DJ mixes showcasing the latest in electronic music and exclusive N4G productions.', position: 2, is_active: true},
-        {key: 'featured_mixes_title', section: 'mixes', title: 'FEATURED MIXES:', position: 3, is_active: true},
-        {key: 'mix_0_title', section: 'mixes', title: 'After Hours: Deep Sessions', position: 4, is_active: true},
-        {key: 'mix_0_duration', section: 'mixes', content: 'Duration: 90 minutes', position: 5, is_active: true},
-        {key: 'mix_1_title', section: 'mixes', title: 'Techno Therapy Vol. 3', position: 6, is_active: true},
-        {key: 'mix_1_duration', section: 'mixes', content: 'Duration: 75 minutes', position: 7, is_active: true},
-        {key: 'mix_2_title', section: 'mixes', title: 'Progressive Journeys', position: 8, is_active: true},
-        {key: 'mix_2_duration', section: 'mixes', content: 'Duration: 60 minutes', position: 9, is_active: true}
-      ];
-
-      // Clear existing content first
-      await supabase.from('site_content').delete().neq('id', 0);
-      
-      // Insert new content
-      const { data, error } = await supabase
-        .from('site_content')
-        .insert(content)
-        .select();
-        
-      if (error) throw error;
-      
-      res.json({ success: true, migrated: data.length });
+      // This endpoint is disabled to prevent seeding mock data
+      // All authentic content is managed through the admin interface
+      res.json({ 
+        success: false, 
+        message: "Migration disabled - use admin interface for content management" 
+      });
     } catch (error) {
       console.error('Migration error:', error);
       res.status(500).json({ error: "Migration failed" });
