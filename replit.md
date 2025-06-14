@@ -155,7 +155,7 @@ Changelog:
 - June 14, 2025. Final logo positioning with negative top margin (-top-4) and larger size (h-48, 192px) for optimal visual integration with CDJ interface
 - June 14, 2025. Perfected logo display with -top-8 positioning and h-56 size (224px) for maximum brand impact while preserving interface functionality
 - June 14, 2025. Completely rebuilt audio effects system with musical timing - delay uses 1/4 note, echo uses 3/8 note timing that syncs to track BPM and tempo changes for professional DJ effects
-- June 14, 2025. Fixed logo positioning to absolute instead of fixed - logo now stays in place and doesn't move when scrolling
+- June 14, 2025. Fixed logo positioning to absolute instead of fixed - logo now stays in place and doesn't move when scrolling, restored original h-56 size
 - June 14, 2025. Repositioned SYNC button horizontally next to CUT FX button for better accessibility and visibility
 
 ## User Preferences
