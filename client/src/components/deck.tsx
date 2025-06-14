@@ -38,6 +38,11 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     beatJump,
     sync,
     getAnalyser,
+    setReverbLevel: setReverbLevelAudio,
+    setDelayLevel: setDelayLevelAudio,
+    setDelayTime: setDelayTimeAudio,
+    setDelayFeedback: setDelayFeedbackAudio,
+    setFilterFrequency: setFilterFrequencyAudio,
   } = useAudio(deckId);
   
   const audioFeedback = useAudioFeedback();
@@ -453,7 +458,97 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         </div>
       </div>
 
+      {/* Effects Section */}
+      <div className="pioneer-eq-section p-2 mb-2">
+        <div className="text-xs text-center mb-2 text-gray-300">EFFECTS</div>
+        <div className="grid grid-cols-3 gap-3">
+          {/* Filter */}
+          <div className="text-center">
+            <div className="text-xs mb-1 text-gray-400">FILTER</div>
+            <Knob
+              value={filterFreq}
+              min={200}
+              max={20000}
+              step={100}
+              onChange={setFilterFreq}
+              size="lg"
+              className="mx-auto mb-1"
+            />
+            <div className="text-xs font-mono text-gray-300">
+              {filterFreq >= 20000 ? 'OPEN' : `${Math.round(filterFreq/1000)}kHz`}
+            </div>
+          </div>
 
+          {/* Reverb */}
+          <div className="text-center">
+            <div className="text-xs mb-1 text-gray-400">REVERB</div>
+            <Knob
+              value={reverbLevel}
+              min={0}
+              max={100}
+              step={1}
+              onChange={setReverbLevel}
+              size="lg"
+              className="mx-auto mb-1"
+            />
+            <div className="text-xs font-mono text-gray-300">
+              {reverbLevel}%
+            </div>
+          </div>
+
+          {/* Delay */}
+          <div className="text-center">
+            <div className="text-xs mb-1 text-gray-400">DELAY</div>
+            <Knob
+              value={delayLevel}
+              min={0}
+              max={100}
+              step={1}
+              onChange={setDelayLevel}
+              size="lg"
+              className="mx-auto mb-1"
+            />
+            <div className="text-xs font-mono text-gray-300">
+              {delayLevel}%
+            </div>
+          </div>
+        </div>
+        
+        {/* Delay Controls */}
+        <div className="grid grid-cols-2 gap-2 mt-3">
+          <div className="text-center">
+            <div className="text-xs mb-1 text-gray-400">DELAY TIME</div>
+            <Knob
+              value={delayTime * 1000}
+              min={50}
+              max={1000}
+              step={10}
+              onChange={(value) => setDelayTime(value / 1000)}
+              size="md"
+              className="mx-auto"
+            />
+            <div className="text-xs font-mono text-gray-300">
+              {Math.round(delayTime * 1000)}ms
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-xs mb-1 text-gray-400">FEEDBACK</div>
+            <Knob
+              value={delayFeedback * 100}
+              min={0}
+              max={90}
+              step={1}
+              onChange={(value) => setDelayFeedback(value / 100)}
+              size="md"
+              className="mx-auto"
+            />
+            <div className="text-xs font-mono text-gray-300">
+              {Math.round(delayFeedback * 100)}%
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Bottom Controls - Compact */}
       <div className="grid grid-cols-3 gap-1">

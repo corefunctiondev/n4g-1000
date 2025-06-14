@@ -74,6 +74,13 @@ export class AudioEngine {
       low: BiquadFilterNode;
     };
     analyser: AnalyserNode;
+    effects: {
+      setReverbWet: (wet: number) => void;
+      setDelayWet: (wet: number) => void;
+      setDelayTime: (time: number) => void;
+      setDelayFeedback: (feedback: number) => void;
+      setFilterFrequency: (frequency: number) => void;
+    };
   } {
     if (!this.context) {
       throw new Error('Audio context not initialized');
@@ -101,6 +108,9 @@ export class AudioEngine {
     lowShelf.frequency.setValueAtTime(100, this.context.currentTime);
     lowShelf.gain.setValueAtTime(0, this.context.currentTime);
 
+    // Create effects
+    const audioEffects = new (require('./audio-effects').AudioEffects)(this.context);
+
     // Configure analyser
     analyser.fftSize = 2048;
     analyser.smoothingTimeConstant = 0.8;
@@ -120,6 +130,13 @@ export class AudioEngine {
         low: lowShelf,
       },
       analyser,
+      effects: {
+        setReverbWet: (wet: number) => audioEffects.setReverbWet(wet),
+        setDelayWet: (wet: number) => audioEffects.setDelayWet(wet),
+        setDelayTime: (time: number) => audioEffects.setDelayTime(time),
+        setDelayFeedback: (feedback: number) => audioEffects.setDelayFeedback(feedback),
+        setFilterFrequency: (frequency: number) => audioEffects.setFilterFrequency(frequency),
+      },
     };
   }
 
