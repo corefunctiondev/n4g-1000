@@ -80,6 +80,11 @@ export class AudioEngine {
     delayNode: DelayNode;
     echoNode: DelayNode;
     analyser: AnalyserNode;
+    dryGain: GainNode;
+    wetGain: GainNode;
+    effectsMix: GainNode;
+    delayFeedback: GainNode;
+    echoFeedback: GainNode;
   } {
     if (!this.context) {
       throw new Error('Audio context not initialized');
@@ -149,39 +154,47 @@ export class AudioEngine {
     midPeaking.connect(highShelf);
     highShelf.connect(analyser);
     
-    // Create feedback loops for delay and echo
+    // Create dry/wet mixer for effects
+    const dryGain = this.context.createGain();
+    const wetGain = this.context.createGain();
+    const effectsMix = this.context.createGain();
+    
+    // Create feedback for delay/echo
     const delayFeedback = this.context.createGain();
     const echoFeedback = this.context.createGain();
-    const delayFilter = this.context.createBiquadFilter();
-    const echoFilter = this.context.createBiquadFilter();
     
-    // Configure filters
-    delayFilter.type = 'lowpass';
-    delayFilter.frequency.setValueAtTime(8000, this.context.currentTime);
-    echoFilter.type = 'lowpass';
-    echoFilter.frequency.setValueAtTime(6000, this.context.currentTime);
+    // Set initial levels
+    dryGain.gain.setValueAtTime(1.0, this.context.currentTime);
+    wetGain.gain.setValueAtTime(0.0, this.context.currentTime);
+    delayFeedback.gain.setValueAtTime(0.35, this.context.currentTime);
+    echoFeedback.gain.setValueAtTime(0.45, this.context.currentTime);
     
-    // Set feedback levels
-    delayFeedback.gain.setValueAtTime(0.3, this.context.currentTime);
-    echoFeedback.gain.setValueAtTime(0.4, this.context.currentTime);
+    // Main signal path: EQ → dry gain → effects mix
+    highShelf.connect(dryGain);
+    dryGain.connect(effectsMix);
     
-    // Connect reverb (simple)
+    // Reverb path: EQ → reverb → reverb gain → wet gain → effects mix
     highShelf.connect(reverbNode);
     reverbNode.connect(reverbGain);
+    reverbGain.connect(wetGain);
+    wetGain.connect(effectsMix);
     
-    // Connect delay with feedback
+    // Delay path with feedback: EQ → delay → delay gain + feedback → delay
     highShelf.connect(delayNode);
-    delayNode.connect(delayFilter);
-    delayFilter.connect(delayGain);
-    delayFilter.connect(delayFeedback);
+    delayNode.connect(delayGain);
+    delayNode.connect(delayFeedback);
     delayFeedback.connect(delayNode);
+    delayGain.connect(effectsMix);
     
-    // Connect echo with feedback
+    // Echo path with feedback: EQ → echo → echo gain + feedback → echo  
     highShelf.connect(echoNode);
-    echoNode.connect(echoFilter);
-    echoFilter.connect(echoGain);
-    echoFilter.connect(echoFeedback);
+    echoNode.connect(echoGain);
+    echoNode.connect(echoFeedback);
     echoFeedback.connect(echoNode);
+    echoGain.connect(effectsMix);
+    
+    // Connect effects mix to analyser for final output
+    effectsMix.connect(analyser);
 
     return {
       source: null,
@@ -198,6 +211,11 @@ export class AudioEngine {
       delayNode,
       echoNode,
       analyser,
+      dryGain,
+      wetGain,
+      effectsMix,
+      delayFeedback,
+      echoFeedback,
     };
   }
 
@@ -306,45 +324,43 @@ export class AudioEngine {
     return { bpm: 120, tempo: 1 };
   }
 
-  setDelayEffect(deckId: string, level: number): void {
+  setDelayEffect(deckId: string, level: number, delayTime?: number): void {
     const nodes = this.deckNodes.get(deckId);
     if (nodes && this.context) {
-      // Calculate BPM-based delay time (1/4 note)
-      const deckState = this.getDeckBPM(deckId);
-      const bpm = deckState?.bpm || 120;
-      const tempoMultiplier = deckState?.tempo || 1;
-      const adjustedBPM = bpm * tempoMultiplier;
-      
-      // 1/4 note delay time in seconds
-      const quarterNoteTime = 60 / adjustedBPM;
-      
-      // Set delay time and level
       const wetLevel = level / 100;
-      nodes.delayNode.delayTime.setTargetAtTime(quarterNoteTime, this.context.currentTime, 0.01);
-      nodes.delayGain.gain.setTargetAtTime(wetLevel * 0.5, this.context.currentTime, 0.01);
+      const time = delayTime || 0.25;
       
-      console.log(`[${deckId}] Delay: ${level}%, Time: ${quarterNoteTime.toFixed(3)}s (BPM: ${adjustedBPM.toFixed(1)})`);
+      // Set delay time and wet level
+      nodes.delayNode.delayTime.setTargetAtTime(time, this.context.currentTime, 0.01);
+      nodes.delayGain.gain.setTargetAtTime(wetLevel * 0.8, this.context.currentTime, 0.01);
+      
+      // Adjust dry/wet balance
+      if (nodes.dryGain && nodes.wetGain) {
+        const dryLevel = Math.sqrt(1 - wetLevel * wetLevel);
+        nodes.dryGain.gain.setTargetAtTime(dryLevel, this.context.currentTime, 0.01);
+        nodes.wetGain.gain.setTargetAtTime(wetLevel * 0.3, this.context.currentTime, 0.01);
+      }
+      
+      console.log(`[${deckId}] Delay: ${level}%, Time: ${time.toFixed(3)}s`);
     }
   }
 
-  setEchoEffect(deckId: string, level: number): void {
+  setEchoEffect(deckId: string, level: number, echoTime?: number): void {
     const nodes = this.deckNodes.get(deckId);
     if (nodes && this.context) {
-      // Calculate BPM-based echo time (3/8 note = dotted quarter)
-      const deckState = this.getDeckBPM(deckId);
-      const bpm = deckState?.bpm || 120;
-      const tempoMultiplier = deckState?.tempo || 1;
-      const adjustedBPM = bpm * tempoMultiplier;
-      
-      // 3/8 note echo time in seconds (dotted quarter note)
-      const dottedQuarterTime = (60 / adjustedBPM) * 1.5;
-      
-      // Set echo time and level
       const wetLevel = level / 100;
-      nodes.echoNode.delayTime.setTargetAtTime(dottedQuarterTime, this.context.currentTime, 0.01);
-      nodes.echoGain.gain.setTargetAtTime(wetLevel * 0.4, this.context.currentTime, 0.01);
+      const time = echoTime || 0.375;
       
-      console.log(`[${deckId}] Echo: ${level}%, Time: ${dottedQuarterTime.toFixed(3)}s (BPM: ${adjustedBPM.toFixed(1)})`);
+      // Set echo time and wet level  
+      nodes.echoNode.delayTime.setTargetAtTime(time, this.context.currentTime, 0.01);
+      nodes.echoGain.gain.setTargetAtTime(wetLevel * 0.7, this.context.currentTime, 0.01);
+      
+      // Adjust feedback for echo character
+      if (nodes.echoFeedback) {
+        nodes.echoFeedback.gain.setTargetAtTime(0.45 * wetLevel, this.context.currentTime, 0.01);
+      }
+      
+      console.log(`[${deckId}] Echo: ${level}%, Time: ${time.toFixed(3)}s`);
     }
   }
 
@@ -352,9 +368,16 @@ export class AudioEngine {
     const nodes = this.deckNodes.get(deckId);
     if (nodes && this.context) {
       const wetLevel = level / 100;
-      const dryLevel = Math.sqrt(1 - wetLevel * wetLevel);
       
-      nodes.reverbGain.gain.setTargetAtTime(wetLevel * 0.6, this.context.currentTime, 0.01);
+      // Set reverb wet level
+      nodes.reverbGain.gain.setTargetAtTime(wetLevel * 0.5, this.context.currentTime, 0.01);
+      
+      // Adjust overall wet gain for reverb
+      if (nodes.wetGain) {
+        nodes.wetGain.gain.setTargetAtTime(wetLevel * 0.4, this.context.currentTime, 0.01);
+      }
+      
+      console.log(`[${deckId}] Reverb: ${level}%`);
     }
   }
 }
