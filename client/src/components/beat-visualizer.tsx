@@ -26,18 +26,9 @@ export function BeatVisualizer({
   const beatInterval = useRef<number | null>(null);
   const animationFrame = useRef<number | null>(null);
 
-  // Enhanced futuristic color palette with better contrast
+  // White color palette
   const colorPalette = [
-    '#00E5FF', // Electric Blue
-    '#FF1744', // Vibrant Red
-    '#00FF41', // Neon Green
-    '#3D5AFE', // Deep Blue
-    '#FF6D00', // Electric Orange
-    '#D500F9', // Electric Purple
-    '#76FF03', // Acid Green
-    '#E91E63', // Hot Pink
-    '#00B8D4', // Cyan Blue
-    '#FFAB00', // Amber
+    '#FFFFFF', // Pure White
   ];
 
   const beatDuration = 60000 / bpm;
@@ -51,7 +42,7 @@ export function BeatVisualizer({
       return;
     }
 
-    // Beat-synchronized wave animation with real-time audio analysis
+    // Beat-locked wave animation with audio analysis
     const animate = () => {
       if (analyser) {
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -66,8 +57,11 @@ export function BeatVisualizer({
         setAudioLevel(overall);
       }
 
-      const beatProgress = ((Date.now() - lastBeatTime.current) % beatDuration) / beatDuration;
-      setWavePhase(beatProgress * Math.PI * 2);
+      // Discrete beat-based wave phase (only changes on beat)
+      const timeSinceLastBeat = Date.now() - lastBeatTime.current;
+      const beatNumber = Math.floor(timeSinceLastBeat / beatDuration);
+      setWavePhase(beatNumber * Math.PI * 0.5); // Smaller phase jumps per beat
+      
       animationFrame.current = requestAnimationFrame(animate);
     };
     
@@ -118,9 +112,7 @@ export function BeatVisualizer({
   const pulseIntensity = Math.max(beatPulse, audioLevel);
   const opacity = 0.2 + (pulseIntensity * 0.6);
   
-  const dynamicColor = colorPalette[colorCycle];
-  const audioColorShift = Math.floor(audioLevel * 3) % colorPalette.length;
-  const finalColor = audioLevel > 0.3 ? colorPalette[audioColorShift] : dynamicColor;
+  const finalColor = '#FFFFFF';
 
   // Audio-reactive wave parameters
   const baseAmplitude = 20 + (audioLevel * 80); // Wave size responds to audio fluctuations
@@ -152,13 +144,13 @@ export function BeatVisualizer({
       const x = startX + (waveWidth / steps) * i;
       const normalizedX = (x - startX) / waveWidth;
       
-      // Audio-reactive wave components with dynamic sizing
-      const audioIntensity = audioLevel * 2; // Amplify audio response
-      const beatWave = Math.sin((normalizedX * Math.PI * 2) + (wavePhase * direction) + phaseShift) * (waveAmplitude * (0.5 + audioIntensity));
-      const subBeat = Math.sin((normalizedX * Math.PI * 4) + (wavePhase * direction * 2)) * (waveAmplitude * 0.3 * (0.3 + audioIntensity));
-      const beatOffset = beatSyncedOffset * Math.sin(normalizedX * Math.PI) * (0.4 + audioIntensity);
-      const audioReactive = Math.sin(normalizedX * Math.PI * 6 + wavePhase * 3) * (audioLevel * 80);
-      const dynamicVariation = Math.cos(normalizedX * Math.PI * 8 + wavePhase * 1.5) * (audioLevel * 30);
+      // Beat-locked wave components with audio sizing
+      const audioIntensity = audioLevel * 1.5; // Audio affects size, not movement
+      const beatWave = Math.sin((normalizedX * Math.PI * 2) + wavePhase + phaseShift) * (waveAmplitude * (0.6 + audioIntensity));
+      const subBeat = Math.sin((normalizedX * Math.PI * 4) + wavePhase) * (waveAmplitude * 0.2 * (0.5 + audioIntensity));
+      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase) * (20 + audioLevel * 40);
+      const audioReactive = Math.sin(normalizedX * Math.PI * 3) * (audioLevel * 50); // Static pattern, audio-sized
+      const dynamicVariation = Math.cos(normalizedX * Math.PI * 6) * (audioLevel * 20); // Static pattern, audio-sized
       
       const waveY = baseY + beatWave + subBeat + beatOffset + audioReactive + dynamicVariation;
       points.push(`${Math.round(x)},${Math.round(waveY)}`);
@@ -210,7 +202,7 @@ export function BeatVisualizer({
         {audioLevel > 0.5 && (
           <path
             d={createBeatWavePath(layerY, i, direction)}
-            stroke={colorPalette[(colorCycle + 1) % colorPalette.length]}
+            stroke="#FFFFFF"
             strokeWidth={2 + audioLevel * 3}
             fill="none"
             opacity={strokeOpacity * audioLevel * 0.4}
