@@ -88,7 +88,7 @@ export function useWaveform(
     const bands = frequencyBandsRef.current;
     if (!bands.bass || !bands.mid || !bands.high) return;
 
-    // Calculate zoom window around current position (like CDJ zoomed view)
+    // Calculate zoom window around current position (like N4G zoomed view)
     const zoomSeconds = 30; // Show 30 seconds of waveform
     const startTime = Math.max(0, currentTime - zoomSeconds / 2);
     const endTime = Math.min(duration, currentTime + zoomSeconds / 2);
@@ -118,17 +118,17 @@ export function useWaveform(
         }
       }
 
-      // Draw bass (orange like CDJ-3000) - full amplitude
+      // Draw bass (orange like N4G-1000) - full amplitude
       if (bassMax > 0.01) {
-        ctx.fillStyle = '#ff9500'; // CDJ orange
+        ctx.fillStyle = '#ff9500'; // N4G orange
         const bassHeight = bassMax * amp * 1.1;
         ctx.fillRect(x, centerY, 1, bassHeight);
         ctx.fillRect(x, centerY - bassHeight, 1, bassHeight);
       }
 
-      // Draw mids (blue like CDJ-3000) - overlaid on bass
+      // Draw mids (blue like N4G-1000) - overlaid on bass
       if (midMax > 0.01) {
-        ctx.fillStyle = '#0099ff'; // CDJ blue
+        ctx.fillStyle = '#0099ff'; // N4G blue
         const midHeight = midMax * amp * 0.9;
         ctx.fillRect(x, centerY, 1, midHeight);
         ctx.fillRect(x, centerY - midHeight, 1, midHeight);
@@ -136,14 +136,14 @@ export function useWaveform(
 
       // Draw highs (white/light blue) - top layer
       if (highMax > 0.01) {
-        ctx.fillStyle = '#ffffff'; // White like CDJ highs
+        ctx.fillStyle = '#ffffff'; // White like N4G highs
         const highHeight = highMax * amp * 0.7;
         ctx.fillRect(x, centerY, 1, highHeight);
         ctx.fillRect(x, centerY - highHeight, 1, highHeight);
       }
     }
 
-    // Draw beat grid exactly like CDJ-3000
+    // Draw beat grid exactly like N4G-1000
     if (track.bpm > 0 && duration > 0) {
       const beatDuration = 60 / track.bpm;
       const firstBeat = Math.floor(startTime / beatDuration) * beatDuration;
@@ -153,7 +153,7 @@ export function useWaveform(
           const x = ((beatTime - startTime) / (endTime - startTime)) * width;
           const beatNumber = Math.round(beatTime / beatDuration);
           
-          // Draw different beat markers like CDJ-3000
+          // Draw different beat markers like N4G-1000
           if (beatNumber % 16 === 0) {
             // 16-beat marker (phrase) - thick white line
             ctx.strokeStyle = '#ffffff';
@@ -182,7 +182,7 @@ export function useWaveform(
       ctx.globalAlpha = 1.0;
     }
 
-    // Draw CDJ-3000 style playhead with triangle needle
+    // Draw N4G-1000 style playhead with triangle needle
     const playheadX = width / 2;
     
     // Main playhead line
@@ -196,7 +196,7 @@ export function useWaveform(
     ctx.lineTo(playheadX, height);
     ctx.stroke();
     
-    // Draw triangle needle at top (like CDJ-3000)
+    // Draw triangle needle at top (like N4G-1000)
     ctx.fillStyle = '#ff3366';
     ctx.shadowBlur = 4;
     ctx.beginPath();
@@ -209,7 +209,7 @@ export function useWaveform(
     // Reset shadow
     ctx.shadowBlur = 0;
 
-    // Draw hot cue points with colored markers (like CDJ-3000)
+    // Draw hot cue points with colored markers (like N4G-1000)
     const cueColors = ['#ff0000', '#00ff00', '#0066ff', '#ffff00', '#ff8800', '#ff00ff', '#00ffff', '#ffffff'];
     for (let i = 1; i <= 8; i++) {
       const cueTime = duration * (i / 20); // Spread cues across track
@@ -228,7 +228,7 @@ export function useWaveform(
       }
     }
     
-    // Add time markers like CDJ-3000
+    // Add time markers like N4G-1000
     ctx.fillStyle = '#888888';
     ctx.font = '11px Arial';
     ctx.textAlign = 'center';

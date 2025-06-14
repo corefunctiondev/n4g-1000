@@ -1,8 +1,8 @@
-# CDJ Digital Turntable Interface
+# N4G-1000 Digital Turntable Interface
 
 ## Overview
 
-This is a full-stack web application that replicates the functionality of professional DJ equipment (CDJ-style digital turntables) in a browser environment. The application provides dual-deck mixing capabilities with real-time audio processing, waveform visualization, and professional DJ controls.
+This is a full-stack web application that replicates the functionality of professional DJ equipment (N4G-1000 style digital turntables) in a browser environment. The application provides dual-deck mixing capabilities with real-time audio processing, waveform visualization, and professional DJ controls.
 
 ## System Architecture
 
