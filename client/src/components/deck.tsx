@@ -356,7 +356,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           
           {/* Controls Row - Inside Black Screen */}
           <div className="flex justify-between items-center mt-2 text-xs">
-            <div className="flex flex-col gap-1">
+            <div className="flex gap-2">
               <button 
                 className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
                 onClick={handleSync}
