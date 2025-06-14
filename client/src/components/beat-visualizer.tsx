@@ -24,6 +24,8 @@ export function BeatVisualizer({
   const [beatDropIntensity, setBeatDropIntensity] = useState(0);
   const [lastAudioLevel, setLastAudioLevel] = useState(0);
   const [shapePhase, setShapePhase] = useState(0);
+  const [waveReveal, setWaveReveal] = useState(0);
+  const startTime = useRef<number | null>(null);
   
   const lastBeatTime = useRef(0);
   const beatInterval = useRef<number | null>(null);
@@ -45,8 +47,28 @@ export function BeatVisualizer({
       return;
     }
 
-    // Beat-locked wave animation with audio analysis
+    // Beat-locked wave animation with snake entrance effect
     const animate = () => {
+      const now = Date.now();
+      
+      // Initialize start time on first frame
+      if (!startTime.current) {
+        startTime.current = now;
+        setWaveReveal(0);
+      }
+      
+      // Snake entrance animation over 3 seconds
+      const entranceTime = now - startTime.current;
+      const entranceDuration = 3000; // 3 seconds
+      if (entranceTime < entranceDuration) {
+        const progress = entranceTime / entranceDuration;
+        // Smooth ease-in curve for snake entrance
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        setWaveReveal(easeProgress);
+      } else {
+        setWaveReveal(1);
+      }
+      
       if (analyser) {
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(dataArray);
@@ -89,6 +111,14 @@ export function BeatVisualizer({
       }
     };
   }, [isPlaying, analyser, beatDuration]);
+
+  // Reset entrance animation when playback stops
+  useEffect(() => {
+    if (!isPlaying) {
+      startTime.current = null;
+      setWaveReveal(0);
+    }
+  }, [isPlaying]);
 
   // Enhanced beat detection using audio analysis
   useEffect(() => {
@@ -169,9 +199,31 @@ export function BeatVisualizer({
     
     const waveWidth = endX - startX;
     
-    for (let i = 0; i <= steps; i++) {
-      const x = startX + (waveWidth / steps) * i;
-      const normalizedX = (x - startX) / waveWidth;
+    // Snake entrance effect: waves reveal progressively from the sides
+    const totalRevealSteps = Math.floor(steps * waveReveal);
+    
+    for (let i = 0; i <= totalRevealSteps; i++) {
+      let x, normalizedX;
+      
+      if (position === 'left') {
+        // Snake flows from left to right
+        x = startX + (waveWidth / steps) * i;
+        normalizedX = (x - startX) / waveWidth;
+      } else if (position === 'right') {
+        // Snake flows from right to left
+        const reverseI = totalRevealSteps - i;
+        x = startX + (waveWidth / steps) * reverseI;
+        normalizedX = (x - startX) / waveWidth;
+      } else {
+        // Center waves grow from both sides simultaneously
+        const centerStep = Math.floor(steps / 2);
+        if (i <= centerStep) {
+          x = startX + waveWidth / 2 - (waveWidth / 2 / centerStep) * (centerStep - i);
+        } else {
+          x = startX + waveWidth / 2 + (waveWidth / 2 / centerStep) * (i - centerStep);
+        }
+        normalizedX = (x - startX) / waveWidth;
+      }
       
       // Ultra-smooth wave components with minimal frequency variation
       const audioIntensity = audioLevel * 1.0;
