@@ -85,7 +85,7 @@ export function Mixer() {
     setIsDragging(`tempo-${deck}`);
     
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = (e.target as HTMLElement).closest('.pioneer-fader-track')?.getBoundingClientRect();
+      const rect = (e.target as HTMLElement).closest('.n4g-fader-track')?.getBoundingClientRect();
       if (!rect) return;
       
       const y = e.clientY - rect.top;
@@ -279,18 +279,18 @@ export function Mixer() {
 
   return (
     <div 
-      className="pioneer-mixer p-2 w-full h-full flex flex-col"
+      className="n4g-mixer p-2 w-full h-full flex flex-col"
     >
-      {/* Top Section - Pioneer Branding */}
+      {/* Top Section - N4G Branding */}
       <div className="text-center mb-2">
-        <div className="text-xs font-bold text-white mb-1">Pioneer DJ</div>
-        <div className="text-xs text-gray-300 font-mono">DJM-750MK2</div>
+        <div className="text-xs font-bold text-white mb-1">Groover</div>
+        <div className="text-xs text-gray-300 font-mono">N4G-800</div>
       </div>
 
       {/* Channel Strips - Compact Layout */}
       <div className="flex gap-1 mb-2 flex-1">
         {/* Channel A */}
-        <div className="pioneer-eq-section p-1 flex-1">
+        <div className="n4g-eq-section p-1 flex-1">
           <div className="text-center mb-1">
             <div className="text-xs font-bold text-blue-300">CH A</div>
           </div>
@@ -299,7 +299,7 @@ export function Mixer() {
           <div className="flex flex-col items-center gap-1 mb-1">
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
+                className={`n4g-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'high-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.high - 50) * 2.7}deg)` }}
@@ -309,7 +309,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
+                className={`n4g-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'mid-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.mid - 50) * 2.7}deg)` }}
@@ -319,7 +319,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
+                className={`n4g-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'low-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.low - 50) * 2.7}deg)` }}
@@ -332,11 +332,11 @@ export function Mixer() {
           {/* Channel Fader - Longer */}
           <div className="flex justify-center mb-1">
             <div 
-              className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+              className="n4g-fader-track h-16 w-4 relative cursor-pointer"
               onMouseDown={handleFaderMouseDown('volume', 'A')}
             >
               <div 
-                className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
+                className={`n4g-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
                   isDragging === 'volume-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ 
@@ -398,7 +398,7 @@ export function Mixer() {
               onMouseDown={handleFaderMouseDown('volume', 'B')}
             >
               <div 
-                className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
+                className={`n4g-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
                   isDragging === 'volume-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ 
@@ -414,7 +414,7 @@ export function Mixer() {
 
       {/* Center Tempo Controls */}
       <div className="flex justify-center mt-4">
-        <div className="pioneer-eq-section p-2">
+        <div className="n4g-eq-section p-2">
           <div className="text-center mb-2">
             <div className="text-xs font-bold text-white">TEMPO</div>
           </div>
@@ -424,11 +424,11 @@ export function Mixer() {
               <div className="text-xs text-blue-300 mb-1">DECK A</div>
               <div className="text-xs text-blue-300 mb-2">{tempoA >= 0 ? '+' : ''}{tempoA.toFixed(1)}%</div>
               <div 
-                className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+                className="n4g-fader-track h-16 w-4 relative cursor-pointer"
                 onMouseDown={handleTempoMouseDown('A')}
               >
                 <div 
-                  className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
+                  className={`n4g-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
                     isDragging === 'tempo-A' ? 'bg-blue-400' : ''
                   }`}
                   style={{ 
@@ -438,13 +438,13 @@ export function Mixer() {
               </div>
               <div className="grid grid-cols-2 gap-1 mt-2">
                 <button 
-                  className="pioneer-button py-1 px-1 text-xs hover:bg-blue-500"
+                  className="n4g-button py-1 px-1 text-xs hover:bg-blue-500"
                   onClick={cycleTempoRangeA}
                 >
                   ±{tempoRangeA}%
                 </button>
                 <button 
-                  className="pioneer-button py-1 px-1 text-xs hover:bg-blue-500"
+                  className="n4g-button py-1 px-1 text-xs hover:bg-blue-500"
                   onClick={resetTempoA}
                 >
                   RST
@@ -457,11 +457,11 @@ export function Mixer() {
               <div className="text-xs text-orange-400 mb-1">DECK B</div>
               <div className="text-xs text-orange-400 mb-2">{tempoB >= 0 ? '+' : ''}{tempoB.toFixed(1)}%</div>
               <div 
-                className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+                className="n4g-fader-track h-16 w-4 relative cursor-pointer"
                 onMouseDown={handleTempoMouseDown('B')}
               >
                 <div 
-                  className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
+                  className={`n4g-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
                     isDragging === 'tempo-B' ? 'bg-orange-400' : ''
                   }`}
                   style={{ 
@@ -471,13 +471,13 @@ export function Mixer() {
               </div>
               <div className="grid grid-cols-2 gap-1 mt-2">
                 <button 
-                  className="pioneer-button py-1 px-1 text-xs hover:bg-orange-500"
+                  className="n4g-button py-1 px-1 text-xs hover:bg-orange-500"
                   onClick={cycleTempoRangeB}
                 >
                   ±{tempoRangeB}%
                 </button>
                 <button 
-                  className="pioneer-button py-1 px-1 text-xs hover:bg-orange-500"
+                  className="n4g-button py-1 px-1 text-xs hover:bg-orange-500"
                   onClick={resetTempoB}
                 >
                   RST

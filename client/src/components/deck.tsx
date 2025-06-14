@@ -252,7 +252,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       className="n4g-deck p-2 flex-1 h-full flex flex-col"
       style={{ position: 'relative', zIndex: 1 }}
     >
-      {/* Track Selection Dropdown - Top of CDJ */}
+      {/* Track Selection Dropdown - Top of N4G */}
       <div className="mb-3" style={{ zIndex: 10, position: 'relative' }}>
         <div className="text-xs text-blue-300 mb-2 text-center">TRACK SELECTION</div>
         <Select value={selectedTrackId} onValueChange={handleTrackSelect} disabled={isLoadingTrack}>
@@ -286,9 +286,9 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       </div>
 
       {/* Black LCD Screen Area - Only Waveform and Digital Info */}
-      <div className="pioneer-screen p-3 mb-3 overflow-hidden" style={{ height: '240px' }}>
+      <div className="n4g-screen p-3 mb-3 overflow-hidden" style={{ height: '240px' }}>
         <div className="flex justify-between items-start mb-2">
-          <div className="text-xs text-blue-300 font-mono">CDJ-3000</div>
+          <div className="text-xs text-blue-300 font-mono">N4G-1000</div>
           <div className="text-xs text-blue-300 font-mono">
             {deck.isReady ? 'READY' : 'LOADING'}
           </div>
