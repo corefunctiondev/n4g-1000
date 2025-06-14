@@ -476,15 +476,7 @@ function HomeSection() {
         </a>
       </div>
       
-      <div className="space-y-4">
-        <div className="text-cyan-400">NEED FOR GROOVE INFO:</div>
-        <div className="pl-4 space-y-1 text-sm">
-          <div>Location: <DynamicText contentKey="location" fallback="New York, NY" /></div>
-          <div>Origin: <DynamicText contentKey="origin" fallback="Kosovo" /></div>
-          <div>Genres: <DynamicText contentKey="genres" fallback="House, Techno, Minimal" /></div>
-          <div>Experience: <DynamicText contentKey="experience" fallback="Almost a decade producing and playing" /></div>
-        </div>
-      </div>
+
       
       <div className="border border-cyan-400 p-4 rounded">
         <div className="text-orange-400 mb-2">UPCOMING:</div>
