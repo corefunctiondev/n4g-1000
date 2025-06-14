@@ -310,18 +310,18 @@ export default function CDJInterface() {
           
         {/* External Crossfader Section - Below Container */}
         <div className="flex justify-center mt-4">
-          <div className="pioneer-eq-section p-4 rounded-lg">
+          <div className="n4g-eq-section p-4 rounded-lg">
             <div className="text-center mb-2">
-              <div className="text-sm font-bold text-white">DJM-750MK2</div>
+              <div className="text-sm font-bold text-white">N4G-800</div>
               <div className="text-xs text-gray-300">CROSSFADER</div>
             </div>
             <div className="flex justify-center">
               <div 
-                className="pioneer-fader-track w-48 h-6 relative cursor-pointer"
+                className="n4g-fader-track w-48 h-6 relative cursor-pointer border border-gray-400 rounded"
                 onMouseDown={handleCrossfaderMouseDown}
               >
                 <div 
-                  className={`pioneer-fader-handle w-5 h-10 absolute -top-2 transition-colors ${
+                  className={`n4g-fader-handle w-5 h-10 absolute -top-2 transition-colors border border-gray-500 rounded ${
                     isDraggingCrossfader ? 'bg-purple-400' : 'bg-gray-300'
                   }`}
                   style={{ left: `${(crossfaderValue / 100) * (192 - 20)}px` }}
@@ -338,7 +338,7 @@ export default function CDJInterface() {
         {/* Connection Cables Visual */}
         <div className="mt-8 flex justify-center">
           <div className="text-xs text-gray-500 font-mono">
-            CDJ-A ═══════════ DJM-750MK2 ═══════════ CDJ-B
+            N4G-A ═══════════ N4G-800 ═══════════ N4G-B
           </div>
         </div>
 
