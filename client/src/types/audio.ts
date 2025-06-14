@@ -60,11 +60,4 @@ export interface AudioNodeSetup {
     low: BiquadFilterNode;
   };
   analyser: AnalyserNode;
-  effects?: {
-    setReverbWet: (wet: number) => void;
-    setDelayWet: (wet: number) => void;
-    setDelayTime: (time: number) => void;
-    setDelayFeedback: (feedback: number) => void;
-    setFilterFrequency: (frequency: number) => void;
-  };
 }

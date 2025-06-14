@@ -24,9 +24,9 @@ export function Knob({
   const startValueRef = useRef<number>(value);
 
   const sizeClasses = {
-    sm: 'w-12 h-12',
-    md: 'w-16 h-16',
-    lg: 'w-20 h-20',
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
   };
 
   const normalizedValue = (value - min) / (max - min);

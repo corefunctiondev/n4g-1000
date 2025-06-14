@@ -451,69 +451,12 @@ export function useAudio(deckId: 'A' | 'B') {
     // Clamp tempo adjustment to reasonable range (-50% to +50%)
     const clampedTempo = Math.max(-50, Math.min(50, tempoAdjustment));
     
-    // Apply the tempo adjustment immediately and smoothly
+    // Apply the tempo adjustment
     setTempo(clampedTempo);
-    
-    // If currently playing, apply tempo change to the audio source immediately
-    if (sourceRef.current && deck.isPlaying) {
-      const playbackRate = 1 + (clampedTempo / 100);
-      sourceRef.current.playbackRate.setValueAtTime(playbackRate, audioEngine.getCurrentTime());
-    }
-    
-    // Calculate phase alignment for perfect beatmatching
-    if (targetDeck.isPlaying && deck.isPlaying) {
-      const targetBeatDuration = 60 / targetCurrentBPM;
-      const currentBeatDuration = 60 / (currentOriginalBPM * (1 + (clampedTempo / 100)));
-      
-      // Get the target deck's position within its current beat
-      const targetBeatPosition = (targetDeck.currentTime % targetBeatDuration) / targetBeatDuration;
-      
-      // Calculate where this deck should be to match the beat phase
-      const desiredTime = Math.floor(deck.currentTime / currentBeatDuration) * currentBeatDuration + 
-                         (targetBeatPosition * currentBeatDuration);
-      
-      // Apply the phase correction if it's a small adjustment (< 0.5 seconds)
-      const phaseOffset = desiredTime - deck.currentTime;
-      if (Math.abs(phaseOffset) < 0.5) {
-        seek(desiredTime);
-        console.log(`Applied phase correction: ${phaseOffset.toFixed(3)}s`);
-      }
-    }
     
     console.log(`Deck ${deckId} synced: ${currentOriginalBPM.toFixed(1)} BPM -> ${targetCurrentBPM.toFixed(1)} BPM (${clampedTempo.toFixed(1)}% tempo)`);
     console.log(`Target deck tempo: ${targetDeck.tempo.toFixed(1)}%, This deck new tempo: ${clampedTempo.toFixed(1)}%`);
-  }, [deckId, deck.track, deck.isPlaying, deck.currentTime, setTempo, seek]);
-
-  // Effects controls
-  const setReverbLevel = useCallback((level: number) => {
-    if (audioNodes.current?.effects) {
-      audioNodes.current.effects.setReverbWet(level / 100);
-    }
-  }, []);
-
-  const setDelayLevel = useCallback((level: number) => {
-    if (audioNodes.current?.effects) {
-      audioNodes.current.effects.setDelayWet(level / 100);
-    }
-  }, []);
-
-  const setDelayTime = useCallback((time: number) => {
-    if (audioNodes.current?.effects) {
-      audioNodes.current.effects.setDelayTime(time);
-    }
-  }, []);
-
-  const setDelayFeedback = useCallback((feedback: number) => {
-    if (audioNodes.current?.effects) {
-      audioNodes.current.effects.setDelayFeedback(feedback);
-    }
-  }, []);
-
-  const setFilterFrequency = useCallback((frequency: number) => {
-    if (audioNodes.current?.effects) {
-      audioNodes.current.effects.setFilterFrequency(frequency);
-    }
-  }, []);
+  }, [deckId, deck.track, setTempo]);
 
   return {
     deck,
@@ -533,11 +476,5 @@ export function useAudio(deckId: 'A' | 'B') {
     beatJump,
     sync,
     getAnalyser: () => audioNodes.current?.analyser || null,
-    // Effects controls
-    setReverbLevel,
-    setDelayLevel,
-    setDelayTime,
-    setDelayFeedback,
-    setFilterFrequency,
   };
 }
