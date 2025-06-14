@@ -97,8 +97,8 @@ export function BeatVisualizer({
       const beatNumber = Math.floor(timeSinceLastBeat / beatDuration);
       setWavePhase(beatNumber * Math.PI * 0.5); // Beat-based jumps
       
-      // Ultra-smooth continuous shape evolution
-      setShapePhase(Date.now() * 0.0003); // Much slower, smoother morphing
+      // Ultra-smooth continuous shape evolution with more flexibility
+      setShapePhase(Date.now() * 0.0002); // Even slower for maximum smoothness
       
       animationFrame.current = requestAnimationFrame(animate);
     };
@@ -173,11 +173,11 @@ export function BeatVisualizer({
   const beatDropColor = beatDropIntensity > 0.7 ? '#000000' : beatDropIntensity > 0.3 ? '#0066FF' : '#FFFFFF';
   const finalColor = beatDropColor;
 
-  // Audio-reactive wave parameters
-  const baseAmplitude = 20 + (audioLevel * 80); // Wave size responds to audio fluctuations
-  const waveAmplitude = baseAmplitude + (pulseIntensity * 40);
-  const beatSyncedOffset = Math.sin(wavePhase) * (50 + audioLevel * 100);
-  const secondaryOffset = Math.sin(wavePhase * 2) * (30 + audioLevel * 60);
+  // Smooth and flexible wave parameters with limited extension
+  const baseAmplitude = 15 + (audioLevel * 35); // Reduced maximum size
+  const waveAmplitude = baseAmplitude + (pulseIntensity * 20); // Gentler pulse effect
+  const beatSyncedOffset = Math.sin(wavePhase) * (20 + audioLevel * 30); // Limited offset
+  const secondaryOffset = Math.sin(wavePhase * 2) * (12 + audioLevel * 18); // Smaller secondary
 
   // Create beat-matched wave path
   const createBeatWavePath = (baseY: number, waveIndex: number, direction: number) => {
@@ -225,28 +225,31 @@ export function BeatVisualizer({
         normalizedX = (x - startX) / waveWidth;
       }
       
-      // Ultra-smooth wave components with minimal frequency variation
-      const audioIntensity = audioLevel * 1.0;
-      const beatBounce = beatPulse * 0.15; // Very gentle beat bounces
+      // Flexible and smooth wave components with limited extension
+      const audioIntensity = audioLevel * 0.8; // Reduced audio impact
+      const beatBounce = beatPulse * 0.1; // Very subtle beat bounces
       
-      // Extremely smooth easing with minimal variation
-      const smoothEase1 = (Math.sin(shapePhase * 0.1) + 1) * 0.5; // Very slow 0-1 ease
-      const smoothEase2 = (Math.cos(shapePhase * 0.08) + 1) * 0.5; // Even slower 0-1 ease
-      const smoothEase3 = (Math.sin(shapePhase * 0.06) + 1) * 0.5; // Slowest 0-1 ease
+      // Ultra-smooth flexible easing functions
+      const flexEase1 = (Math.sin(shapePhase * 0.07) + 1) * 0.5; // Slow flexible movement
+      const flexEase2 = (Math.cos(shapePhase * 0.05) + 1) * 0.5; // Even more flexible
+      const flexEase3 = (Math.sin(shapePhase * 0.04) + 1) * 0.5; // Maximum flexibility
       
-      // Main wave with fixed frequency and gentle morphing
-      const beatWave = Math.sin((normalizedX * Math.PI * 2) + wavePhase + phaseShift) * (waveAmplitude * (0.6 + audioIntensity + beatBounce));
+      // Main wave with smooth flexibility and controlled size
+      const mainWaveFreq = 2 + flexEase1 * 0.2; // Subtle frequency variation
+      const beatWave = Math.sin((normalizedX * Math.PI * mainWaveFreq) + wavePhase + phaseShift) * (waveAmplitude * (0.5 + audioIntensity + beatBounce));
       
-      // Secondary waves with minimal frequency changes
-      const morphingWave1 = Math.sin((normalizedX * Math.PI * 3) + shapePhase * 0.2) * (waveAmplitude * 0.1 * (0.3 + audioIntensity) * smoothEase1);
-      const morphingWave2 = Math.cos((normalizedX * Math.PI * 1.5) + shapePhase * 0.15) * (waveAmplitude * 0.08 * (0.25 + audioIntensity) * smoothEase2);
+      // Flexible secondary waves with organic movement
+      const morphFreq1 = 2.8 + flexEase2 * 0.3; // Gentle frequency shift
+      const morphFreq2 = 1.2 + flexEase3 * 0.25; // Smooth variation
+      const morphingWave1 = Math.sin((normalizedX * Math.PI * morphFreq1) + shapePhase * 0.1) * (waveAmplitude * 0.08 * (0.2 + audioIntensity) * flexEase1);
+      const morphingWave2 = Math.cos((normalizedX * Math.PI * morphFreq2) + shapePhase * 0.08) * (waveAmplitude * 0.06 * (0.15 + audioIntensity) * flexEase2);
       
-      // Very gentle beat-responsive elements
-      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase) * (8 + audioLevel * 12 + beatPulse * 10);
-      const audioReactive = Math.sin(normalizedX * Math.PI * 2.5 + shapePhase * 0.1) * (audioLevel * 15) * smoothEase3;
+      // Gentle beat-responsive elements with flexibility
+      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase) * (6 + audioLevel * 8 + beatPulse * 6) * flexEase3;
+      const audioReactive = Math.sin(normalizedX * Math.PI * (2.2 + flexEase1 * 0.1) + shapePhase * 0.06) * (audioLevel * 10) * flexEase2;
       
-      // Minimal shape variation for ultra-smooth flow
-      const shapeVariation = Math.sin(normalizedX * Math.PI * 4 + shapePhase * 0.05) * (4 + audioLevel * 6) * smoothEase1;
+      // Smooth shape variation with controlled amplitude
+      const shapeVariation = Math.sin(normalizedX * Math.PI * (3.5 + flexEase2 * 0.2) + shapePhase * 0.03) * (3 + audioLevel * 4) * flexEase3;
       
       const waveY = baseY + beatWave + morphingWave1 + morphingWave2 + beatOffset + audioReactive + shapeVariation;
       points.push(`${Math.round(x)},${Math.round(waveY)}`);
