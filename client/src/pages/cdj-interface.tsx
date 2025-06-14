@@ -7,6 +7,7 @@ import { audioEngine } from '@/lib/audio-engine';
 import { Menu, X, Folder, FolderOpen, File, Settings, LogOut } from 'lucide-react';
 import { useAudioFeedback } from '@/hooks/use-audio-feedback';
 import { DJLaunchSequence } from '@/components/dj-launch-sequence';
+import { GlobalBeatVisualizer } from '@/components/beat-visualizer';
 
 export default function CDJInterface() {
   const [location, navigate] = useLocation();
@@ -24,8 +25,16 @@ export default function CDJInterface() {
   const [hasPlayedInitSound, setHasPlayedInitSound] = useState(false);
   const [showLaunchSequence, setShowLaunchSequence] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Beat visualizer states
+  const [deckAPlaying, setDeckAPlaying] = useState(false);
+  const [deckBPlaying, setDeckBPlaying] = useState(false);
+  const [deckABpm, setDeckABpm] = useState<number>();
+  const [deckBBpm, setDeckBBpm] = useState<number>();
+  const [deckAAnalyser, setDeckAAnalyser] = useState<AnalyserNode | null>(null);
+  const [deckBAnalyser, setDeckBAnalyser] = useState<AnalyserNode | null>(null);
 
-  // Track playback order for smart sync
+  // Track playback order for smart sync and beat visualization
   const handleDeckPlaybackChange = useCallback((deckId: 'A' | 'B', isPlaying: boolean) => {
     setPlaybackOrder(prev => {
       if (isPlaying) {
@@ -36,6 +45,26 @@ export default function CDJInterface() {
         return prev.filter(id => id !== deckId);
       }
     });
+    
+    // Update beat visualizer states
+    if (deckId === 'A') {
+      setDeckAPlaying(isPlaying);
+    } else {
+      setDeckBPlaying(isPlaying);
+    }
+  }, []);
+  
+  // Enhanced state change handler to capture audio data for visualization
+  const handleDeckStateChange = useCallback((deckId: 'A' | 'B', state: any) => {
+    if (deckId === 'A') {
+      setDeckAState(state);
+      if (state?.track?.bpm) setDeckABpm(state.track.bpm);
+      if (state?.analyser) setDeckAAnalyser(state.analyser);
+    } else {
+      setDeckBState(state);
+      if (state?.track?.bpm) setDeckBBpm(state.track.bpm);
+      if (state?.analyser) setDeckBAnalyser(state.analyser);
+    }
   }, []);
 
   // Crossfader interaction
@@ -129,9 +158,19 @@ export default function CDJInterface() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-2 sm:p-4 lg:p-8 overflow-x-auto">
+    <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-2 sm:p-4 lg:p-8 overflow-x-auto relative">
+      {/* Beat Visualizer Background */}
+      <GlobalBeatVisualizer
+        deckAPlaying={deckAPlaying}
+        deckBPlaying={deckBPlaying}
+        deckABpm={deckABpm}
+        deckBBpm={deckBBpm}
+        deckAAnalyser={deckAAnalyser}
+        deckBAnalyser={deckBAnalyser}
+      />
+      
       {/* Pioneer DJ Setup Layout */}
-      <div className="w-full max-w-[98vw] mx-auto">
+      <div className="w-full max-w-[98vw] mx-auto relative z-20">
         {/* Header */}
         <div className="mb-4 lg:mb-8 relative">
           <div className="flex justify-between items-center mb-4">
@@ -196,7 +235,7 @@ export default function CDJInterface() {
                   deckId="A" 
                   color="#00d4ff" 
                   otherDeckState={deckBState}
-                  onStateChange={setDeckAState}
+                  onStateChange={(state) => handleDeckStateChange('A', state)}
                   onPlaybackChange={handleDeckPlaybackChange}
                   playbackOrder={playbackOrder}
                 />
@@ -213,7 +252,7 @@ export default function CDJInterface() {
                   deckId="B" 
                   color="#ff6b00" 
                   otherDeckState={deckAState}
-                  onStateChange={setDeckBState}
+                  onStateChange={(state) => handleDeckStateChange('B', state)}
                   onPlaybackChange={handleDeckPlaybackChange}
                   playbackOrder={playbackOrder}
                 />
