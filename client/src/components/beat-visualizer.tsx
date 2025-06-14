@@ -23,6 +23,7 @@ export function BeatVisualizer({
   const [wavePhase, setWavePhase] = useState(0);
   const [beatDropIntensity, setBeatDropIntensity] = useState(0);
   const [lastAudioLevel, setLastAudioLevel] = useState(0);
+  const [shapePhase, setShapePhase] = useState(0);
   
   const lastBeatTime = useRef(0);
   const beatInterval = useRef<number | null>(null);
@@ -72,7 +73,10 @@ export function BeatVisualizer({
       // Discrete beat-based wave phase (only changes on beat)
       const timeSinceLastBeat = Date.now() - lastBeatTime.current;
       const beatNumber = Math.floor(timeSinceLastBeat / beatDuration);
-      setWavePhase(beatNumber * Math.PI * 0.5); // Smaller phase jumps per beat
+      setWavePhase(beatNumber * Math.PI * 0.5); // Beat-based jumps
+      
+      // Slow continuous shape evolution (independent of beats)
+      setShapePhase(Date.now() * 0.0005); // Very slow shape morphing
       
       animationFrame.current = requestAnimationFrame(animate);
     };
@@ -86,38 +90,49 @@ export function BeatVisualizer({
     };
   }, [isPlaying, analyser, beatDuration]);
 
-  // Precise beat timing
+  // Enhanced beat detection using audio analysis
   useEffect(() => {
-    if (isPlaying && bpm) {
-      const startBeat = () => {
-        const now = Date.now();
-        if (now - lastBeatTime.current >= beatDuration) {
-          setBeatPulse(1);
-          setColorCycle(prev => (prev + 1) % colorPalette.length);
-          lastBeatTime.current = now;
-          
-          // Quick beat pulse
-          setTimeout(() => setBeatPulse(0.7), 50);
-          setTimeout(() => setBeatPulse(0.4), 100);
-          setTimeout(() => setBeatPulse(0), 150);
-        }
-      };
+    if (!isPlaying || !analyser) return;
 
-      beatInterval.current = window.setInterval(startBeat, beatDuration / 16); // High precision
+    let lastBeatDetected = 0;
+    let energyHistory: number[] = [];
+    const minBeatInterval = 60000 / (bpm || 120) * 0.7; // Allow some timing flexibility
+    
+    const detectBeats = () => {
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(dataArray);
       
-      return () => {
-        if (beatInterval.current) {
-          clearInterval(beatInterval.current);
-        }
-      };
-    } else {
-      setBeatPulse(0);
-      if (beatInterval.current) {
-        clearInterval(beatInterval.current);
-        beatInterval.current = null;
+      // Focus on low frequencies for beat detection (kick drums, bass)
+      const lowFreqs = dataArray.slice(0, 60);
+      const lowFreqEnergy = lowFreqs.reduce((sum, val) => sum + val, 0) / lowFreqs.length;
+      
+      // Keep energy history for comparison
+      energyHistory.push(lowFreqEnergy);
+      if (energyHistory.length > 8) energyHistory.shift();
+      
+      const avgEnergy = energyHistory.reduce((sum, val) => sum + val, 0) / energyHistory.length;
+      const energySpike = lowFreqEnergy > avgEnergy * 1.4 && lowFreqEnergy > 100;
+      
+      // Beat detection with timing constraints
+      const now = Date.now();
+      if (energySpike && (now - lastBeatDetected) > minBeatInterval) {
+        lastBeatDetected = now;
+        lastBeatTime.current = now;
+        setBeatPulse(1.0);
+        
+        // Quick beat bounce
+        setTimeout(() => setBeatPulse(0.6), 100);
+        setTimeout(() => setBeatPulse(0.2), 200);
+        setTimeout(() => setBeatPulse(0), 300);
       }
-    }
-  }, [isPlaying, bpm, beatDuration]);
+      
+      if (isPlaying) {
+        requestAnimationFrame(detectBeats);
+      }
+    };
+    
+    detectBeats();
+  }, [isPlaying, analyser, bpm]);
 
   if (!isPlaying) return null;
 
@@ -158,15 +173,25 @@ export function BeatVisualizer({
       const x = startX + (waveWidth / steps) * i;
       const normalizedX = (x - startX) / waveWidth;
       
-      // Beat-locked wave components with audio sizing
-      const audioIntensity = audioLevel * 1.5; // Audio affects size, not movement
-      const beatWave = Math.sin((normalizedX * Math.PI * 2) + wavePhase + phaseShift) * (waveAmplitude * (0.6 + audioIntensity));
-      const subBeat = Math.sin((normalizedX * Math.PI * 4) + wavePhase) * (waveAmplitude * 0.2 * (0.5 + audioIntensity));
-      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase) * (20 + audioLevel * 40);
-      const audioReactive = Math.sin(normalizedX * Math.PI * 3) * (audioLevel * 50); // Static pattern, audio-sized
-      const dynamicVariation = Math.cos(normalizedX * Math.PI * 6) * (audioLevel * 20); // Static pattern, audio-sized
+      // Beat-locked wave components with slow shape morphing
+      const audioIntensity = audioLevel * 1.5;
+      const beatBounce = beatPulse * 0.3; // Only bounces on detected beats
       
-      const waveY = baseY + beatWave + subBeat + beatOffset + audioReactive + dynamicVariation;
+      // Main wave with beat bounce and slow shape change
+      const beatWave = Math.sin((normalizedX * Math.PI * 2) + wavePhase + phaseShift) * (waveAmplitude * (0.6 + audioIntensity + beatBounce));
+      
+      // Slow morphing secondary waves
+      const morphingWave1 = Math.sin((normalizedX * Math.PI * 3) + shapePhase) * (waveAmplitude * 0.2 * (0.5 + audioIntensity));
+      const morphingWave2 = Math.cos((normalizedX * Math.PI * 5) + shapePhase * 1.3) * (waveAmplitude * 0.15 * (0.3 + audioIntensity));
+      
+      // Beat-responsive elements
+      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase) * (15 + audioLevel * 30 + beatPulse * 25);
+      const audioReactive = Math.sin(normalizedX * Math.PI * 4 + shapePhase * 0.7) * (audioLevel * 40);
+      
+      // Slow shape variation
+      const shapeVariation = Math.sin(normalizedX * Math.PI * 7 + shapePhase * 0.5) * (15 + audioLevel * 15);
+      
+      const waveY = baseY + beatWave + morphingWave1 + morphingWave2 + beatOffset + audioReactive + shapeVariation;
       points.push(`${Math.round(x)},${Math.round(waveY)}`);
     }
     
