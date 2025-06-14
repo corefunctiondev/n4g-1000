@@ -199,6 +199,7 @@ Changelog:
 - June 14, 2025. Completely restructured page components to display only authentic Supabase content without any fallback text or mock data
 - June 14, 2025. Updated email to n4gsounds@gmail.com and added animated building blocks for "Under Development..." sections with colorful floating animations and progress indicators
 - June 14, 2025. Added releases section content with TUTTO PASSA album information and N4G-1000 reference for playing songs
+- June 14, 2025. Updated home page hero content to "New York Based" with authentic description about Kosovo producers bringing their sound to New York
 
 ## User Preferences
 
