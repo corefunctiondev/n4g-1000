@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AudioFeedbackProvider } from "@/hooks/use-audio-feedback";
 import TerminalOS from "@/pages/terminal-os";
 import CDJInterface from "@/pages/cdj-interface";
 import AdminLogin from "@/pages/admin-login";
@@ -37,10 +38,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="dark">
-          <Toaster />
-          <Router />
-        </div>
+        <AudioFeedbackProvider>
+          <div className="dark">
+            <Toaster />
+            <Router />
+          </div>
+        </AudioFeedbackProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { X, Save, Edit3, Eye, Settings } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
+import { useAudioFeedback } from '@/hooks/use-audio-feedback';
 
 interface LiveEditorProps {
   isEditMode: boolean;
@@ -29,6 +30,7 @@ export function LiveEditor({ isEditMode, onToggleEditMode, onLogout }: LiveEdito
   const [editableElements, setEditableElements] = useState<EditableElement[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const audioFeedback = useAudioFeedback();
 
   // Find and mark all editable elements
   useEffect(() => {
@@ -72,6 +74,7 @@ export function LiveEditor({ isEditMode, onToggleEditMode, onLogout }: LiveEdito
         const handleClick = (e: Event) => {
           e.preventDefault();
           e.stopPropagation();
+          audioFeedback.playEdit();
           setSelectedElement(editableElement);
           setEditValue(editableElement.originalContent);
         };
@@ -142,6 +145,7 @@ export function LiveEditor({ isEditMode, onToggleEditMode, onLogout }: LiveEdito
       queryClient.invalidateQueries({ queryKey: ['/api/admin/content'] });
       queryClient.invalidateQueries({ queryKey: ['/api/content'] });
       
+      audioFeedback.playSuccess();
       toast({
         title: "Success",
         description: "Content updated successfully",
@@ -151,6 +155,7 @@ export function LiveEditor({ isEditMode, onToggleEditMode, onLogout }: LiveEdito
       setEditValue('');
     } catch (error) {
       console.error('Error updating content:', error);
+      audioFeedback.playError();
       toast({
         title: "Error",
         description: "Failed to update content",
