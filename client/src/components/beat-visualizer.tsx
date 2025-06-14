@@ -364,6 +364,157 @@ export function BeatVisualizer({
   );
 }
 
+// Circular wave visualizer for dual deck mixing
+interface CircularBeatVisualizerProps {
+  deckABpm?: number;
+  deckBBpm?: number;
+  deckAAnalyser?: AnalyserNode | null;
+  deckBAnalyser?: AnalyserNode | null;
+}
+
+function CircularBeatVisualizer({ 
+  deckABpm = 120, 
+  deckBBpm = 120, 
+  deckAAnalyser, 
+  deckBAnalyser 
+}: CircularBeatVisualizerProps) {
+  const [beatPulse, setBeatPulse] = useState(0);
+  const [audioLevelA, setAudioLevelA] = useState(0);
+  const [audioLevelB, setAudioLevelB] = useState(0);
+  const [rotation, setRotation] = useState(0);
+  const [ripplePhase, setRipplePhase] = useState(0);
+  const animationFrame = useRef<number | null>(null);
+
+  const avgBpm = (deckABpm + deckBBpm) / 2;
+  const beatInterval = 60000 / avgBpm;
+
+  useEffect(() => {
+    const animate = () => {
+      const now = Date.now();
+      
+      // Audio analysis for both decks
+      if (deckAAnalyser) {
+        const dataArrayA = new Uint8Array(deckAAnalyser.frequencyBinCount);
+        deckAAnalyser.getByteFrequencyData(dataArrayA);
+        const avgA = dataArrayA.reduce((sum, value) => sum + value, 0) / dataArrayA.length;
+        setAudioLevelA(avgA / 255);
+      }
+      
+      if (deckBAnalyser) {
+        const dataArrayB = new Uint8Array(deckBAnalyser.frequencyBinCount);
+        deckBAnalyser.getByteFrequencyData(dataArrayB);
+        const avgB = dataArrayB.reduce((sum, value) => sum + value, 0) / dataArrayB.length;
+        setAudioLevelB(avgB / 255);
+      }
+
+      // Beat detection and pulse
+      const beatPosition = (now % beatInterval) / beatInterval;
+      const beatStrength = Math.max(0, 1 - Math.abs(beatPosition - 0.5) * 4);
+      setBeatPulse(beatStrength);
+
+      // Continuous rotation
+      setRotation(prev => (prev + 0.5) % 360);
+      
+      // Ripple effects
+      setRipplePhase(prev => (prev + 0.02) % (Math.PI * 2));
+
+      animationFrame.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      if (animationFrame.current) {
+        cancelAnimationFrame(animationFrame.current);
+      }
+    };
+  }, [deckAAnalyser, deckBAnalyser, avgBpm, beatInterval]);
+
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  const baseRadius = Math.min(window.innerWidth, window.innerHeight) * 0.15;
+  const maxRadius = Math.min(window.innerWidth, window.innerHeight) * 0.4;
+
+  // Create multiple circular wave rings
+  const rings = Array.from({ length: 12 }, (_, i) => {
+    const ringProgress = i / 12;
+    const radius = baseRadius + (maxRadius - baseRadius) * ringProgress;
+    const audioResponse = (audioLevelA + audioLevelB) / 2;
+    const pulseRadius = radius + beatPulse * 50 + audioResponse * 30;
+    const opacity = (1 - ringProgress) * 0.8 * (0.3 + audioResponse + beatPulse * 0.5);
+
+    // Create wave distortion around the circle
+    const points = [];
+    const segments = 64;
+    
+    for (let j = 0; j <= segments; j++) {
+      const angle = (j / segments) * Math.PI * 2 + rotation * (Math.PI / 180) * (1 + ringProgress);
+      
+      // Multiple wave frequencies for complex patterns
+      const wave1 = Math.sin(angle * 3 + ripplePhase) * (10 + audioResponse * 20);
+      const wave2 = Math.cos(angle * 5 - ripplePhase * 1.5) * (8 + beatPulse * 15);
+      const wave3 = Math.sin(angle * 8 + ripplePhase * 2) * (5 + audioResponse * 10);
+      
+      const distortedRadius = pulseRadius + wave1 + wave2 + wave3;
+      const x = centerX + Math.cos(angle) * distortedRadius;
+      const y = centerY + Math.sin(angle) * distortedRadius;
+      
+      points.push(`${x},${y}`);
+    }
+
+    return (
+      <g key={i}>
+        <path
+          d={`M ${points.join(' L ')} Z`}
+          stroke="#FFFFFF"
+          strokeWidth={2 + beatPulse * 3 + audioResponse * 2}
+          fill="none"
+          opacity={opacity}
+          style={{
+            filter: `drop-shadow(0 0 ${15 + beatPulse * 25 + audioResponse * 20}px #FFFFFF)`,
+            transform: `scale(${1 + beatPulse * 0.1 + audioResponse * 0.05})`,
+            transformOrigin: 'center'
+          }}
+        />
+      </g>
+    );
+  });
+
+  // Central pulsing core
+  const coreRadius = 20 + beatPulse * 30 + (audioLevelA + audioLevelB) * 25;
+  const coreOpacity = 0.6 + beatPulse * 0.4 + (audioLevelA + audioLevelB) * 0.3;
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0">
+      <svg width="100%" height="100%" className="absolute inset-0">
+        <defs>
+          <radialGradient id="circularCoreGradient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity={coreOpacity} />
+            <stop offset="50%" stopColor="#00FFFF" stopOpacity={coreOpacity * 0.7} />
+            <stop offset="100%" stopColor="#FF0040" stopOpacity={0.1} />
+          </radialGradient>
+        </defs>
+        
+        {/* Circular wave rings */}
+        {rings}
+        
+        {/* Central pulsing core */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={coreRadius}
+          fill="url(#circularCoreGradient)"
+          style={{
+            filter: `drop-shadow(0 0 ${30 + beatPulse * 40}px #FFFFFF)`,
+            transform: `scale(${1 + beatPulse * 0.2})`,
+            transformOrigin: 'center'
+          }}
+        />
+      </svg>
+    </div>
+  );
+}
+
 // Global background visualizer
 interface GlobalBeatVisualizerProps {
   deckAPlaying: boolean;
@@ -405,32 +556,12 @@ export function GlobalBeatVisualizer({
         />
       )}
       {deckAPlaying && deckBPlaying && (
-        <>
-          <BeatVisualizer
-            isPlaying={deckAPlaying}
-            bpm={deckABpm}
-            analyser={deckAAnalyser}
-            color="#00FFFF"
-            intensity={0.6}
-            position="left"
-          />
-          <BeatVisualizer
-            isPlaying={deckBPlaying}
-            bpm={deckBBpm}
-            analyser={deckBAnalyser}
-            color="#FF0040"
-            intensity={0.6}
-            position="right"
-          />
-          <BeatVisualizer
-            isPlaying={true}
-            bpm={Math.max(deckABpm || 120, deckBBpm || 120)}
-            analyser={deckAAnalyser || deckBAnalyser}
-            color="#8000FF"
-            intensity={0.4}
-            position="center"
-          />
-        </>
+        <CircularBeatVisualizer
+          deckABpm={deckABpm}
+          deckBBpm={deckBBpm}
+          deckAAnalyser={deckAAnalyser}
+          deckBAnalyser={deckBAnalyser}
+        />
       )}
     </>
   );
