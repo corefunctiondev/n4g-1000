@@ -196,7 +196,11 @@ export default function CDJInterface() {
         <div className="mb-4 lg:mb-8 relative">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">N4G-1000 Interface</h1>
+              <img 
+                src="/attached_assets/13_1749865869309.png" 
+                alt="Need For Groove Logo" 
+                className="h-8 sm:h-10 lg:h-12"
+              />
             </div>
             <button
               onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
