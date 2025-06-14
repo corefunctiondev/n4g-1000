@@ -57,9 +57,9 @@ export function BeatVisualizer({
         setWaveReveal(0);
       }
       
-      // Snake entrance animation over 3 seconds
+      // Snake entrance animation over 6 seconds
       const entranceTime = now - startTime.current;
-      const entranceDuration = 3000; // 3 seconds
+      const entranceDuration = 6000; // 6 seconds for slower entrance
       if (entranceTime < entranceDuration) {
         const progress = entranceTime / entranceDuration;
         // Smooth ease-in curve for snake entrance

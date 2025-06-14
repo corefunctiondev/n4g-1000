@@ -173,7 +173,7 @@ Changelog:
 - June 14, 2025. Enhanced waves with real-time audio-reactive sizing - wave amplitude, effects, and colors respond to live audio fluctuations with frequency-separated analysis and improved color palette
 - June 14, 2025. Implemented beat drop detection with dynamic color changes - waves turn blue or black during intense musical moments, returning to white during normal playback
 - June 14, 2025. Enhanced beat detection using real-time audio analysis - waves now bounce precisely on detected beats while continuously morphing shape slowly
-- June 14, 2025. Added snake entrance animation - waves flow smoothly from sides when songs start, creating cinematic 3-second entrance effect
+- June 14, 2025. Added snake entrance animation - waves flow smoothly from sides when songs start, creating cinematic 6-second entrance effect with enhanced flexibility and controlled wave extension
 
 ## User Preferences
 
