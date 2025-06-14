@@ -139,6 +139,7 @@ Changelog:
 - June 14, 2025. Reorganized CDJ layout - moved all overflowing elements inside black screen boundaries and placed transport controls in gray CDJ area
 - June 14, 2025. Enhanced mixer controls - made knobs bigger (32x32px) and sliders longer (64px height) for improved usability and touch interaction
 - June 14, 2025. Expanded CDJ gray area to properly contain tempo slider and play/stop buttons outside black screen but within CDJ frame
+- June 14, 2025. Corrected CDJ layout structure - separated black LCD screen (waveform/digital info only) from gray CDJ body (physical controls), moved tempo controls to mixer center below volume knobs
 
 ## User Preferences
 

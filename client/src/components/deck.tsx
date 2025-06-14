@@ -285,173 +285,171 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         </Select>
       </div>
 
-      {/* Top Section - Screen and Info Display */}
-      <div className="mb-2 flex-1">
-        {/* Main LCD Screen */}
-        <div className="pioneer-screen p-3 mb-3 h-full flex flex-col">
-          <div className="flex justify-between items-start mb-2">
-            <div className="text-xs text-blue-300 font-mono">CDJ-3000</div>
-            <div className="text-xs text-blue-300 font-mono">
-              {deck.isReady ? 'READY' : 'LOADING'}
+      {/* Black LCD Screen Area - Only Waveform and Digital Info */}
+      <div className="pioneer-screen p-3 mb-3" style={{ height: '240px' }}>
+        <div className="flex justify-between items-start mb-2">
+          <div className="text-xs text-blue-300 font-mono">CDJ-3000</div>
+          <div className="text-xs text-blue-300 font-mono">
+            {deck.isReady ? 'READY' : 'LOADING'}
+          </div>
+        </div>
+        
+        {/* BPM and Bar Display */}
+        <div className="flex justify-between items-center mb-2">
+          <div className="text-orange-400 font-mono text-sm">
+            {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm / 4))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm / 4)) * 4) + 1}` : '0.1'} Bars
+          </div>
+          <div className="text-blue-300 font-mono text-sm">
+            {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm)) * 4) + 1}` : '0.1'} Bars
+          </div>
+        </div>
+        
+        {/* Waveform Display */}
+        <div className="pioneer-waveform mb-2 relative" style={{ height: '100px' }}>
+          <Waveform
+            track={deck.track}
+            currentTime={deck.currentTime}
+            width={480}
+            height={100}
+            color={color}
+            onSeek={seek}
+            className="w-full h-full cursor-pointer"
+            analyser={getAnalyser()}
+            isPlaying={deck.isPlaying}
+          />
+          
+          {/* Hot Cue Markers */}
+          <div className="absolute bottom-0 left-0 right-0 h-2 flex">
+            {[1, 2, 3, 4].map((cue) => (
+              <div 
+                key={cue}
+                className="w-1 h-2 bg-blue-400 mr-4"
+                style={{ left: `${cue * 20}%` }}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Track Info and Time Display */}
+        <div className="text-white">
+          <div className="flex justify-between items-start mb-1">
+            <div className="text-sm font-bold truncate flex-1 mr-2">
+              {deck.track?.name?.replace(/\.wav$/i, '') || 'No Track Loaded'}
+            </div>
+            <div className="text-xs text-gray-300">TRACK 01</div>
+          </div>
+          
+          <div className="flex justify-between items-center text-xs">
+            <div className="text-orange-400 font-mono">
+              {formatTime(deck.currentTime)}
+            </div>
+            <div className="pioneer-led text-center" style={{ color }}>
+              <div className="text-lg font-bold">
+                {deck.track ? formatBPM(deck.track.bpm) : '---.-'}
+              </div>
+              <div className="text-xs">BPM</div>
+            </div>
+            <div className="text-orange-400 font-mono">
+              -{deck.track ? formatTime(deck.track.duration - deck.currentTime) : '--:--'}
             </div>
           </div>
           
-          {/* BPM and Bar Display */}
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-orange-400 font-mono text-sm">
-              {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm / 4))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm / 4)) * 4) + 1}` : '0.1'} Bars
+          {/* Controls Row - Inside Black Screen */}
+          <div className="flex justify-between items-center mt-2 text-xs">
+            <div className="flex flex-col gap-1">
+              <button 
+                className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
+                onClick={handleSync}
+                type="button"
+              >
+                SYNC
+              </button>
+              <button 
+                className="pioneer-button py-1 px-2 text-xs text-red-400 hover:text-red-300"
+                onClick={() => {
+                  cutFX();
+                  audioFeedback?.playClick();
+                }}
+                type="button"
+              >
+                CUT FX
+              </button>
             </div>
-            <div className="text-blue-300 font-mono text-sm">
-              {deck.track ? `${Math.floor(deck.currentTime / (60 / deck.track.bpm))}.${Math.floor((deck.currentTime % (60 / deck.track.bpm)) * 4) + 1}` : '0.1'} Bars
+            
+            <div className="text-gray-300">
+              <span>A.HOT CUE</span>
+            </div>
+            
+            <div className="text-orange-400 font-mono">
+              {deck.track ? `${formatTempo(deck.tempo)}` : '+0.0%'}
+            </div>
+            
+            <div className="text-blue-300 font-mono">
+              02:34
             </div>
           </div>
-          
-          {/* Extended Waveform Display - Fill Available Space */}
-          <div className="pioneer-waveform mb-2 relative" style={{ height: '140px' }}>
-            <Waveform
-              track={deck.track}
-              currentTime={deck.currentTime}
-              width={580}
-              height={140}
-              color={color}
-              onSeek={seek}
-              className="w-full h-full cursor-pointer"
-              analyser={getAnalyser()}
-              isPlaying={deck.isPlaying}
+        </div>
+      </div>
+
+      {/* Gray CDJ Area - Effects and Transport Controls */}
+      <div className="p-3 bg-gray-700 rounded border border-gray-600">
+        {/* Effects Controls - Gray Area */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
+            <div className="text-purple-300 text-center mb-1 font-bold text-[10px]">REVERB</div>
+            <Knob
+              value={deck.effects.reverb}
+              min={0}
+              max={100}
+              onChange={setReverb}
+              size="sm"
+              className="mb-1"
             />
-            
-
-            
-            {/* Hot Cue Markers */}
-            <div className="absolute bottom-0 left-0 right-0 h-2 flex">
-              {[1, 2, 3, 4].map((cue) => (
-                <div 
-                  key={cue}
-                  className="w-1 h-2 bg-blue-400 mr-4"
-                  style={{ left: `${cue * 20}%` }}
-                />
-              ))}
-            </div>
+            <div className="text-purple-200 text-[8px]">{deck.effects.reverb}%</div>
           </div>
+          <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
+            <div className="text-green-300 text-center mb-1 font-bold text-[10px]">DELAY</div>
+            <Knob
+              value={deck.effects.delay}
+              min={0}
+              max={100}
+              onChange={setDelay}
+              size="sm"
+              className="mb-1"
+            />
+            <div className="text-green-200 text-[8px]">{deck.effects.delay}%</div>
+          </div>
+          <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
+            <div className="text-cyan-300 text-center mb-1 font-bold text-[10px]">ECHO</div>
+            <Knob
+              value={deck.effects.echo}
+              min={0}
+              max={100}
+              onChange={setEcho}
+              size="sm"
+              className="mb-1"
+            />
+            <div className="text-cyan-200 text-[8px]">{deck.effects.echo}%</div>
+          </div>
+        </div>
+
+        {/* Play/Stop Controls - Gray Area */}
+        <div className="flex justify-center gap-2">
+          <button 
+            onClick={handlePlayPause}
+            className={`pioneer-button py-2 px-3 text-xs ${deck.isPlaying ? 'text-blue-300' : 'text-blue-300'}`}
+          >
+            <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
+            <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
+          </button>
           
-          {/* Track Info and Time Display */}
-          <div className="text-white">
-            <div className="flex justify-between items-start mb-1">
-              <div className="text-sm font-bold truncate flex-1 mr-2">
-                {deck.track?.name?.replace(/\.wav$/i, '') || 'No Track Loaded'}
-              </div>
-              <div className="text-xs text-gray-300">TRACK 01</div>
-            </div>
-            
-            <div className="flex justify-between items-center text-xs">
-              <div className="text-orange-400 font-mono">
-                {formatTime(deck.currentTime)}
-              </div>
-              <div className="pioneer-led text-center" style={{ color }}>
-                <div className="text-lg font-bold">
-                  {deck.track ? formatBPM(deck.track.bpm) : '---.-'}
-                </div>
-                <div className="text-xs">BPM</div>
-              </div>
-              <div className="text-orange-400 font-mono">
-                -{deck.track ? formatTime(deck.track.duration - deck.currentTime) : '--:--'}
-              </div>
-            </div>
-            
-            {/* Controls Row - Inside Screen */}
-            <div className="flex justify-between items-center mt-2 text-xs">
-              <div className="flex flex-col gap-1">
-                <button 
-                  className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
-                  onClick={handleSync}
-                  type="button"
-                >
-                  SYNC
-                </button>
-                <button 
-                  className="pioneer-button py-1 px-2 text-xs text-red-400 hover:text-red-300"
-                  onClick={() => {
-                    cutFX();
-                    audioFeedback?.playClick();
-                  }}
-                  type="button"
-                >
-                  CUT FX
-                </button>
-              </div>
-              
-              <div className="text-gray-300">
-                <span>A.HOT CUE</span>
-              </div>
-              
-              <div className="text-orange-400 font-mono">
-                {deck.track ? `${formatTempo(deck.tempo)}` : '+0.0%'}
-              </div>
-              
-              <div className="text-blue-300 font-mono">
-                02:34
-              </div>
-            </div>
-
-            {/* Effects Controls - Inside Screen */}
-            <div className="grid grid-cols-3 gap-2 mt-2">
-              <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
-                <div className="text-purple-300 text-center mb-1 font-bold text-[10px]">REVERB</div>
-                <Knob
-                  value={deck.effects.reverb}
-                  min={0}
-                  max={100}
-                  onChange={setReverb}
-                  size="sm"
-                  className="mb-1"
-                />
-                <div className="text-purple-200 text-[8px]">{deck.effects.reverb}%</div>
-              </div>
-              <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
-                <div className="text-green-300 text-center mb-1 font-bold text-[10px]">DELAY</div>
-                <Knob
-                  value={deck.effects.delay}
-                  min={0}
-                  max={100}
-                  onChange={setDelay}
-                  size="sm"
-                  className="mb-1"
-                />
-                <div className="text-green-200 text-[8px]">{deck.effects.delay}%</div>
-              </div>
-              <div className="bg-gray-900/50 border border-gray-600 rounded p-1 text-xs flex flex-col items-center">
-                <div className="text-cyan-300 text-center mb-1 font-bold text-[10px]">ECHO</div>
-                <Knob
-                  value={deck.effects.echo}
-                  min={0}
-                  max={100}
-                  onChange={setEcho}
-                  size="sm"
-                  className="mb-1"
-                />
-                <div className="text-cyan-200 text-[8px]">{deck.effects.echo}%</div>
-              </div>
-            </div>
-
-            {/* Play/Stop Controls - Inside Screen */}
-            <div className="flex justify-center gap-2 mt-2">
-              <button 
-                onClick={handlePlayPause}
-                className={`pioneer-button py-1 px-2 text-xs ${deck.isPlaying ? 'text-blue-300' : 'text-blue-300'}`}
-              >
-                <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
-                <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
-              </button>
-              
-              <button 
-                onClick={stop}
-                className="pioneer-button py-1 px-2 text-xs text-red-400"
-              >
-                <div className="text-sm">⏹</div>
-                <div className="text-xs">STOP</div>
-              </button>
-            </div>
-          </div>
+          <button 
+            onClick={stop}
+            className="pioneer-button py-2 px-3 text-xs text-red-400"
+          >
+            <div className="text-sm">⏹</div>
+            <div className="text-xs">STOP</div>
+          </button>
         </div>
       </div>
     </div>
