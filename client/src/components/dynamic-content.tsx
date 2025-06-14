@@ -19,8 +19,9 @@ export function DynamicContent({
   const { data: keyContent, isLoading: keyLoading } = useContentByKey(contentKey || '');
   const { data: sectionContent, isLoading: sectionLoading } = useContentBySection(section || '');
 
+  // Show loading state without fallback text to prevent flash
   if (keyLoading || sectionLoading) {
-    return <Component className={`${className} animate-pulse bg-gray-800`}>{fallbackText}</Component>;
+    return <Component className={`${className} opacity-0`}></Component>;
   }
 
   // Single content item by key
@@ -29,7 +30,7 @@ export function DynamicContent({
     const fieldType = keyContent.title ? 'title' : keyContent.content ? 'content' : 'value';
     return (
       <Component 
-        className={className} 
+        className={`${className} transition-opacity duration-150 opacity-100`} 
         style={styles}
         data-content-key={contentKey}
         data-section={keyContent.section}
@@ -108,8 +109,9 @@ interface DynamicTextProps {
 export function DynamicText({ contentKey, fallback = '', className = '', as: Component = 'span' }: DynamicTextProps) {
   const { data: content, isLoading } = useContentByKey(contentKey);
 
+  // Hide completely while loading to prevent text flash
   if (isLoading) {
-    return <Component className={`${className} animate-pulse`}>Loading...</Component>;
+    return <Component className={`${className} opacity-0`}></Component>;
   }
 
   const styles = getContentStyles(content || {} as SiteContent);

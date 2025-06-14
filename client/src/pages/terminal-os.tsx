@@ -6,6 +6,7 @@ import { VisualEditor } from '@/components/visual-editor';
 import { useContentBySection } from '@/hooks/use-content';
 import { useAudioFeedback } from '@/hooks/use-audio-feedback';
 import { GlobalBeatVisualizer } from '@/components/beat-visualizer';
+import { usePreloadContent } from '@/hooks/use-preload-content';
 
 interface TerminalOSProps {}
 
@@ -21,6 +22,9 @@ export default function TerminalOS({}: TerminalOSProps) {
   const [glitchActive, setGlitchActive] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const audioFeedback = useAudioFeedback();
+  
+  // Preload all content to prevent text flashing
+  usePreloadContent();
   
   // Beat visualizer states - synchronized with DJ interface
   const [deckAPlaying, setDeckAPlaying] = useState(false);

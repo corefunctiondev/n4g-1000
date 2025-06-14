@@ -176,6 +176,8 @@ Changelog:
 - June 14, 2025. Added snake entrance animation - waves flow smoothly from sides when songs start, creating cinematic 6-second entrance effect with enhanced flexibility and controlled wave extension
 - June 14, 2025. Implemented beat-only wave movement - removed all continuous animations, waves now move exclusively on detected song beats with enhanced responsiveness
 - June 14, 2025. Updated all website content with authentic NEED FOR GROOVE information - replaced 55 placeholder content items with real business details including Kosovo origin, NY base, decade of experience, venues played, contact info, and upcoming album "TUTTO PASSA"
+- June 14, 2025. Eliminated all mock data (ALEX RODRIGUEZ, JORDAN CHEN, fake contact info) throughout website - database now contains only 38 authentic NEED FOR GROOVE content items
+- June 14, 2025. Fixed text flashing issue when navigating pages - implemented content preloading system with smooth opacity transitions to prevent jarring text replacements
 
 ## User Preferences
 
