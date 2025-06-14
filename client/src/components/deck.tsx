@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAudio } from '@/hooks/use-audio';
+import { useAudioFeedback } from '@/hooks/use-audio-feedback';
 import { Waveform } from './waveform';
 import { Knob } from './knob';
 import { Fader } from './fader';
@@ -38,6 +39,8 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
     sync,
     getAnalyser,
   } = useAudio(deckId);
+  
+  const audioFeedback = useAudioFeedback();
 
   const [isDraggingTempo, setIsDraggingTempo] = useState(false);
   const [tempoRange, setTempoRange] = useState(8); // Default ±8%
