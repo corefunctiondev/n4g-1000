@@ -149,7 +149,6 @@ export default function TerminalOS({}: TerminalOSProps) {
 
   const fileTreeItems = [
     { id: 'home', label: 'HOME/', type: 'folder', description: 'System boot and overview', isLast: false },
-    { id: 'about', label: 'ABOUT/', type: 'folder', description: 'DJ member profiles', isLast: false },
     { id: 'sets', label: 'SETS/', type: 'folder', description: 'Live DJ performances', isLast: false },
     { id: 'podcasts', label: 'PODCASTS/', type: 'folder', description: 'Audio episodes', isLast: false },
     { id: 'bookings', label: 'BOOKINGS/', type: 'folder', description: 'Event schedule', isLast: false },

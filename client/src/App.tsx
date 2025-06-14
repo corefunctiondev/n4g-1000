@@ -16,7 +16,6 @@ function Router() {
     <Switch>
       <Route path="/" component={AppWrapper} />
       <Route path="/home" component={TerminalOS} />
-      <Route path="/about" component={TerminalOS} />
       <Route path="/sets" component={TerminalOS} />
       <Route path="/podcasts" component={TerminalOS} />
       <Route path="/bookings" component={TerminalOS} />
