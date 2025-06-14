@@ -197,7 +197,7 @@ export default function CDJInterface() {
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-4">
               <img 
-                src="/attached_assets/13_1749865869309.png" 
+                src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/music/logos/n4g-logo.png" 
                 alt="Need For Groove Logo" 
                 className="h-8 sm:h-10 lg:h-12"
               />

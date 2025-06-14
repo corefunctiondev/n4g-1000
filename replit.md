@@ -144,6 +144,7 @@ Changelog:
 - June 14, 2025. Restored CUT FX button to gray CDJ area next to STOP button for complete transport control set
 - June 14, 2025. Updated CDJ body color to authentic dark gray (bg-gray-800) matching real Pioneer hardware appearance
 - June 14, 2025. Removed MASTER OUTPUT section with Monitoring/Main Out/Booth Out options for cleaner interface layout
+- June 14, 2025. Replaced header text with Need For Groove logo, uploaded to Supabase storage for proper asset management
 
 ## User Preferences
 
