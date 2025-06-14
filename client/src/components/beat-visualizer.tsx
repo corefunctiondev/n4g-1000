@@ -104,7 +104,9 @@ export function BeatVisualizer({
   useEffect(() => {
     if (isPlaying && bpm) {
       const createParticles = () => {
-        const particleCount = Math.floor(intensity * 25 + audioLevel * 35);
+        // MASSIVE particle count for futuristic effect
+        const baseCount = Math.floor(intensity * 200 + audioLevel * 300);
+        const particleCount = baseCount + Math.floor(beatPulse * 500);
         const newParticles: Array<{
           id: number;
           x: number;
@@ -120,41 +122,45 @@ export function BeatVisualizer({
         for (let i = 0; i < particleCount; i++) {
           const currentColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
           
-          // Position-based particle spawning
+          // Position-based particle spawning with multiple streams
           let startX, startY, velX, velY;
           
           if (position === 'left') {
-            // Spawn from left edge, move right
-            startX = -20;
-            startY = Math.random() * window.innerHeight;
-            velX = Math.random() * 6 + 2; // Fast rightward movement
-            velY = (Math.random() - 0.5) * 2;
+            // Multiple horizontal streams from left
+            const streamHeight = window.innerHeight / 8;
+            const streamIndex = Math.floor(Math.random() * 8);
+            startX = -50 - Math.random() * 100;
+            startY = streamIndex * streamHeight + Math.random() * streamHeight;
+            velX = Math.random() * 12 + 4; // Very fast rightward
+            velY = (Math.random() - 0.5) * 1;
           } else if (position === 'right') {
-            // Spawn from right edge, move left
-            startX = window.innerWidth + 20;
-            startY = Math.random() * window.innerHeight;
-            velX = -(Math.random() * 6 + 2); // Fast leftward movement
-            velY = (Math.random() - 0.5) * 2;
+            // Multiple horizontal streams from right
+            const streamHeight = window.innerHeight / 8;
+            const streamIndex = Math.floor(Math.random() * 8);
+            startX = window.innerWidth + 50 + Math.random() * 100;
+            startY = streamIndex * streamHeight + Math.random() * streamHeight;
+            velX = -(Math.random() * 12 + 4); // Very fast leftward
+            velY = (Math.random() - 0.5) * 1;
           } else {
-            // Center: spawn from random edges and converge
-            const edge = Math.random() < 0.5 ? 'left' : 'right';
-            if (edge === 'left') {
-              startX = -20;
-              velX = Math.random() * 4 + 3;
-            } else {
-              startX = window.innerWidth + 20;
-              velX = -(Math.random() * 4 + 3);
-            }
-            startY = Math.random() * window.innerHeight;
-            velY = (Math.random() - 0.5) * 3;
+            // Center: explosive bursts from all directions
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 200 + 50;
+            const speed = Math.random() * 8 + 3;
+            startX = window.innerWidth / 2 + Math.cos(angle) * distance;
+            startY = window.innerHeight / 2 + Math.sin(angle) * distance;
+            velX = Math.cos(angle) * speed;
+            velY = Math.sin(angle) * speed;
           }
+          
+          // Tiny particles for futuristic dust effect
+          const particleSize = Math.random() * 2 + 0.5;
           
           newParticles.push({
             id: particleId.current++,
             x: startX,
             y: startY,
-            size: Math.random() * 6 + 2,
-            opacity: Math.random() * 0.9 + 0.3,
+            size: particleSize,
+            opacity: Math.random() * 0.7 + 0.1,
             color: currentColor,
             velocityX: velX,
             velocityY: velY,
@@ -183,10 +189,58 @@ export function BeatVisualizer({
 
       beatInterval.current = window.setInterval(startBeat, beatDuration / 8);
       
+      // Ultra-dense micro-bursts for millions of particles effect
+      const microBurstInterval = window.setInterval(() => {
+        const microCount = Math.floor((intensity + audioLevel) * 150);
+        const microParticles: Array<{
+          id: number;
+          x: number;
+          y: number;
+          size: number;
+          opacity: number;
+          color: string;
+          velocityX: number;
+          velocityY: number;
+          life: number;
+        }> = [];
+        
+        for (let i = 0; i < microCount; i++) {
+          const currentColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+          let startX, velX;
+          
+          if (position === 'left') {
+            startX = -40 - Math.random() * 80;
+            velX = Math.random() * 18 + 6;
+          } else if (position === 'right') {
+            startX = window.innerWidth + 40 + Math.random() * 80;
+            velX = -(Math.random() * 18 + 6);
+          } else {
+            const edge = Math.random() < 0.5;
+            startX = edge ? -40 : window.innerWidth + 40;
+            velX = edge ? Math.random() * 12 + 4 : -(Math.random() * 12 + 4);
+          }
+          
+          microParticles.push({
+            id: particleId.current++,
+            x: startX,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 1.2 + 0.2,
+            opacity: Math.random() * 0.5 + 0.05,
+            color: currentColor,
+            velocityX: velX,
+            velocityY: (Math.random() - 0.5) * 1.5,
+            life: 0.6
+          });
+        }
+        
+        setParticles(prev => [...prev, ...microParticles]);
+      }, beatDuration / 16); // Ultra-fast micro-bursts
+      
       return () => {
         if (beatInterval.current) {
           clearInterval(beatInterval.current);
         }
+        clearInterval(microBurstInterval);
       };
     } else {
       setBeatPulse(0);
@@ -228,11 +282,12 @@ export function BeatVisualizer({
             height: `${particle.size}px`,
             backgroundColor: particle.color,
             opacity: particle.opacity,
-            boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
-            transform: `scale(${1 + beatPulse * 0.3})`,
-            transition: 'transform 0.1s ease-out',
-            filter: `blur(${particle.size * 0.2}px)`,
-            mixBlendMode: 'screen'
+            boxShadow: `0 0 ${particle.size * 3}px ${particle.color}, 0 0 ${particle.size * 6}px ${particle.color}40`,
+            transform: `scale(${1 + beatPulse * 0.5})`,
+            transition: 'transform 0.05s ease-out',
+            filter: `blur(${particle.size * 0.1}px) brightness(1.5)`,
+            mixBlendMode: 'screen',
+            willChange: 'transform, opacity'
           }}
         />
       ))}
