@@ -200,6 +200,37 @@
   box-shadow: 0 0 4px var(--n4g-red);
 }
 
+/* Building Blocks Animation for Development Sections */
+@keyframes buildingBlockFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(5deg); }
+  50% { transform: translateY(-4px) rotate(-3deg); }
+  75% { transform: translateY(-12px) rotate(2deg); }
+}
+
+@keyframes progressDotPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.building-block {
+  animation: buildingBlockFloat 2s ease-in-out infinite;
+}
+
+.building-block-1 { animation-delay: 0s; }
+.building-block-2 { animation-delay: 0.2s; }
+.building-block-3 { animation-delay: 0.4s; }
+.building-block-4 { animation-delay: 0.6s; }
+.building-block-5 { animation-delay: 0.8s; }
+
+.progress-dot {
+  animation: progressDotPulse 1.5s ease-in-out infinite;
+}
+
+.progress-dot-1 { animation-delay: 0s; }
+.progress-dot-2 { animation-delay: 0.5s; }
+.progress-dot-3 { animation-delay: 1s; }
+
 .n4g-fader-track {
   background: linear-gradient(to bottom, var(--n4g-dark-gray), var(--n4g-button));
   border: 2px solid var(--n4g-light-gray);

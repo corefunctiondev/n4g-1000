@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation, Link } from 'wouter';
 import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail, Settings, User, LogOut, Menu, X, Folder, FolderOpen, File, Volume2, VolumeX } from 'lucide-react';
 import { DynamicContent, DynamicText, DynamicLink } from '@/components/dynamic-content';
+import { BuildingBlocks } from '@/components/building-blocks';
 import { VisualEditor } from '@/components/visual-editor';
 import { useContentBySection } from '@/hooks/use-content';
 import { useAudioFeedback } from '@/hooks/use-audio-feedback';
@@ -548,14 +549,20 @@ function SetsSection() {
     return item?.title || item?.content || '';
   };
 
+  const isDevelopment = getContent('sets_coming_soon').includes('Development');
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ls -la ./sets/</div>
       
       <div className="space-y-4">
-        <div className="text-2xl font-bold text-cyan-400">
-          {getContent('sets_coming_soon')}
-        </div>
+        {isDevelopment ? (
+          <BuildingBlocks text={getContent('sets_coming_soon')} />
+        ) : (
+          <div className="text-2xl font-bold text-cyan-400">
+            {getContent('sets_coming_soon')}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -569,14 +576,20 @@ function PodcastsSection() {
     return item?.title || item?.content || '';
   };
 
+  const isDevelopment = getContent('podcasts_coming_soon').includes('Development');
+
   return (
     <div className="space-y-6 text-blue-300">
       <div className="text-xl font-bold text-cyan-400">$ ./podcast_manager.sh --list</div>
       
       <div className="space-y-4">
-        <div className="text-2xl font-bold text-cyan-400">
-          {getContent('podcasts_coming_soon')}
-        </div>
+        {isDevelopment ? (
+          <BuildingBlocks text={getContent('podcasts_coming_soon')} />
+        ) : (
+          <div className="text-2xl font-bold text-cyan-400">
+            {getContent('podcasts_coming_soon')}
+          </div>
+        )}
       </div>
     </div>
   );
