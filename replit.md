@@ -195,6 +195,7 @@ Changelog:
 - June 14, 2025. Fixed crossfader branding from DJM-750MK2 to N4G-800, updated all CSS classes from pioneer- to n4g-, added center line indicator to crossfader
 - June 14, 2025. Completely cleared website pages of all mock data - bookings shows only email and social links, sets/podcasts/mixes show only "Coming Soon"
 - June 14, 2025. Removed all remaining database content from pages - completely deleted and recreated minimal content for clean page display
+- June 14, 2025. Fixed Supabase integration - now properly using service role key for direct database operations instead of local API calls
 
 ## User Preferences
 
