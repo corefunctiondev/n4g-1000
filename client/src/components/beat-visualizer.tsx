@@ -25,6 +25,7 @@ export function BeatVisualizer({
   const [lastAudioLevel, setLastAudioLevel] = useState(0);
   const [shapePhase, setShapePhase] = useState(0);
   const [waveReveal, setWaveReveal] = useState(0);
+  const [snakePosition, setSnakePosition] = useState(0);
   const startTime = useRef<number | null>(null);
   
   const lastBeatTime = useRef(0);
@@ -92,6 +93,9 @@ export function BeatVisualizer({
         setAudioLevel(overall);
       }
 
+      // Snake movement around CDJ interface (continuous while playing)
+      setSnakePosition(Date.now() * 0.0008); // Slow continuous snake movement
+      
       // Wave phase only updates on detected beats (no continuous movement)
       // wavePhase and shapePhase are only updated when beats are detected
       
@@ -168,6 +172,8 @@ export function BeatVisualizer({
 
   if (!isPlaying) return null;
 
+  const width = window.innerWidth;
+  const height = window.innerHeight;
   const pulseIntensity = Math.max(beatPulse, audioLevel);
   const opacity = 0.2 + (pulseIntensity * 0.6);
   
@@ -207,23 +213,29 @@ export function BeatVisualizer({
     for (let i = 0; i <= totalRevealSteps; i++) {
       let x, normalizedX;
       
+      // Calculate snake path around CDJ (flowing movement)
+      const snakeProgress = (i / steps) + snakePosition;
+      
       if (position === 'left') {
-        // Snake flows from left to right
-        x = startX + (waveWidth / steps) * i;
+        // Left snake flows in curved path around left CDJ
+        const pathProgress = snakeProgress % 1;
+        const curveX = pathProgress * waveWidth;
+        const curveOffset = Math.sin(pathProgress * Math.PI * 3) * (waveWidth * 0.2);
+        x = startX + curveX + curveOffset;
         normalizedX = (x - startX) / waveWidth;
       } else if (position === 'right') {
-        // Snake flows from right to left
-        const reverseI = totalRevealSteps - i;
-        x = startX + (waveWidth / steps) * reverseI;
+        // Right snake flows in curved path around right CDJ (opposite direction)
+        const pathProgress = (-snakeProgress) % 1;
+        const curveX = Math.abs(pathProgress) * waveWidth;
+        const curveOffset = Math.sin(Math.abs(pathProgress) * Math.PI * 3) * (waveWidth * 0.2);
+        x = startX + waveWidth - curveX - curveOffset;
         normalizedX = (x - startX) / waveWidth;
       } else {
-        // Center waves grow from both sides simultaneously
-        const centerStep = Math.floor(steps / 2);
-        if (i <= centerStep) {
-          x = startX + waveWidth / 2 - (waveWidth / 2 / centerStep) * (centerStep - i);
-        } else {
-          x = startX + waveWidth / 2 + (waveWidth / 2 / centerStep) * (i - centerStep);
-        }
+        // Center snakes flow in sinuous S-curves
+        const pathProgress = snakeProgress % 1;
+        const curveX = pathProgress * waveWidth;
+        const sineOffset = Math.sin(pathProgress * Math.PI * 4) * (waveWidth * 0.15);
+        x = startX + curveX + sineOffset;
         normalizedX = (x - startX) / waveWidth;
       }
       
