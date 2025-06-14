@@ -4,6 +4,7 @@ import { Monitor, Terminal, Zap, Music, Radio, Calendar, Disc, Headphones, Mail,
 import { DynamicContent, DynamicText, DynamicLink } from '@/components/dynamic-content';
 import { VisualEditor } from '@/components/visual-editor';
 import { useContentBySection } from '@/hooks/use-content';
+import { useAudioFeedback } from '@/hooks/use-audio-feedback';
 
 interface TerminalOSProps {}
 
@@ -18,6 +19,7 @@ export default function TerminalOS({}: TerminalOSProps) {
   const [bootText, setBootText] = useState('');
   const [glitchActive, setGlitchActive] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const audioFeedback = useAudioFeedback();
 
   // Initialize current section from URL
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function TerminalOS({}: TerminalOSProps) {
     setCurrentSection(path);
   }, [location]);
 
-  // Fast boot sequence with typewriter effect
+  // Fast boot sequence with typewriter effect and themed sound
   useEffect(() => {
     const bootLines = [
       'NEED FOR GROOVE OS',
@@ -40,6 +42,11 @@ export default function TerminalOS({}: TerminalOSProps) {
     let currentChar = 0;
     let currentText = '';
     
+    // Play initialization sound when boot starts
+    if (soundEnabled) {
+      audioFeedback.playSystemInit();
+    }
+    
     const typeText = () => {
       if (currentLine < bootLines.length) {
         if (currentChar < bootLines[currentLine].length) {
@@ -52,6 +59,12 @@ export default function TerminalOS({}: TerminalOSProps) {
           setBootText(currentText);
           currentLine++;
           currentChar = 0;
+          
+          // Play special sound when "Initializing audio systems..." appears
+          if (currentLine === 2 && soundEnabled) {
+            setTimeout(() => audioFeedback.playDJModeActivate(), 100);
+          }
+          
           setTimeout(typeText, 20); // Very short pause between lines
         }
       } else {
@@ -61,7 +74,7 @@ export default function TerminalOS({}: TerminalOSProps) {
     };
     
     typeText();
-  }, []);
+  }, [soundEnabled, audioFeedback]);
 
   // Random glitch effect
   useEffect(() => {

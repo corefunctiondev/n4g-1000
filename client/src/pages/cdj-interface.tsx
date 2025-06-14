@@ -5,6 +5,7 @@ import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
 import { audioEngine } from '@/lib/audio-engine';
 import { Menu, X, Folder, FolderOpen, File, Settings, LogOut } from 'lucide-react';
+import { useAudioFeedback } from '@/hooks/use-audio-feedback';
 
 export default function CDJInterface() {
   const [location, navigate] = useLocation();
@@ -18,6 +19,8 @@ export default function CDJInterface() {
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const audioFeedback = useAudioFeedback();
+  const [hasPlayedInitSound, setHasPlayedInitSound] = useState(false);
 
   // Track playback order for smart sync
   const handleDeckPlaybackChange = useCallback((deckId: 'A' | 'B', isPlaying: boolean) => {
@@ -83,8 +86,16 @@ export default function CDJInterface() {
     // Set page title
     document.title = 'N4G-1000 Digital Turntable Interface';
     
+    // Play DJ mode activation sound on first load
+    if (!hasPlayedInitSound) {
+      setTimeout(() => {
+        audioFeedback.playDJModeActivate();
+        setHasPlayedInitSound(true);
+      }, 500);
+    }
+    
     // Simple responsive scaling - no complex calculations needed
-  }, []);
+  }, [audioFeedback, hasPlayedInitSound]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-2 sm:p-4 lg:p-8 overflow-x-auto">

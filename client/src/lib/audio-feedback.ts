@@ -108,6 +108,52 @@ class AudioFeedback {
     setTimeout(() => this.createBeep(1200, 0.06, 0.04), 80);
   }
 
+  async playSystemInit() {
+    if (!this.isEnabled) return;
+    await this.init();
+    await this.resumeContext();
+    
+    // Futuristic system initialization sequence
+    // Low bass foundation
+    this.createBeep(120, 0.8, 0.08);
+    
+    // Rising sweep
+    setTimeout(() => {
+      for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+          const freq = 200 + (i * 100);
+          this.createBeep(freq, 0.15, 0.03);
+        }, i * 80);
+      }
+    }, 200);
+    
+    // High confirmation tones
+    setTimeout(() => {
+      this.createBeep(1200, 0.2, 0.05);
+      setTimeout(() => this.createBeep(1500, 0.2, 0.05), 150);
+      setTimeout(() => this.createBeep(1800, 0.3, 0.06), 300);
+    }, 800);
+  }
+
+  async playDJModeActivate() {
+    if (!this.isEnabled) return;
+    await this.init();
+    await this.resumeContext();
+    
+    // DJ mode activation sound - three ascending chords
+    const playChord = (frequencies: number[], delay: number) => {
+      setTimeout(() => {
+        frequencies.forEach(freq => {
+          this.createBeep(freq, 0.4, 0.04);
+        });
+      }, delay);
+    };
+    
+    playChord([440, 554, 659], 0);     // A major chord
+    playChord([493, 622, 740], 200);   // B major chord  
+    playChord([523, 659, 784], 400);   // C major chord
+  }
+
   setEnabled(enabled: boolean) {
     this.isEnabled = enabled;
   }
