@@ -249,14 +249,14 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
 
   return (
     <div 
-      className="pioneer-cdj p-2 flex-1 h-full flex flex-col"
+      className="n4g-deck p-2 flex-1 h-full flex flex-col"
       style={{ position: 'relative', zIndex: 1 }}
     >
       {/* Track Selection Dropdown - Top of CDJ */}
       <div className="mb-3" style={{ zIndex: 10, position: 'relative' }}>
         <div className="text-xs text-blue-300 mb-2 text-center">TRACK SELECTION</div>
         <Select value={selectedTrackId} onValueChange={handleTrackSelect} disabled={isLoadingTrack}>
-          <SelectTrigger className="w-full pioneer-button text-xs bg-gray-800 border-gray-600 text-gray-300">
+          <SelectTrigger className="w-full n4g-button text-xs bg-gray-800 border-gray-600 text-gray-300">
             {isLoadingTrack ? (
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 border border-blue-300 border-t-transparent rounded-full animate-spin"></div>
@@ -417,7 +417,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
         <div className="flex justify-center gap-2">
           <button 
             onClick={handlePlayPause}
-            className={`pioneer-button py-2 px-3 text-xs ${deck.isPlaying ? 'text-blue-300' : 'text-blue-300'}`}
+            className={`n4g-button py-2 px-3 text-xs ${deck.isPlaying ? 'text-blue-300' : 'text-blue-300'}`}
           >
             <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
             <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
@@ -425,14 +425,14 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           
           <button 
             onClick={stop}
-            className="pioneer-button py-2 px-3 text-xs text-red-400"
+            className="n4g-button py-2 px-3 text-xs text-red-400"
           >
             <div className="text-sm">⏹</div>
             <div className="text-xs">STOP</div>
           </button>
           
           <button 
-            className="pioneer-button py-2 px-3 text-xs text-purple-400 hover:text-purple-300"
+            className="n4g-button py-2 px-3 text-xs text-purple-400 hover:text-purple-300"
             onClick={handleSync}
             type="button"
           >
@@ -441,7 +441,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           </button>
           
           <button 
-            className="pioneer-button py-2 px-3 text-xs text-red-400 hover:text-red-300"
+            className="n4g-button py-2 px-3 text-xs text-red-400 hover:text-red-300"
             onClick={() => {
               cutFX();
               audioFeedback?.playClick();

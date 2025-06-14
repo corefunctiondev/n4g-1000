@@ -92,11 +92,11 @@ export default function AdminLogin() {
                 <span>Home</span>
               </button>
               <button
-                onClick={() => { navigate('/cdj'); setIsMenuOpen(false); }}
+                onClick={() => { navigate('/n4g-1000'); setIsMenuOpen(false); }}
                 className="flex items-center gap-3 text-cyan-400 hover:text-cyan-300 transition-colors p-2"
               >
                 <Music size={20} />
-                <span>CDJ Interface</span>
+                <span>N4G-1000 Interface</span>
               </button>
               <button
                 onClick={() => { navigate('/terminal'); setIsMenuOpen(false); }}
