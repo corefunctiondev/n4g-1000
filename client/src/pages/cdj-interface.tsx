@@ -190,16 +190,17 @@ export default function CDJInterface() {
         />
       )}
       
+      {/* Logo in top left corner */}
+      <div className="fixed top-4 left-4 z-30">
+        <img 
+          src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
+          alt="Need For Groove Logo" 
+          className="h-24 w-auto"
+        />
+      </div>
+
       {/* Pioneer DJ Setup Layout */}
       <div className="w-full max-w-[98vw] mx-auto relative z-20">
-        {/* Background Logo */}
-        <div className="absolute top-0 left-0 flex items-start justify-start z-0 opacity-40 pt-4 pl-4">
-          <img 
-            src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
-            alt="Need For Groove Logo Background" 
-            className="h-[600px] w-auto"
-          />
-        </div>
 
         {/* Header */}
         <div className="mb-2 relative z-10">
