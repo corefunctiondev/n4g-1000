@@ -343,8 +343,8 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
             <div className="text-orange-400 font-mono">
               {formatTime(deck.currentTime)}
             </div>
-            <div className="pioneer-led text-center" style={{ color }}>
-              <div className="text-lg font-bold">
+            <div className="pioneer-led text-center min-w-[60px]" style={{ color }}>
+              <div className="text-sm font-bold truncate">
                 {deck.track ? formatBPM(deck.track.bpm) : '---.-'}
               </div>
               <div className="text-xs">BPM</div>
