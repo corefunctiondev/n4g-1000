@@ -140,6 +140,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PATCH endpoint for partial updates (used by simple-admin interface)
+  app.patch("/api/admin/content/:id", requireAdmin, async (req, res) => {
+    try {
+      const contentId = parseInt(req.params.id);
+      const updateData = req.body;
+      
+      const { data: updatedContent, error } = await supabase
+        .from('site_content')
+        .update(updateData)
+        .eq('id', contentId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      if (!updatedContent) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+
+      res.json(updatedContent);
+    } catch (error) {
+      console.error('Error updating site content:', error);
+      res.status(500).json({ error: "Failed to update content" });
+    }
+  });
+
   // Delete site content
   app.delete("/api/admin/content/:id", requireAdmin, async (req, res) => {
     try {
