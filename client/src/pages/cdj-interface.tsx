@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { audioEngine } from '@/lib/audio-engine';
 import { Menu, X, Folder, FolderOpen, File, Settings, LogOut } from 'lucide-react';
 import { useAudioFeedback } from '@/hooks/use-audio-feedback';
+import { DJLaunchSequence } from '@/components/dj-launch-sequence';
 
 export default function CDJInterface() {
   const [location, navigate] = useLocation();
@@ -21,6 +22,8 @@ export default function CDJInterface() {
   const contentRef = useRef<HTMLDivElement>(null);
   const audioFeedback = useAudioFeedback();
   const [hasPlayedInitSound, setHasPlayedInitSound] = useState(false);
+  const [showLaunchSequence, setShowLaunchSequence] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Track playback order for smart sync
   const handleDeckPlaybackChange = useCallback((deckId: 'A' | 'B', isPlaying: boolean) => {
@@ -65,6 +68,10 @@ export default function CDJInterface() {
 
   // Navigation handler
   const handleNavigation = useCallback((section: string) => {
+    if (section === 'home') {
+      // Clear DJ launch session when returning home so boot sequence can show again
+      sessionStorage.removeItem('dj_launch_shown');
+    }
     navigate(`/${section === 'home' ? '' : section}`);
     setIsBurgerMenuOpen(false);
   }, [navigate]);
@@ -86,16 +93,40 @@ export default function CDJInterface() {
     // Set page title
     document.title = 'N4G-1000 Digital Turntable Interface';
     
-    // Play DJ mode activation sound on first load
-    if (!hasPlayedInitSound) {
-      setTimeout(() => {
-        audioFeedback.playDJModeActivate();
-        setHasPlayedInitSound(true);
-      }, 500);
-    }
+    // Check if this is a direct navigation to DJ interface (not from boot sequence)
+    const hasSeenBoot = localStorage.getItem('n4g_has_booted');
+    const djLaunchShown = sessionStorage.getItem('dj_launch_shown');
     
-    // Simple responsive scaling - no complex calculations needed
+    if (hasSeenBoot && !djLaunchShown) {
+      // Show launch sequence for returning users
+      setShowLaunchSequence(true);
+      sessionStorage.setItem('dj_launch_shown', 'true');
+    } else {
+      // Skip launch sequence, already initialized
+      setIsInitialized(true);
+      if (!hasPlayedInitSound) {
+        setTimeout(() => {
+          audioFeedback.playDJModeActivate();
+          setHasPlayedInitSound(true);
+        }, 500);
+      }
+    }
   }, [audioFeedback, hasPlayedInitSound]);
+
+  const handleLaunchComplete = () => {
+    setShowLaunchSequence(false);
+    setIsInitialized(true);
+  };
+
+  // Show launch sequence if needed
+  if (showLaunchSequence) {
+    return <DJLaunchSequence onComplete={handleLaunchComplete} />;
+  }
+
+  // Don't render the interface until initialized
+  if (!isInitialized) {
+    return <div className="min-h-screen bg-black" />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-2 sm:p-4 lg:p-8 overflow-x-auto">
