@@ -157,6 +157,7 @@ Changelog:
 - June 14, 2025. Completely rebuilt audio effects system with musical timing - delay uses 1/4 note, echo uses 3/8 note timing that syncs to track BPM and tempo changes for professional DJ effects
 - June 14, 2025. Fixed logo positioning to absolute instead of fixed - logo now stays in place and doesn't move when scrolling, restored original h-56 size
 - June 14, 2025. Added SYNC button to gray CDJ transport control area alongside PLAY, STOP, and CUT FX buttons for consistent control layout on both decks
+- June 14, 2025. Removed duplicate SYNC button from black LCD area, keeping only the one in gray transport controls for cleaner interface
 
 ## User Preferences
 

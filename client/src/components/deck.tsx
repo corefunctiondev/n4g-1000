@@ -358,13 +358,6 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
           <div className="flex justify-between items-center mt-2 text-xs">
             <div className="flex gap-2">
               <button 
-                className="pioneer-button py-1 px-2 text-xs text-purple-400 hover:text-purple-300"
-                onClick={handleSync}
-                type="button"
-              >
-                SYNC
-              </button>
-              <button 
                 className="pioneer-button py-1 px-2 text-xs text-red-400 hover:text-red-300"
                 onClick={() => {
                   cutFX();
