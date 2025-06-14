@@ -27,29 +27,37 @@ export default function TerminalOS({}: TerminalOSProps) {
   const [deckBPlaying, setDeckBPlaying] = useState(false);
   const [deckABpm, setDeckABpm] = useState<number>();
   const [deckBBpm, setDeckBBpm] = useState<number>();
+  
+  // Lighting state - synchronized with DJ interface
+  const [lightsOn, setLightsOn] = useState(true);
 
-  // Sync beat visualizer data from DJ interface
+  // Sync beat visualizer and lighting data from DJ interface
   useEffect(() => {
-    const syncBeatData = () => {
+    const syncDJData = () => {
       try {
-        const djData = localStorage.getItem('dj_beat_data');
-        if (djData) {
-          const data = JSON.parse(djData);
+        const beatData = localStorage.getItem('dj_beat_data');
+        if (beatData) {
+          const data = JSON.parse(beatData);
           setDeckAPlaying(data.deckAPlaying || false);
           setDeckBPlaying(data.deckBPlaying || false);
           setDeckABpm(data.deckABpm);
           setDeckBBpm(data.deckBBpm);
         }
+        
+        const lightsData = localStorage.getItem('dj_lights_state');
+        if (lightsData) {
+          setLightsOn(JSON.parse(lightsData));
+        }
       } catch (error) {
-        console.log('No DJ beat data found');
+        console.log('No DJ data found');
       }
     };
 
     // Initial sync
-    syncBeatData();
+    syncDJData();
 
     // Listen for changes
-    const interval = setInterval(syncBeatData, 100);
+    const interval = setInterval(syncDJData, 100);
     
     return () => clearInterval(interval);
   }, []);
@@ -162,15 +170,17 @@ export default function TerminalOS({}: TerminalOSProps) {
 
   return (
     <div className={`min-h-screen bg-black text-white font-mono relative overflow-hidden ${glitchActive ? 'animate-pulse' : ''}`}>
-      {/* Beat Visualizer Background */}
-      <GlobalBeatVisualizer
-        deckAPlaying={deckAPlaying}
-        deckBPlaying={deckBPlaying}
-        deckABpm={deckABpm}
-        deckBBpm={deckBBpm}
-        deckAAnalyser={null}
-        deckBAnalyser={null}
-      />
+      {/* Beat Visualizer Background - Only when lights are on */}
+      {lightsOn && (
+        <GlobalBeatVisualizer
+          deckAPlaying={deckAPlaying}
+          deckBPlaying={deckBPlaying}
+          deckABpm={deckABpm}
+          deckBBpm={deckBBpm}
+          deckAAnalyser={null}
+          deckBAnalyser={null}
+        />
+      )}
       
       {/* CRT Monitor Frame */}
       <div className="absolute inset-0 pointer-events-none">

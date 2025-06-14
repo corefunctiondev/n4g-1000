@@ -4,7 +4,7 @@ import { Deck } from '@/components/deck';
 import { Mixer } from '@/components/mixer';
 import { Card, CardContent } from '@/components/ui/card';
 import { audioEngine } from '@/lib/audio-engine';
-import { Menu, X, Folder, FolderOpen, File, Settings, LogOut } from 'lucide-react';
+import { Menu, X, Folder, FolderOpen, File, Settings, LogOut, Lightbulb, LightbulbOff } from 'lucide-react';
 import { useAudioFeedback } from '@/hooks/use-audio-feedback';
 import { DJLaunchSequence } from '@/components/dj-launch-sequence';
 import { GlobalBeatVisualizer } from '@/components/beat-visualizer';
@@ -33,6 +33,9 @@ export default function CDJInterface() {
   const [deckBBpm, setDeckBBpm] = useState<number>();
   const [deckAAnalyser, setDeckAAnalyser] = useState<AnalyserNode | null>(null);
   const [deckBAnalyser, setDeckBAnalyser] = useState<AnalyserNode | null>(null);
+  
+  // Lighting control
+  const [lightsOn, setLightsOn] = useState(true);
 
   // Track playback order for smart sync and beat visualization
   const handleDeckPlaybackChange = useCallback((deckId: 'A' | 'B', isPlaying: boolean) => {
@@ -170,15 +173,17 @@ export default function CDJInterface() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pioneer-black to-pioneer-dark-gray p-2 sm:p-4 lg:p-8 overflow-x-auto relative">
-      {/* Beat Visualizer Background */}
-      <GlobalBeatVisualizer
-        deckAPlaying={deckAPlaying}
-        deckBPlaying={deckBPlaying}
-        deckABpm={deckABpm}
-        deckBBpm={deckBBpm}
-        deckAAnalyser={deckAAnalyser}
-        deckBAnalyser={deckBAnalyser}
-      />
+      {/* Beat Visualizer Background - Only when lights are on */}
+      {lightsOn && (
+        <GlobalBeatVisualizer
+          deckAPlaying={deckAPlaying}
+          deckBPlaying={deckBPlaying}
+          deckABpm={deckABpm}
+          deckBBpm={deckBBpm}
+          deckAAnalyser={deckAAnalyser}
+          deckBAnalyser={deckBAnalyser}
+        />
+      )}
       
       {/* Pioneer DJ Setup Layout */}
       <div className="w-full max-w-[98vw] mx-auto relative z-20">
@@ -197,7 +202,9 @@ export default function CDJInterface() {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-300">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              <div className={`w-2 h-2 rounded-full transition-all ${
+                lightsOn ? 'bg-blue-400 animate-pulse' : 'bg-gray-700'
+              }`} />
               <span>System Ready</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -210,6 +217,22 @@ export default function CDJInterface() {
                 }`}
               >
                 {isRecording ? '● REC' : '○ REC'}
+              </button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={() => {
+                  setLightsOn(!lightsOn);
+                  audioFeedback.playClick();
+                }}
+                className={`px-3 py-1 rounded text-xs font-medium transition-all flex items-center space-x-1 ${
+                  lightsOn 
+                    ? 'bg-yellow-500 text-black hover:bg-yellow-400' 
+                    : 'bg-gray-700 text-gray-300 hover:bg-yellow-500'
+                }`}
+              >
+                {lightsOn ? <Lightbulb className="w-3 h-3" /> : <LightbulbOff className="w-3 h-3" />}
+                <span>{lightsOn ? 'LIGHTS' : 'DARK'}</span>
               </button>
             </div>
             <div className="text-gray-400 font-mono text-xs">
