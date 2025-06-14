@@ -286,7 +286,7 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
       </div>
 
       {/* Black LCD Screen Area - Only Waveform and Digital Info */}
-      <div className="pioneer-screen p-3 mb-3" style={{ height: '240px' }}>
+      <div className="pioneer-screen p-3 mb-3 overflow-hidden" style={{ height: '240px' }}>
         <div className="flex justify-between items-start mb-2">
           <div className="text-xs text-blue-300 font-mono">CDJ-3000</div>
           <div className="text-xs text-blue-300 font-mono">
