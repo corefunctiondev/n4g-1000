@@ -55,9 +55,9 @@ export function BeatVisualizer({
       setAudioLevel(normalizedLevel);
     }
 
-    // Continuous wave animation
+    // Faster wave animation synced to beat
     const waveAnimation = setInterval(() => {
-      setWaveOffset(prev => prev + 0.15);
+      setWaveOffset(prev => prev + 0.3 + (audioLevel * 0.2));
     }, 16); // 60fps
 
     return () => clearInterval(waveAnimation);
@@ -133,27 +133,36 @@ export function BeatVisualizer({
   let waveElements;
   
   if (position === 'left') {
-    // Flowing waves from left to right
+    // Waves start from left edge and flow rightward only
+    const createLeftWavePath = (baseY: number, waveIndex: number) => {
+      const points: string[] = [];
+      const steps = 60;
+      const phaseShift = waveIndex * 0.8;
+      const maxWidth = window.innerWidth * 0.6; // Only cover left 60% of screen
+      
+      for (let i = 0; i <= steps; i++) {
+        const x = (maxWidth / steps) * i;
+        const normalizedX = x / maxWidth;
+        const waveY = baseY + Math.sin((normalizedX * Math.PI * 3) + (waveSpeed * 0.15) + phaseShift) * waveAmplitude;
+        points.push(`${Math.round(x)},${Math.round(waveY)}`);
+      }
+      
+      return `M ${points.join(' L ')}`;
+    };
+
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(2px)' }}>
-        <defs>
-          <linearGradient id="leftWaveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={finalColor} stopOpacity={opacity} />
-            <stop offset="70%" stopColor={finalColor} stopOpacity={opacity * 0.3} />
-            <stop offset="100%" stopColor="transparent" />
-          </linearGradient>
-        </defs>
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(1px)' }}>
         {[0, 1, 2, 3, 4, 5].map(i => (
           <path
             key={i}
-            d={createWavePath(window.innerHeight * (0.15 + i * 0.14), 1, i)}
+            d={createLeftWavePath(window.innerHeight * (0.15 + i * 0.14), i)}
             stroke={finalColor}
-            strokeWidth={8 + pulseIntensity * 12}
+            strokeWidth={10 + pulseIntensity * 15}
             fill="none"
-            opacity={opacity * (1 - i * 0.1)}
+            opacity={opacity * (1 - i * 0.08)}
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
+              filter: `drop-shadow(0 0 ${20 + pulseIntensity * 25}px ${finalColor})`,
               transform: `scale(${scale})`,
               transformOrigin: 'left center'
             }}
@@ -162,27 +171,37 @@ export function BeatVisualizer({
       </svg>
     );
   } else if (position === 'right') {
-    // Flowing waves from right to left
+    // Waves start from right edge and flow leftward only
+    const createRightWavePath = (baseY: number, waveIndex: number) => {
+      const points: string[] = [];
+      const steps = 60;
+      const phaseShift = waveIndex * 0.8;
+      const startX = window.innerWidth * 0.4; // Start from right 40% mark
+      const maxWidth = window.innerWidth * 0.6; // Cover right 60% of screen
+      
+      for (let i = 0; i <= steps; i++) {
+        const x = startX + (maxWidth / steps) * i;
+        const normalizedX = (x - startX) / maxWidth;
+        const waveY = baseY + Math.sin((normalizedX * Math.PI * 3) + (waveSpeed * -0.15) + phaseShift) * waveAmplitude;
+        points.push(`${Math.round(x)},${Math.round(waveY)}`);
+      }
+      
+      return `M ${points.join(' L ')}`;
+    };
+
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(2px)' }}>
-        <defs>
-          <linearGradient id="rightWaveGradient" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor={finalColor} stopOpacity={opacity} />
-            <stop offset="70%" stopColor={finalColor} stopOpacity={opacity * 0.3} />
-            <stop offset="100%" stopColor="transparent" />
-          </linearGradient>
-        </defs>
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(1px)' }}>
         {[0, 1, 2, 3, 4, 5].map(i => (
           <path
             key={i}
-            d={createWavePath(window.innerHeight * (0.15 + i * 0.14), -1, i)}
+            d={createRightWavePath(window.innerHeight * (0.15 + i * 0.14), i)}
             stroke={finalColor}
-            strokeWidth={8 + pulseIntensity * 12}
+            strokeWidth={10 + pulseIntensity * 15}
             fill="none"
-            opacity={opacity * (1 - i * 0.1)}
+            opacity={opacity * (1 - i * 0.08)}
             strokeLinecap="round"
             style={{
-              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
+              filter: `drop-shadow(0 0 ${20 + pulseIntensity * 25}px ${finalColor})`,
               transform: `scale(${scale})`,
               transformOrigin: 'right center'
             }}
@@ -191,29 +210,42 @@ export function BeatVisualizer({
       </svg>
     );
   } else {
-    // Center: expanding circular waves
+    // Center: connecting waves that bridge left and right
+    const createConnectingWavePath = (baseY: number, waveIndex: number) => {
+      const points: string[] = [];
+      const steps = 60;
+      const phaseShift = waveIndex * 0.8;
+      const centerStart = window.innerWidth * 0.3;
+      const centerWidth = window.innerWidth * 0.4;
+      
+      for (let i = 0; i <= steps; i++) {
+        const x = centerStart + (centerWidth / steps) * i;
+        const normalizedX = (x - centerStart) / centerWidth;
+        const waveY = baseY + Math.sin((normalizedX * Math.PI * 4) + (waveSpeed * 0.2) + phaseShift) * (waveAmplitude * 0.8);
+        points.push(`${Math.round(x)},${Math.round(waveY)}`);
+      }
+      
+      return `M ${points.join(' L ')}`;
+    };
+
     waveElements = (
-      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(2px)' }}>
-        {[0, 1, 2, 3, 4, 5].map(i => {
-          const radius = 60 + i * 90 + waveSpeed * 8;
-          const radiusVariation = Math.sin(waveSpeed * 0.1 + i) * 20;
-          return (
-            <circle
-              key={i}
-              cx={window.innerWidth / 2}
-              cy={window.innerHeight / 2}
-              r={radius + radiusVariation}
-              stroke={finalColor}
-              strokeWidth={6 + pulseIntensity * 10}
-              fill="none"
-              opacity={opacity * (1 - i * 0.12)}
-              style={{
-                filter: `drop-shadow(0 0 ${20 + pulseIntensity * 25}px ${finalColor})`,
-                transform: `scale(${scale})`
-              }}
-            />
-          );
-        })}
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(1px)' }}>
+        {[0, 1, 2, 3, 4, 5].map(i => (
+          <path
+            key={i}
+            d={createConnectingWavePath(window.innerHeight * (0.15 + i * 0.14), i)}
+            stroke={finalColor}
+            strokeWidth={8 + pulseIntensity * 12}
+            fill="none"
+            opacity={opacity * (1 - i * 0.1)}
+            strokeLinecap="round"
+            style={{
+              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
+              transform: `scale(${scale})`,
+              transformOrigin: 'center'
+            }}
+          />
+        ))}
       </svg>
     );
   }
