@@ -236,7 +236,7 @@ export function Mixer() {
           <div className="flex flex-col items-center gap-1 mb-1">
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-5 h-5 mx-auto cursor-pointer transition-colors ${
+                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'high-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.high - 50) * 2.7}deg)` }}
@@ -246,7 +246,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-5 h-5 mx-auto cursor-pointer transition-colors ${
+                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'mid-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.mid - 50) * 2.7}deg)` }}
@@ -256,7 +256,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-5 h-5 mx-auto cursor-pointer transition-colors ${
+                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'low-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelA.eq.low - 50) * 2.7}deg)` }}
@@ -266,18 +266,18 @@ export function Mixer() {
             </div>
           </div>
 
-          {/* Compact Channel Fader */}
+          {/* Channel Fader - Longer */}
           <div className="flex justify-center mb-1">
             <div 
-              className="pioneer-fader-track h-10 w-4 relative cursor-pointer"
+              className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
               onMouseDown={handleFaderMouseDown('volume', 'A')}
             >
               <div 
-                className={`pioneer-fader-handle w-6 h-3 absolute -left-1 transition-colors ${
+                className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
                   isDragging === 'volume-A' ? 'bg-blue-400' : ''
                 }`}
                 style={{ 
-                  top: `${((100 - channelA.volume) / 100) * (40 - 12)}px`,
+                  top: `${((100 - channelA.volume) / 100) * (64 - 16)}px`,
                 }}
               />
             </div>
@@ -298,7 +298,7 @@ export function Mixer() {
           <div className="flex flex-col items-center gap-1 mb-1">
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-5 h-5 mx-auto cursor-pointer transition-colors ${
+                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'high-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.high - 50) * 2.7}deg)` }}
@@ -308,7 +308,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-5 h-5 mx-auto cursor-pointer transition-colors ${
+                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'mid-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.mid - 50) * 2.7}deg)` }}
@@ -318,7 +318,7 @@ export function Mixer() {
             </div>
             <div className="text-center">
               <div 
-                className={`pioneer-knob w-5 h-5 mx-auto cursor-pointer transition-colors ${
+                className={`pioneer-knob w-8 h-8 mx-auto cursor-pointer transition-colors ${
                   isDragging === 'low-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ transform: `rotate(${(channelB.eq.low - 50) * 2.7}deg)` }}
@@ -328,18 +328,18 @@ export function Mixer() {
             </div>
           </div>
 
-          {/* Compact Channel Fader */}
+          {/* Channel Fader - Longer */}
           <div className="flex justify-center mb-1">
             <div 
-              className="pioneer-fader-track h-10 w-4 relative cursor-pointer"
+              className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
               onMouseDown={handleFaderMouseDown('volume', 'B')}
             >
               <div 
-                className={`pioneer-fader-handle w-6 h-3 absolute -left-1 transition-colors ${
+                className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
                   isDragging === 'volume-B' ? 'bg-orange-400' : ''
                 }`}
                 style={{ 
-                  top: `${((100 - channelB.volume) / 100) * (40 - 12)}px`,
+                  top: `${((100 - channelB.volume) / 100) * (64 - 16)}px`,
                 }}
               />
             </div>

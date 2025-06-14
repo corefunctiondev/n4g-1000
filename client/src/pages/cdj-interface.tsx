@@ -310,14 +310,14 @@ export default function CDJInterface() {
             </div>
             <div className="flex justify-center">
               <div 
-                className="pioneer-fader-track w-32 h-6 relative cursor-pointer"
+                className="pioneer-fader-track w-48 h-6 relative cursor-pointer"
                 onMouseDown={handleCrossfaderMouseDown}
               >
                 <div 
-                  className={`pioneer-fader-handle w-4 h-8 absolute -top-1 transition-colors ${
+                  className={`pioneer-fader-handle w-5 h-10 absolute -top-2 transition-colors ${
                     isDraggingCrossfader ? 'bg-purple-400' : 'bg-gray-300'
                   }`}
-                  style={{ left: `${(crossfaderValue / 100) * (128 - 16)}px` }}
+                  style={{ left: `${(crossfaderValue / 100) * (192 - 20)}px` }}
                 />
               </div>
             </div>
