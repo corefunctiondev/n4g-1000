@@ -275,7 +275,7 @@ export default function CDJInterface() {
             }}
           >
             <div className="w-full h-full flex p-2">
-              {/* Left CDJ (Deck A) - Takes 45% width */}
+              {/* Left N4G-1000 (Deck A) - Takes 45% width */}
               <div className="w-[45%] h-full">
                 <Deck 
                   deckId="A" 
@@ -287,12 +287,12 @@ export default function CDJInterface() {
                 />
               </div>
 
-              {/* Center Mixer - Takes 10% width */}
+              {/* Center N4G-800 Mixer - Takes 10% width */}
               <div className="w-[10%] h-full">
                 <Mixer />
               </div>
 
-              {/* Right CDJ (Deck B) - Takes 45% width */}
+              {/* Right N4G-1000 (Deck B) - Takes 45% width */}
               <div className="w-[45%] h-full">
                 <Deck 
                   deckId="B" 
