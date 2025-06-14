@@ -70,12 +70,23 @@ export function Knob({
 
   return (
     <div
-      className={`cdj-knob rounded-full cursor-pointer select-none ${sizeClasses[size]} ${className}`}
+      className={`relative rounded-full cursor-pointer select-none bg-gray-700 border-2 border-gray-500 shadow-inner ${sizeClasses[size]} ${className} ${isDragging ? 'ring-2 ring-blue-400' : ''}`}
       onMouseDown={handleMouseDown}
-      style={{
-        transform: `rotate(${rotation}deg)`,
-      }}
       title={`${value}`}
-    />
+    >
+      {/* Knob indicator */}
+      <div
+        className="absolute w-1 h-3 bg-white rounded-sm shadow-sm"
+        style={{
+          top: '2px',
+          left: '50%',
+          transformOrigin: `50% ${(parseInt(sizeClasses[size].split(' ')[0].replace('w-', '')) * 4) / 2 - 2}px`,
+          transform: `translateX(-50%) rotate(${rotation}deg)`,
+        }}
+      />
+      
+      {/* Center dot */}
+      <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-gray-400 rounded-full transform -translate-x-1/2 -translate-y-1/2" />
+    </div>
   );
 }

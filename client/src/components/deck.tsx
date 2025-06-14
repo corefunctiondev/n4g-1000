@@ -477,38 +477,41 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
 
       {/* Effects Controls */}
       <div className="grid grid-cols-3 gap-1">
-        <div className="pioneer-button p-1 text-xs">
-          <div className="text-purple-300 text-center mb-1">REVERB</div>
+        <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
+          <div className="text-purple-300 text-center mb-2 font-bold">REVERB</div>
           <Knob
             value={reverbLevel}
             min={0}
             max={100}
             onChange={setReverbLevel}
             size="sm"
-            className="mx-auto"
+            className="mb-1"
           />
+          <div className="text-purple-200 text-[10px]">{reverbLevel}%</div>
         </div>
-        <div className="pioneer-button p-1 text-xs">
-          <div className="text-green-300 text-center mb-1">DELAY</div>
+        <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
+          <div className="text-green-300 text-center mb-2 font-bold">DELAY</div>
           <Knob
             value={delayLevel}
             min={0}
             max={100}
             onChange={setDelayLevel}
             size="sm"
-            className="mx-auto"
+            className="mb-1"
           />
+          <div className="text-green-200 text-[10px]">{delayLevel}%</div>
         </div>
-        <div className="pioneer-button p-1 text-xs">
-          <div className="text-cyan-300 text-center mb-1">ECHO</div>
+        <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
+          <div className="text-cyan-300 text-center mb-2 font-bold">ECHO</div>
           <Knob
             value={echoLevel}
             min={0}
             max={100}
             onChange={setEchoLevel}
             size="sm"
-            className="mx-auto"
+            className="mb-1"
           />
+          <div className="text-cyan-200 text-[10px]">{echoLevel}%</div>
         </div>
       </div>
     </div>
