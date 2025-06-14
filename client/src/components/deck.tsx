@@ -499,45 +499,6 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
 
 
 
-      {/* Effects Controls */}
-      <div className="grid grid-cols-3 gap-1">
-        <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
-          <div className="text-purple-300 text-center mb-2 font-bold">REVERB</div>
-          <Knob
-            value={deck.effects.reverb}
-            min={0}
-            max={100}
-            onChange={setReverb}
-            size="sm"
-            className="mb-1"
-          />
-          <div className="text-purple-200 text-[10px]">{deck.effects.reverb}%</div>
-        </div>
-        <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
-          <div className="text-green-300 text-center mb-2 font-bold">DELAY</div>
-          <Knob
-            value={deck.effects.delay}
-            min={0}
-            max={100}
-            onChange={setDelay}
-            size="sm"
-            className="mb-1"
-          />
-          <div className="text-green-200 text-[10px]">{deck.effects.delay}%</div>
-        </div>
-        <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs flex flex-col items-center">
-          <div className="text-cyan-300 text-center mb-2 font-bold">ECHO</div>
-          <Knob
-            value={deck.effects.echo}
-            min={0}
-            max={100}
-            onChange={setEcho}
-            size="sm"
-            className="mb-1"
-          />
-          <div className="text-cyan-200 text-[10px]">{deck.effects.echo}%</div>
-        </div>
-      </div>
     </div>
   );
 }
