@@ -7,6 +7,7 @@ import TerminalOS from "@/pages/terminal-os";
 import CDJInterface from "@/pages/cdj-interface";
 import AdminLogin from "@/pages/admin-login";
 import SimpleAdmin from "@/pages/simple-admin";
+import { LiveAdmin } from "@/pages/live-admin";
 
 function Router() {
   return (
@@ -22,7 +23,8 @@ function Router() {
       <Route path="/contact" component={TerminalOS} />
       <Route path="/n4g-1000" component={CDJInterface} />
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/dashboard" component={SimpleAdmin} />
+      <Route path="/admin/dashboard" component={LiveAdmin} />
+      <Route path="/admin/simple" component={SimpleAdmin} />
       <Route path="/admin" component={AdminLogin} />
       <Route>
         <TerminalOS />

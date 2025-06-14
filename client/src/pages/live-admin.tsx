@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { LiveEditor } from '@/components/live-editor';
-import { Terminal } from '@/pages/terminal';
+import TerminalOS from '@/pages/terminal-os';
 
 export function LiveAdmin() {
   const [, setLocation] = useLocation();
@@ -76,7 +76,7 @@ export function LiveAdmin() {
       
       {/* Main Website Content with Editing Capabilities */}
       <div className={`transition-all duration-300 ${isEditMode ? 'pt-16' : 'pt-16'}`}>
-        <Terminal />
+        <TerminalOS />
       </div>
       
       {/* Edit Mode Instructions */}
