@@ -191,7 +191,7 @@ export default function CDJInterface() {
       )}
       
       {/* Logo in top left corner */}
-      <div className="fixed top-4 left-4 z-30">
+      <div className="fixed top-0 left-4 z-30">
         <img 
           src="https://lyyavdrmviludznyamzr.supabase.co/storage/v1/object/public/images/need for groove logo/n4glogo.svg" 
           alt="Need For Groove Logo" 
