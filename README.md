@@ -1,4 +1,4 @@
-# NEED FOR GROOVE - N4G-1000 Digital Turntable Interface
+# NEED FOR GROOVE - N4G-1000 Digital Player Interface
 
 Deploy your professional DJ platform to needforgroove.com using Vercel's free tier.
 

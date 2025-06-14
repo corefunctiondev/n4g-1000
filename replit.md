@@ -204,6 +204,8 @@ Changelog:
 - June 14, 2025. Updated hero section to display "Need For Groove" as main title with "New York Based" as subtitle
 - June 14, 2025. Changed all "turntables" references to "players" throughout application for updated branding
 - June 14, 2025. Redesigned boot sequence buttons with terminal command styling (./launch_n4g.sh and ./explore_site.sh) to match OS theme
+- June 14, 2025. Cleaned up all migration scripts and unnecessary files for production deployment - removed 18 temporary .js files
+- June 14, 2025. Restored normal boot sequence behavior (shows only on first visit) and prepared Vercel deployment configuration
 
 ## User Preferences
 

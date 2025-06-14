@@ -8,11 +8,9 @@ export function AppWrapper() {
   // Check if user has seen the boot sequence before
   useEffect(() => {
     const hasSeenBoot = localStorage.getItem('n4g_has_booted');
-    // Temporarily always show boot for testing
-    setShowBoot(true);
-    // if (!hasSeenBoot) {
-    //   setShowBoot(true);
-    // }
+    if (!hasSeenBoot) {
+      setShowBoot(true);
+    }
   }, []);
 
   const handleBootComplete = (mode: 'dj' | 'explore') => {
