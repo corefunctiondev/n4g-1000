@@ -275,6 +275,56 @@ export class AudioEngine {
   getCurrentTime(): number {
     return this.context?.currentTime || 0;
   }
+
+  setDelayEffect(deckId: string, level: number, delayTime?: number): void {
+    const nodes = this.deckNodes.get(deckId);
+    if (nodes && this.context) {
+      // Set delay level (wet/dry mix)
+      const wetLevel = level / 100;
+      const dryLevel = Math.sqrt(1 - wetLevel * wetLevel);
+      
+      nodes.delayGain.gain.setTargetAtTime(wetLevel * 0.8, this.context.currentTime, 0.01);
+      
+      // Set delay time if provided (musical timing)
+      if (delayTime && nodes.delayNode) {
+        nodes.delayNode.delayTime.setTargetAtTime(
+          Math.max(0.01, Math.min(2.0, delayTime)), 
+          this.context.currentTime, 
+          0.01
+        );
+      }
+    }
+  }
+
+  setEchoEffect(deckId: string, level: number, echoTime?: number): void {
+    const nodes = this.deckNodes.get(deckId);
+    if (nodes && this.context) {
+      // Set echo level with more feedback for echo character
+      const wetLevel = level / 100;
+      const dryLevel = Math.sqrt(1 - wetLevel * wetLevel);
+      
+      nodes.echoGain.gain.setTargetAtTime(wetLevel * 0.7, this.context.currentTime, 0.01);
+      
+      // Set echo time if provided (musical timing)
+      if (echoTime && nodes.echoNode) {
+        nodes.echoNode.delayTime.setTargetAtTime(
+          Math.max(0.01, Math.min(1.5, echoTime)), 
+          this.context.currentTime, 
+          0.01
+        );
+      }
+    }
+  }
+
+  setReverbEffect(deckId: string, level: number): void {
+    const nodes = this.deckNodes.get(deckId);
+    if (nodes && this.context) {
+      const wetLevel = level / 100;
+      const dryLevel = Math.sqrt(1 - wetLevel * wetLevel);
+      
+      nodes.reverbGain.gain.setTargetAtTime(wetLevel * 0.6, this.context.currentTime, 0.01);
+    }
+  }
 }
 
 export const audioEngine = new AudioEngine();

@@ -154,6 +154,7 @@ Changelog:
 - June 14, 2025. Enlarged logo to h-40 (160px) and positioned closer to top edge (top-2) for prominent branding display
 - June 14, 2025. Final logo positioning with negative top margin (-top-4) and larger size (h-48, 192px) for optimal visual integration with CDJ interface
 - June 14, 2025. Perfected logo display with -top-8 positioning and h-56 size (224px) for maximum brand impact while preserving interface functionality
+- June 14, 2025. Completely rebuilt audio effects system with musical timing - delay uses 1/4 note, echo uses 3/8 note timing that syncs to track BPM and tempo changes for professional DJ effects
 
 ## User Preferences
 

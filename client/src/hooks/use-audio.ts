@@ -466,11 +466,9 @@ export function useAudio(deckId: 'A' | 'B') {
       effects: { ...prev.effects, reverb: level }
     }));
     
-    if (audioNodes.current?.reverbGain) {
-      const normalizedLevel = level / 100;
-      audioNodes.current.reverbGain.gain.setValueAtTime(normalizedLevel, audioEngine.getCurrentTime());
-      console.log(`[${deckId}] Reverb set to ${level}%`);
-    }
+    // Use the improved reverb effect
+    audioEngine.setReverbEffect(deckId, level);
+    console.log(`[${deckId}] Reverb set to ${level}%`);
   }, [deckId]);
 
   const setDelay = useCallback((level: number) => {
@@ -479,12 +477,19 @@ export function useAudio(deckId: 'A' | 'B') {
       effects: { ...prev.effects, delay: level }
     }));
     
-    if (audioNodes.current?.delayGain) {
-      const normalizedLevel = level / 100;
-      audioNodes.current.delayGain.gain.setValueAtTime(normalizedLevel, audioEngine.getCurrentTime());
-      console.log(`[${deckId}] Delay set to ${level}%`);
+    // Apply musical timing if track is loaded
+    if (deck.track && audioNodes.current) {
+      const currentBPM = deck.track.bpm * (1 + (deck.tempo / 100));
+      
+      // Set delay to 1/4 note timing by default
+      const beatTime = 60 / currentBPM;
+      const delayTime = beatTime; // 1/4 note
+      
+      // Apply the effect level and timing
+      audioEngine.setDelayEffect(deckId, level, delayTime);
+      console.log(`[${deckId}] Delay set to ${level}% (1/4 note @ ${currentBPM.toFixed(1)} BPM = ${delayTime.toFixed(3)}s)`);
     }
-  }, [deckId]);
+  }, [deckId, deck.track, deck.tempo]);
 
   const setEcho = useCallback((level: number) => {
     setDeck(prev => ({ 
@@ -492,12 +497,19 @@ export function useAudio(deckId: 'A' | 'B') {
       effects: { ...prev.effects, echo: level }
     }));
     
-    if (audioNodes.current?.echoGain) {
-      const normalizedLevel = level / 100;
-      audioNodes.current.echoGain.gain.setValueAtTime(normalizedLevel, audioEngine.getCurrentTime());
-      console.log(`[${deckId}] Echo set to ${level}%`);
+    // Apply musical timing if track is loaded
+    if (deck.track && audioNodes.current) {
+      const currentBPM = deck.track.bpm * (1 + (deck.tempo / 100));
+      
+      // Set echo to 3/8 note timing for more musical effect
+      const beatTime = 60 / currentBPM;
+      const echoTime = beatTime * 1.5; // 3/8 note (dotted quarter)
+      
+      // Apply the effect level and timing
+      audioEngine.setEchoEffect(deckId, level, echoTime);
+      console.log(`[${deckId}] Echo set to ${level}% (3/8 note @ ${currentBPM.toFixed(1)} BPM = ${echoTime.toFixed(3)}s)`);
     }
-  }, [deckId]);
+  }, [deckId, deck.track, deck.tempo]);
 
   const cutFX = useCallback(() => {
     setDeck(prev => ({ 
