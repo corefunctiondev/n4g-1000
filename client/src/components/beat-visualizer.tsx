@@ -227,32 +227,32 @@ export function BeatVisualizer({
         normalizedX = (x - startX) / waveWidth;
       }
       
-      // Enhanced beat-reactive wave components with smooth response
-      const audioIntensity = audioLevel * 0.8; // Reduced audio impact
-      const beatBounce = beatPulse * 0.25; // More reactive to beats but controlled
-      const beatReactivity = beatPulse * 0.15; // Additional beat responsiveness
+      // More reactive wave components with enhanced beat response
+      const audioIntensity = audioLevel * 0.9; // Increased audio impact
+      const beatBounce = beatPulse * 0.4; // Much more reactive to beats
+      const beatReactivity = beatPulse * 0.25; // Increased beat responsiveness
       
       // Static base values (no continuous movement)
       const flexEase1 = 0.5; // Static value
       const flexEase2 = 0.5; // Static value  
       const flexEase3 = 0.5; // Static value
       
-      // Beat-only reactive main wave (no continuous movement)
-      const mainWaveFreq = 2.1 + beatReactivity * 0.2; // Only changes on beats
-      const beatWave = Math.sin((normalizedX * Math.PI * mainWaveFreq) + wavePhase + phaseShift) * (waveAmplitude * (0.6 + audioIntensity + beatBounce));
+      // Highly reactive main wave (beat-triggered only)
+      const mainWaveFreq = 2.1 + beatReactivity * 0.3; // Stronger frequency response
+      const beatWave = Math.sin((normalizedX * Math.PI * mainWaveFreq) + wavePhase + phaseShift) * (waveAmplitude * (0.7 + audioIntensity + beatBounce));
       
-      // Beat-only secondary waves (static between beats)
-      const morphFreq1 = 2.9 + beatPulse * 0.1; // Only beat response
-      const morphFreq2 = 1.3 + beatPulse * 0.08; // Only beat response
-      const morphingWave1 = Math.sin((normalizedX * Math.PI * morphFreq1) + shapePhase) * (waveAmplitude * 0.1 * (0.3 + audioIntensity + beatReactivity));
-      const morphingWave2 = Math.cos((normalizedX * Math.PI * morphFreq2) + shapePhase * 0.8) * (waveAmplitude * 0.08 * (0.25 + audioIntensity + beatReactivity));
+      // More reactive secondary waves (beat-only)
+      const morphFreq1 = 2.9 + beatPulse * 0.15; // Increased beat response
+      const morphFreq2 = 1.3 + beatPulse * 0.12; // Increased beat response
+      const morphingWave1 = Math.sin((normalizedX * Math.PI * morphFreq1) + shapePhase) * (waveAmplitude * 0.15 * (0.4 + audioIntensity + beatReactivity));
+      const morphingWave2 = Math.cos((normalizedX * Math.PI * morphFreq2) + shapePhase * 0.8) * (waveAmplitude * 0.12 * (0.3 + audioIntensity + beatReactivity));
       
-      // Beat-triggered elements only (no independent movement)
-      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase + beatPulse * 0.5) * (8 + audioLevel * 10 + beatPulse * 6);
-      const audioReactive = Math.sin(normalizedX * Math.PI * (2.3 + beatPulse * 0.1) + shapePhase) * (audioLevel * 12 + beatPulse * 10);
+      // Enhanced beat-triggered elements
+      const beatOffset = Math.sin(normalizedX * Math.PI + wavePhase + beatPulse * 0.7) * (10 + audioLevel * 15 + beatPulse * 10);
+      const audioReactive = Math.sin(normalizedX * Math.PI * (2.3 + beatPulse * 0.15) + shapePhase) * (audioLevel * 15 + beatPulse * 15);
       
-      // Beat-synchronized shape variation only
-      const shapeVariation = Math.sin(normalizedX * Math.PI * (3.6 + beatReactivity * 0.2) + shapePhase * 0.5) * (4 + audioLevel * 5 + beatPulse * 3);
+      // More responsive shape variation
+      const shapeVariation = Math.sin(normalizedX * Math.PI * (3.6 + beatReactivity * 0.3) + shapePhase * 0.5) * (6 + audioLevel * 8 + beatPulse * 5);
       
       const waveY = baseY + beatWave + morphingWave1 + morphingWave2 + beatOffset + audioReactive + shapeVariation;
       points.push(`${Math.round(x)},${Math.round(waveY)}`);
