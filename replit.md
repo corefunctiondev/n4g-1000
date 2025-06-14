@@ -167,6 +167,7 @@ Changelog:
 - June 14, 2025. Fixed glitchy wave rendering and improved display logic to show waves only on the side that's currently playing music
 - June 14, 2025. Completely redesigned wave shapes - left deck uses lightning bolts, right deck uses spiral energy, center uses DNA helix patterns for connecting waves
 - June 14, 2025. Made waves much thinner (2-6px stroke) and multiplied count to 12 waves per deck for dense, detailed lighting coverage on playing side only
+- June 14, 2025. Rebuilt wave system with complex futuristic design - 16 layered waves with multiple frequency components, audio-reactive distortion, and glow effects for satisfying visual experience
 
 ## User Preferences
 
