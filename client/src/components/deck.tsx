@@ -432,73 +432,28 @@ export function Deck({ deckId, color, otherDeckState, onStateChange, onPlaybackC
                 <div className="text-cyan-200 text-[8px]">{deck.effects.echo}%</div>
               </div>
             </div>
+
+            {/* Play/Stop Controls - Inside Screen */}
+            <div className="flex justify-center gap-2 mt-2">
+              <button 
+                onClick={handlePlayPause}
+                className={`pioneer-button py-1 px-2 text-xs ${deck.isPlaying ? 'text-blue-300' : 'text-blue-300'}`}
+              >
+                <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
+                <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
+              </button>
+              
+              <button 
+                onClick={stop}
+                className="pioneer-button py-1 px-2 text-xs text-red-400"
+              >
+                <div className="text-sm">⏹</div>
+                <div className="text-xs">STOP</div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Bottom Controls Section - Gray CDJ Area */}
-      <div className="flex items-center justify-between gap-4 p-3">
-        {/* Play/Stop Controls */}
-        <div className="flex gap-2">
-          <button 
-            onClick={handlePlayPause}
-            className={`pioneer-button py-2 px-3 text-xs ${deck.isPlaying ? 'text-blue-300' : 'text-blue-300'}`}
-          >
-            <div className="text-sm">{deck.isPlaying ? '⏸' : '▶'}</div>
-            <div className="text-xs">{deck.isPlaying ? 'PAUSE' : 'PLAY'}</div>
-          </button>
-          
-          <button 
-            onClick={stop}
-            className="pioneer-button py-2 px-3 text-xs text-red-400"
-          >
-            <div className="text-sm">⏹</div>
-            <div className="text-xs">STOP</div>
-          </button>
-        </div>
-
-        {/* Tempo Control */}
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-center mb-1 text-gray-300">TEMPO</div>
-          <div className="text-center mb-2">
-            <div className="text-sm font-mono pioneer-led" style={{ color }}>
-              {formatTempo(deck.tempo)}
-            </div>
-          </div>
-          <div className="flex justify-center mb-2">
-            <div 
-              className="pioneer-fader-track h-12 w-4 relative cursor-pointer"
-              onMouseDown={handleTempoMouseDown}
-            >
-              <div 
-                className={`pioneer-fader-handle w-6 h-4 absolute -left-1 transition-colors ${
-                  isDraggingTempo ? 'bg-blue-400' : ''
-                }`}
-                style={{ 
-                  top: `${((tempoRange - deck.tempo) / (tempoRange * 2)) * (48 - 16)}px`,
-                }}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-1">
-            <button 
-              className="pioneer-button py-1 px-2 text-xs hover:bg-blue-500 hover:text-white"
-              onClick={cycleTempoRange}
-            >
-              ±{tempoRange}%
-            </button>
-            <button 
-              className="pioneer-button py-1 px-2 text-xs hover:bg-blue-500 hover:text-white"
-              onClick={resetTempo}
-            >
-              RESET
-            </button>
-          </div>
-        </div>
-      </div>
-
-
-
     </div>
   );
 }

@@ -349,9 +349,51 @@ export function Mixer() {
         </div>
       </div>
 
-
-
-
+      {/* Center Tempo Controls */}
+      <div className="flex justify-center mt-4">
+        <div className="pioneer-eq-section p-2">
+          <div className="text-center mb-2">
+            <div className="text-xs font-bold text-white">TEMPO</div>
+          </div>
+          <div className="flex gap-4 justify-center">
+            {/* Deck A Tempo */}
+            <div className="flex flex-col items-center">
+              <div className="text-xs text-blue-300 mb-1">DECK A</div>
+              <div className="text-xs text-blue-300 mb-2">+0.0%</div>
+              <div 
+                className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+              >
+                <div 
+                  className="pioneer-fader-handle w-6 h-4 absolute -left-1"
+                  style={{ top: '24px' }}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-1 mt-2">
+                <button className="pioneer-button py-1 px-1 text-xs">±8%</button>
+                <button className="pioneer-button py-1 px-1 text-xs">RST</button>
+              </div>
+            </div>
+            
+            {/* Deck B Tempo */}
+            <div className="flex flex-col items-center">
+              <div className="text-xs text-orange-400 mb-1">DECK B</div>
+              <div className="text-xs text-orange-400 mb-2">+0.0%</div>
+              <div 
+                className="pioneer-fader-track h-16 w-4 relative cursor-pointer"
+              >
+                <div 
+                  className="pioneer-fader-handle w-6 h-4 absolute -left-1"
+                  style={{ top: '24px' }}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-1 mt-2">
+                <button className="pioneer-button py-1 px-1 text-xs">±8%</button>
+                <button className="pioneer-button py-1 px-1 text-xs">RST</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
