@@ -20,9 +20,21 @@ export function BeatVisualizer({
   const [beatPulse, setBeatPulse] = useState(0);
   const [audioLevel, setAudioLevel] = useState(0);
   const [colorCycle, setColorCycle] = useState(0);
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    x: number;
+    y: number;
+    size: number;
+    opacity: number;
+    color: string;
+    velocityX: number;
+    velocityY: number;
+    life: number;
+  }>>([]);
   const animationFrameRef = useRef<number>();
   const lastBeatTime = useRef<number>(0);
   const beatInterval = useRef<number>();
+  const particleId = useRef(0);
 
   // Calculate beat timing
   const beatDuration = (60 / bpm) * 1000; // milliseconds per beat
@@ -41,40 +53,91 @@ export function BeatVisualizer({
     '#4000ff', // Deep blue
   ];
 
-  // Audio analysis for real-time beat detection
-  const analyzeAudio = useCallback(() => {
-    if (!analyser || !isPlaying) {
-      setAudioLevel(0);
+  // Particle animation and audio analysis
+  const animateParticles = useCallback(() => {
+    if (!isPlaying) {
+      setParticles([]);
       return;
     }
 
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(dataArray);
+    // Update particles
+    setParticles(prev => {
+      const updated = prev.map(particle => ({
+        ...particle,
+        x: particle.x + particle.velocityX,
+        y: particle.y + particle.velocityY,
+        life: particle.life - 0.01,
+        opacity: particle.opacity * particle.life,
+        size: particle.size * (1 + (1 - particle.life) * 0.1)
+      })).filter(particle => particle.life > 0 && particle.opacity > 0.05);
+      
+      return updated;
+    });
 
-    // Focus on bass frequencies (20-200Hz range)
-    const bassRange = Math.floor(dataArray.length * 0.1);
-    let bassSum = 0;
-    for (let i = 0; i < bassRange; i++) {
-      bassSum += dataArray[i];
+    // Audio analysis for real-time beat detection
+    if (analyser) {
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(dataArray);
+
+      // Focus on bass frequencies (20-200Hz range)
+      const bassRange = Math.floor(dataArray.length * 0.1);
+      let bassSum = 0;
+      for (let i = 0; i < bassRange; i++) {
+        bassSum += dataArray[i];
+      }
+      
+      const bassLevel = bassSum / (bassRange * 255);
+      setAudioLevel(bassLevel * intensity);
     }
-    
-    const bassLevel = bassSum / (bassRange * 255);
-    setAudioLevel(bassLevel * intensity);
 
-    animationFrameRef.current = requestAnimationFrame(analyzeAudio);
+    animationFrameRef.current = requestAnimationFrame(animateParticles);
   }, [analyser, isPlaying, intensity]);
 
   // Beat timing simulation when no real-time audio analysis
   useEffect(() => {
     if (isPlaying && bpm) {
+      const createParticles = () => {
+        const particleCount = Math.floor(intensity * 15 + audioLevel * 20);
+        const newParticles: Array<{
+          id: number;
+          x: number;
+          y: number;
+          size: number;
+          opacity: number;
+          color: string;
+          velocityX: number;
+          velocityY: number;
+          life: number;
+        }> = [];
+        
+        for (let i = 0; i < particleCount; i++) {
+          const currentColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+          
+          newParticles.push({
+            id: particleId.current++,
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 4 + 1,
+            opacity: Math.random() * 0.8 + 0.2,
+            color: currentColor,
+            velocityX: (Math.random() - 0.5) * 2,
+            velocityY: (Math.random() - 0.5) * 2,
+            life: 1.0
+          });
+        }
+        
+        setParticles(prev => [...prev, ...newParticles]);
+      };
+
       const startBeat = () => {
         const now = Date.now();
         if (now - lastBeatTime.current >= beatDuration) {
           setBeatPulse(1);
           setColorCycle(prev => (prev + 1) % colorPalette.length);
+          createParticles();
           lastBeatTime.current = now;
           
-          // Fade out the pulse with enhanced intensity
+          // Fade out the pulse
           setTimeout(() => setBeatPulse(0.8), 50);
           setTimeout(() => setBeatPulse(0.5), 100);
           setTimeout(() => setBeatPulse(0.2), 150);
@@ -97,10 +160,10 @@ export function BeatVisualizer({
     }
   }, [isPlaying, bpm, beatDuration]);
 
-  // Start audio analysis
+  // Start particle animation
   useEffect(() => {
-    if (isPlaying && analyser) {
-      analyzeAudio();
+    if (isPlaying) {
+      animateParticles();
     }
     
     return () => {
@@ -108,49 +171,36 @@ export function BeatVisualizer({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, analyser, analyzeAudio]);
+  }, [isPlaying, animateParticles]);
 
   if (!isPlaying) return null;
 
-  const pulseIntensity = Math.max(beatPulse, audioLevel);
-  const opacity = 0.15 + (pulseIntensity * 0.7); // Enhanced opacity range
-  const scale = 1 + (pulseIntensity * 0.5); // More dramatic scaling
-  
-  // Dynamic color based on cycle and audio level
-  const dynamicColor = colorPalette[colorCycle];
-  const audioColorShift = Math.floor(audioLevel * 3) % colorPalette.length;
-  const finalColor = audioLevel > 0.3 ? colorPalette[audioColorShift] : dynamicColor;
-
-  // Position-based gradient direction
-  const gradientDirection = position === 'left' ? 'to right' : 
-                           position === 'right' ? 'to left' : 
-                           'radial';
-
-  // Multiple color layers for more vivid effect
-  const primaryColor = finalColor;
-  const secondaryColor = colorPalette[(colorCycle + 3) % colorPalette.length];
-
   return (
     <div 
-      className={`fixed inset-0 pointer-events-none transition-all duration-75 ${
+      className={`fixed inset-0 pointer-events-none ${
         position === 'left' ? 'z-0' : position === 'right' ? 'z-0' : 'z-10'
       }`}
-      style={{
-        background: gradientDirection === 'radial' 
-          ? `radial-gradient(circle at center, 
-              ${primaryColor}${Math.floor(opacity * 255).toString(16).padStart(2, '0')} 0%, 
-              ${secondaryColor}${Math.floor(opacity * 0.3 * 255).toString(16).padStart(2, '0')} 40%, 
-              transparent 80%)`
-          : `linear-gradient(${gradientDirection}, 
-              ${primaryColor}${Math.floor(opacity * 255).toString(16).padStart(2, '0')} 0%, 
-              ${secondaryColor}${Math.floor(opacity * 0.4 * 255).toString(16).padStart(2, '0')} 30%, 
-              transparent 60%)`,
-        transform: `scale(${scale})`,
-        opacity: pulseIntensity * 0.9,
-        mixBlendMode: 'screen',
-        filter: `saturate(${1.5 + pulseIntensity}) brightness(${1.2 + pulseIntensity * 0.5})`
-      }}
-    />
+    >
+      {particles.map(particle => (
+        <div
+          key={particle.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${particle.x}px`,
+            top: `${particle.y}px`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            backgroundColor: particle.color,
+            opacity: particle.opacity,
+            boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
+            transform: `scale(${1 + beatPulse * 0.3})`,
+            transition: 'transform 0.1s ease-out',
+            filter: `blur(${particle.size * 0.2}px)`,
+            mixBlendMode: 'screen'
+          }}
+        />
+      ))}
+    </div>
   );
 }
 

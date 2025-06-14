@@ -161,6 +161,7 @@ Changelog:
 - June 14, 2025. Removed duplicate CUT FX button from black LCD area, maintaining only transport controls in gray hardware section for authentic CDJ layout
 - June 14, 2025. Enhanced beat visualizer with vivid 10-color palette, dynamic color cycling, audio-responsive shifts, enhanced saturation/brightness filters, and multi-layer gradients for immersive club lighting experience
 - June 14, 2025. Removed all pink colors from beat visualizer palette, replaced with additional vibrant blues, reds, and greens per user preference
+- June 14, 2025. Transformed beat visualizer from gradient backgrounds to floating dust particle system with realistic movement, life cycles, audio responsiveness, and atmospheric glow effects
 
 ## User Preferences
 
