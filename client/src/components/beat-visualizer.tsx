@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface BeatVisualizerProps {
   isPlaying: boolean;
@@ -14,169 +14,63 @@ export function BeatVisualizer({
   bpm = 120, 
   analyser, 
   color, 
-  intensity = 1,
+  intensity = 0.5,
   position = 'center'
 }: BeatVisualizerProps) {
   const [beatPulse, setBeatPulse] = useState(0);
-  const [audioLevel, setAudioLevel] = useState(0);
   const [colorCycle, setColorCycle] = useState(0);
-  const [particles, setParticles] = useState<Array<{
-    id: number;
-    x: number;
-    y: number;
-    size: number;
-    opacity: number;
-    color: string;
-    velocityX: number;
-    velocityY: number;
-    life: number;
-  }>>([]);
-  const animationFrameRef = useRef<number>();
-  const lastBeatTime = useRef<number>(0);
-  const beatInterval = useRef<number>();
-  const particleId = useRef(0);
-
-  // Calculate beat timing
-  const beatDuration = (60 / bpm) * 1000; // milliseconds per beat
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [waveOffset, setWaveOffset] = useState(0);
   
-  // Dynamic color palette for variety (no pink)
+  const lastBeatTime = useRef(0);
+  const beatInterval = useRef<number | null>(null);
+
+  // Vivid color palette (no pink per user preference)
   const colorPalette = [
-    '#00ff80', // Bright green
-    '#8000ff', // Electric purple
-    '#ff8000', // Vivid orange
-    '#0080ff', // Electric blue
-    '#ff4000', // Red-orange
-    '#40ff00', // Lime green
-    '#00ffff', // Cyan
-    '#ffff00', // Yellow
-    '#ff2000', // Bright red
-    '#4000ff', // Deep blue
+    '#00FFFF', // Cyan
+    '#FF0040', // Red
+    '#00FF80', // Green
+    '#4080FF', // Blue
+    '#FF8000', // Orange
+    '#8000FF', // Purple
+    '#40FF00', // Lime
+    '#FF0080', // Magenta
+    '#0080FF', // Light Blue
+    '#FF4000'  // Red-Orange
   ];
 
-  // Particle animation and audio analysis
-  const animateParticles = useCallback(() => {
-    if (!isPlaying) {
-      setParticles([]);
-      return;
-    }
+  const beatDuration = 60000 / bpm; // Beat duration in milliseconds
 
-    // Update particles
-    setParticles(prev => {
-      const updated = prev.map(particle => ({
-        ...particle,
-        x: particle.x + particle.velocityX,
-        y: particle.y + particle.velocityY,
-        life: particle.life - 0.008,
-        opacity: particle.opacity * particle.life,
-        size: particle.size * (1 + (1 - particle.life) * 0.1)
-      })).filter(particle => 
-        particle.life > 0 && 
-        particle.opacity > 0.05 &&
-        particle.x > -50 && 
-        particle.x < window.innerWidth + 50 &&
-        particle.y > -50 && 
-        particle.y < window.innerHeight + 50
-      );
-      
-      return updated;
-    });
+  // Real-time audio analysis
+  useEffect(() => {
+    if (!isPlaying) return;
 
     // Audio analysis for real-time beat detection
     if (analyser) {
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(dataArray);
-
-      // Focus on bass frequencies (20-200Hz range)
-      const bassRange = Math.floor(dataArray.length * 0.1);
-      let bassSum = 0;
-      for (let i = 0; i < bassRange; i++) {
-        bassSum += dataArray[i];
-      }
       
-      const bassLevel = bassSum / (bassRange * 255);
-      setAudioLevel(bassLevel * intensity);
+      const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+      const normalizedLevel = average / 255;
+      setAudioLevel(normalizedLevel);
     }
 
-    animationFrameRef.current = requestAnimationFrame(animateParticles);
-  }, [analyser, isPlaying, intensity]);
+    // Continuous wave animation
+    const waveAnimation = setInterval(() => {
+      setWaveOffset(prev => prev + 0.15);
+    }, 16); // 60fps
 
-  // Beat timing simulation when no real-time audio analysis
+    return () => clearInterval(waveAnimation);
+  }, [isPlaying, analyser]);
+
+  // Beat timing for pulse effects
   useEffect(() => {
     if (isPlaying && bpm) {
-      const createParticles = () => {
-        // MASSIVE particle count for futuristic effect
-        const baseCount = Math.floor(intensity * 200 + audioLevel * 300);
-        const particleCount = baseCount + Math.floor(beatPulse * 500);
-        const newParticles: Array<{
-          id: number;
-          x: number;
-          y: number;
-          size: number;
-          opacity: number;
-          color: string;
-          velocityX: number;
-          velocityY: number;
-          life: number;
-        }> = [];
-        
-        for (let i = 0; i < particleCount; i++) {
-          const currentColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-          
-          // Position-based particle spawning with multiple streams
-          let startX, startY, velX, velY;
-          
-          if (position === 'left') {
-            // Multiple horizontal streams from left
-            const streamHeight = window.innerHeight / 8;
-            const streamIndex = Math.floor(Math.random() * 8);
-            startX = -50 - Math.random() * 100;
-            startY = streamIndex * streamHeight + Math.random() * streamHeight;
-            velX = Math.random() * 12 + 4; // Very fast rightward
-            velY = (Math.random() - 0.5) * 1;
-          } else if (position === 'right') {
-            // Multiple horizontal streams from right
-            const streamHeight = window.innerHeight / 8;
-            const streamIndex = Math.floor(Math.random() * 8);
-            startX = window.innerWidth + 50 + Math.random() * 100;
-            startY = streamIndex * streamHeight + Math.random() * streamHeight;
-            velX = -(Math.random() * 12 + 4); // Very fast leftward
-            velY = (Math.random() - 0.5) * 1;
-          } else {
-            // Center: explosive bursts from all directions
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 200 + 50;
-            const speed = Math.random() * 8 + 3;
-            startX = window.innerWidth / 2 + Math.cos(angle) * distance;
-            startY = window.innerHeight / 2 + Math.sin(angle) * distance;
-            velX = Math.cos(angle) * speed;
-            velY = Math.sin(angle) * speed;
-          }
-          
-          // Tiny particles for futuristic dust effect
-          const particleSize = Math.random() * 2 + 0.5;
-          
-          newParticles.push({
-            id: particleId.current++,
-            x: startX,
-            y: startY,
-            size: particleSize,
-            opacity: Math.random() * 0.7 + 0.1,
-            color: currentColor,
-            velocityX: velX,
-            velocityY: velY,
-            life: 1.0
-          });
-        }
-        
-        setParticles(prev => [...prev, ...newParticles]);
-      };
-
       const startBeat = () => {
         const now = Date.now();
         if (now - lastBeatTime.current >= beatDuration) {
           setBeatPulse(1);
           setColorCycle(prev => (prev + 1) % colorPalette.length);
-          createParticles();
           lastBeatTime.current = now;
           
           // Fade out the pulse
@@ -189,108 +83,151 @@ export function BeatVisualizer({
 
       beatInterval.current = window.setInterval(startBeat, beatDuration / 8);
       
-      // Ultra-dense micro-bursts for millions of particles effect
-      const microBurstInterval = window.setInterval(() => {
-        const microCount = Math.floor((intensity + audioLevel) * 150);
-        const microParticles: Array<{
-          id: number;
-          x: number;
-          y: number;
-          size: number;
-          opacity: number;
-          color: string;
-          velocityX: number;
-          velocityY: number;
-          life: number;
-        }> = [];
-        
-        for (let i = 0; i < microCount; i++) {
-          const currentColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-          let startX, velX;
-          
-          if (position === 'left') {
-            startX = -40 - Math.random() * 80;
-            velX = Math.random() * 18 + 6;
-          } else if (position === 'right') {
-            startX = window.innerWidth + 40 + Math.random() * 80;
-            velX = -(Math.random() * 18 + 6);
-          } else {
-            const edge = Math.random() < 0.5;
-            startX = edge ? -40 : window.innerWidth + 40;
-            velX = edge ? Math.random() * 12 + 4 : -(Math.random() * 12 + 4);
-          }
-          
-          microParticles.push({
-            id: particleId.current++,
-            x: startX,
-            y: Math.random() * window.innerHeight,
-            size: Math.random() * 1.2 + 0.2,
-            opacity: Math.random() * 0.5 + 0.05,
-            color: currentColor,
-            velocityX: velX,
-            velocityY: (Math.random() - 0.5) * 1.5,
-            life: 0.6
-          });
-        }
-        
-        setParticles(prev => [...prev, ...microParticles]);
-      }, beatDuration / 16); // Ultra-fast micro-bursts
-      
       return () => {
         if (beatInterval.current) {
           clearInterval(beatInterval.current);
         }
-        clearInterval(microBurstInterval);
       };
     } else {
       setBeatPulse(0);
       if (beatInterval.current) {
         clearInterval(beatInterval.current);
+        beatInterval.current = null;
       }
     }
-  }, [isPlaying, bpm, beatDuration]);
-
-  // Start particle animation
-  useEffect(() => {
-    if (isPlaying) {
-      animateParticles();
-    }
-    
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [isPlaying, animateParticles]);
+  }, [isPlaying, bpm, intensity, audioLevel, position]);
 
   if (!isPlaying) return null;
+
+  const pulseIntensity = Math.max(beatPulse, audioLevel);
+  const opacity = 0.2 + (pulseIntensity * 0.8);
+  const scale = 1 + (pulseIntensity * 0.6);
+  
+  // Dynamic color based on cycle and audio level
+  const dynamicColor = colorPalette[colorCycle];
+  const audioColorShift = Math.floor(audioLevel * 3) % colorPalette.length;
+  const finalColor = audioLevel > 0.3 ? colorPalette[audioColorShift] : dynamicColor;
+
+  // Wave parameters for flexible light movement
+  const waveAmplitude = 60 + (pulseIntensity * 80); // How much the wave curves
+  const waveFrequency = 0.01 + (audioLevel * 0.005); // Wave ripple density
+  const waveSpeed = waveOffset + (beatPulse * 3); // Wave movement speed
+
+  // Create multiple wave paths
+  const createWavePath = (baseY: number, direction: number, waveIndex: number) => {
+    const points: string[] = [];
+    const steps = 120;
+    const phaseShift = waveIndex * 0.5; // Offset each wave
+    
+    for (let i = 0; i <= steps; i++) {
+      const x = (window.innerWidth / steps) * i;
+      const waveY = baseY + Math.sin((x * waveFrequency) + (waveSpeed * direction) + phaseShift) * waveAmplitude;
+      points.push(`${x},${waveY}`);
+    }
+    
+    return `M ${points.join(' L ')}`;
+  };
+
+  // Position-based wave configuration
+  let waveElements;
+  
+  if (position === 'left') {
+    // Flowing waves from left to right
+    waveElements = (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(2px)' }}>
+        <defs>
+          <linearGradient id="leftWaveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={finalColor} stopOpacity={opacity} />
+            <stop offset="70%" stopColor={finalColor} stopOpacity={opacity * 0.3} />
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+        </defs>
+        {[0, 1, 2, 3, 4, 5].map(i => (
+          <path
+            key={i}
+            d={createWavePath(window.innerHeight * (0.15 + i * 0.14), 1, i)}
+            stroke={finalColor}
+            strokeWidth={8 + pulseIntensity * 12}
+            fill="none"
+            opacity={opacity * (1 - i * 0.1)}
+            strokeLinecap="round"
+            style={{
+              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
+              transform: `scale(${scale})`,
+              transformOrigin: 'left center'
+            }}
+          />
+        ))}
+      </svg>
+    );
+  } else if (position === 'right') {
+    // Flowing waves from right to left
+    waveElements = (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(2px)' }}>
+        <defs>
+          <linearGradient id="rightWaveGradient" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor={finalColor} stopOpacity={opacity} />
+            <stop offset="70%" stopColor={finalColor} stopOpacity={opacity * 0.3} />
+            <stop offset="100%" stopColor="transparent" />
+          </linearGradient>
+        </defs>
+        {[0, 1, 2, 3, 4, 5].map(i => (
+          <path
+            key={i}
+            d={createWavePath(window.innerHeight * (0.15 + i * 0.14), -1, i)}
+            stroke={finalColor}
+            strokeWidth={8 + pulseIntensity * 12}
+            fill="none"
+            opacity={opacity * (1 - i * 0.1)}
+            strokeLinecap="round"
+            style={{
+              filter: `drop-shadow(0 0 ${15 + pulseIntensity * 20}px ${finalColor})`,
+              transform: `scale(${scale})`,
+              transformOrigin: 'right center'
+            }}
+          />
+        ))}
+      </svg>
+    );
+  } else {
+    // Center: expanding circular waves
+    waveElements = (
+      <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(2px)' }}>
+        {[0, 1, 2, 3, 4, 5].map(i => {
+          const radius = 60 + i * 90 + waveSpeed * 8;
+          const radiusVariation = Math.sin(waveSpeed * 0.1 + i) * 20;
+          return (
+            <circle
+              key={i}
+              cx={window.innerWidth / 2}
+              cy={window.innerHeight / 2}
+              r={radius + radiusVariation}
+              stroke={finalColor}
+              strokeWidth={6 + pulseIntensity * 10}
+              fill="none"
+              opacity={opacity * (1 - i * 0.12)}
+              style={{
+                filter: `drop-shadow(0 0 ${20 + pulseIntensity * 25}px ${finalColor})`,
+                transform: `scale(${scale})`
+              }}
+            />
+          );
+        })}
+      </svg>
+    );
+  }
 
   return (
     <div 
       className={`fixed inset-0 pointer-events-none ${
         position === 'left' ? 'z-0' : position === 'right' ? 'z-0' : 'z-10'
       }`}
+      style={{
+        mixBlendMode: 'screen',
+        filter: `saturate(${1.8 + pulseIntensity}) brightness(${1.4 + pulseIntensity * 0.6})`
+      }}
     >
-      {particles.map(particle => (
-        <div
-          key={particle.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${particle.x}px`,
-            top: `${particle.y}px`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-            backgroundColor: particle.color,
-            opacity: particle.opacity,
-            boxShadow: `0 0 ${particle.size * 3}px ${particle.color}, 0 0 ${particle.size * 6}px ${particle.color}40`,
-            transform: `scale(${1 + beatPulse * 0.5})`,
-            transition: 'transform 0.05s ease-out',
-            filter: `blur(${particle.size * 0.1}px) brightness(1.5)`,
-            mixBlendMode: 'screen',
-            willChange: 'transform, opacity'
-          }}
-        />
-      ))}
+      {waveElements}
     </div>
   );
 }
@@ -315,34 +252,33 @@ export function GlobalBeatVisualizer({
 }: GlobalBeatVisualizerProps) {
   return (
     <>
-      {/* Deck A (Left) - Vivid electric blue/purple pulses */}
-      <BeatVisualizer
-        isPlaying={deckAPlaying}
-        bpm={deckABpm}
-        analyser={deckAAnalyser}
-        color="#0080ff"
-        intensity={1.5}
-        position="left"
-      />
-      
-      {/* Deck B (Right) - Vivid orange/red pulses */}
-      <BeatVisualizer
-        isPlaying={deckBPlaying}
-        bpm={deckBBpm}
-        analyser={deckBAnalyser}
-        color="#ff4000"
-        intensity={1.5}
-        position="right"
-      />
-      
-      {/* Center combined effect when both playing - Rainbow spectrum */}
+      {deckAPlaying && (
+        <BeatVisualizer
+          isPlaying={deckAPlaying}
+          bpm={deckABpm}
+          analyser={deckAAnalyser}
+          color="#00FFFF"
+          intensity={0.7}
+          position="left"
+        />
+      )}
+      {deckBPlaying && (
+        <BeatVisualizer
+          isPlaying={deckBPlaying}
+          bpm={deckBBpm}
+          analyser={deckBAnalyser}
+          color="#FF0040"
+          intensity={0.7}
+          position="right"
+        />
+      )}
       {deckAPlaying && deckBPlaying && (
         <BeatVisualizer
           isPlaying={true}
           bpm={Math.max(deckABpm || 120, deckBBpm || 120)}
           analyser={deckAAnalyser || deckBAnalyser}
-          color="#8000ff"
-          intensity={1.0}
+          color="#8000FF"
+          intensity={0.9}
           position="center"
         />
       )}
