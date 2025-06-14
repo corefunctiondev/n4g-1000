@@ -186,6 +186,7 @@ Changelog:
 - June 14, 2025. Added automatic beat matching and kick alignment system - when both tracks play simultaneously, Deck B instantly syncs to Deck A's tempo with real-time BPM matching, micro-timing adjustments for kick alignment, and continuous beat monitoring for seamless DJ mixing
 - June 14, 2025. Updated all CDJ-3000 references to N4G-1000 and DJM references to N4G-800 throughout application for authentic NEED FOR GROOVE branding
 - June 14, 2025. Replaced all Pioneer DJ branding with Groover - updated CSS classes, component styling, jog wheel text, and hardware references throughout interface
+- June 14, 2025. Configured application for free Vercel deployment with serverless functions and custom domain support for needforgroove.com
 
 ## User Preferences
 
