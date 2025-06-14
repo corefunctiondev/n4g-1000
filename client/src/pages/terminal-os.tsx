@@ -701,7 +701,8 @@ function ReleasesSection() {
           <div className="border border-green-400 p-4 rounded hover:border-green-400 transition-colors cursor-pointer">
             <div className="text-green-400 font-bold mb-2">Collaborations</div>
             <div className="text-xs space-y-1 text-gray-300">
-              <div>{getContent('release_2_date', 'Released: November 2023')}</div>
+              <div>Remixes & features with NYC artists</div>
+              <div>Underground scene connections</div>
             </div>
           </div>
         </div>
@@ -727,7 +728,7 @@ function MixesSection() {
           {getContent('mixes_title', 'DJ Mixes')}
         </div>
         <div className="text-sm leading-relaxed">
-          {getContent('mixes_description', 'Curated DJ mixes showcasing the latest in electronic music and exclusive N4G productions.')}
+          <DynamicText contentKey="mixes_description" fallback="Signature mixes that capture different moods and moments." />
         </div>
       </div>
       
@@ -739,8 +740,8 @@ function MixesSection() {
           <div className="border border-cyan-400 p-4 rounded">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-cyan-400 font-bold">{getContent('mix_0_title', 'After Hours: Deep Sessions')}</div>
-                <div className="text-sm text-gray-300">{getContent('mix_0_duration', 'Duration: 90 minutes')}</div>
+                <div className="text-cyan-400 font-bold">Kosovo Deep Sessions</div>
+                <div className="text-sm text-gray-300">House & Minimal | 60 minutes</div>
               </div>
             </div>
           </div>
@@ -748,8 +749,8 @@ function MixesSection() {
           <div className="border border-orange-400 p-4 rounded">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-orange-400 font-bold">{getContent('mix_1_title', 'Techno Therapy Vol. 3')}</div>
-                <div className="text-sm text-gray-300">{getContent('mix_1_duration', 'Duration: 75 minutes')}</div>
+                <div className="text-orange-400 font-bold">NYC Underground</div>
+                <div className="text-sm text-gray-300">Techno Journey | 75 minutes</div>
               </div>
             </div>
           </div>
@@ -757,8 +758,8 @@ function MixesSection() {
           <div className="border border-green-400 p-4 rounded">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-green-400 font-bold">{getContent('mix_2_title', 'Progressive Journeys')}</div>
-                <div className="text-sm text-gray-300">{getContent('mix_2_duration', 'Duration: 60 minutes')}</div>
+                <div className="text-green-400 font-bold">TUTTO PASSA Preview</div>
+                <div className="text-sm text-gray-300">Album Highlights | 45 minutes</div>
               </div>
             </div>
           </div>
