@@ -19,12 +19,27 @@ export function BeatVisualizer({
 }: BeatVisualizerProps) {
   const [beatPulse, setBeatPulse] = useState(0);
   const [audioLevel, setAudioLevel] = useState(0);
+  const [colorCycle, setColorCycle] = useState(0);
   const animationFrameRef = useRef<number>();
   const lastBeatTime = useRef<number>(0);
   const beatInterval = useRef<number>();
 
   // Calculate beat timing
   const beatDuration = (60 / bpm) * 1000; // milliseconds per beat
+  
+  // Dynamic color palette for variety
+  const colorPalette = [
+    '#ff0080', // Hot pink
+    '#00ff80', // Bright green
+    '#8000ff', // Electric purple
+    '#ff8000', // Vivid orange
+    '#0080ff', // Electric blue
+    '#ff4000', // Red-orange
+    '#40ff00', // Lime green
+    '#ff0040', // Rose
+    '#00ffff', // Cyan
+    '#ffff00', // Yellow
+  ];
 
   // Audio analysis for real-time beat detection
   const analyzeAudio = useCallback(() => {
@@ -56,12 +71,13 @@ export function BeatVisualizer({
         const now = Date.now();
         if (now - lastBeatTime.current >= beatDuration) {
           setBeatPulse(1);
+          setColorCycle(prev => (prev + 1) % colorPalette.length);
           lastBeatTime.current = now;
           
-          // Fade out the pulse
-          setTimeout(() => setBeatPulse(0.7), 50);
-          setTimeout(() => setBeatPulse(0.4), 100);
-          setTimeout(() => setBeatPulse(0.1), 150);
+          // Fade out the pulse with enhanced intensity
+          setTimeout(() => setBeatPulse(0.8), 50);
+          setTimeout(() => setBeatPulse(0.5), 100);
+          setTimeout(() => setBeatPulse(0.2), 150);
           setTimeout(() => setBeatPulse(0), 200);
         }
       };
@@ -97,26 +113,42 @@ export function BeatVisualizer({
   if (!isPlaying) return null;
 
   const pulseIntensity = Math.max(beatPulse, audioLevel);
-  const opacity = 0.1 + (pulseIntensity * 0.4);
-  const scale = 1 + (pulseIntensity * 0.3);
+  const opacity = 0.15 + (pulseIntensity * 0.7); // Enhanced opacity range
+  const scale = 1 + (pulseIntensity * 0.5); // More dramatic scaling
+  
+  // Dynamic color based on cycle and audio level
+  const dynamicColor = colorPalette[colorCycle];
+  const audioColorShift = Math.floor(audioLevel * 3) % colorPalette.length;
+  const finalColor = audioLevel > 0.3 ? colorPalette[audioColorShift] : dynamicColor;
 
   // Position-based gradient direction
   const gradientDirection = position === 'left' ? 'to right' : 
                            position === 'right' ? 'to left' : 
                            'radial';
 
+  // Multiple color layers for more vivid effect
+  const primaryColor = finalColor;
+  const secondaryColor = colorPalette[(colorCycle + 3) % colorPalette.length];
+
   return (
     <div 
-      className={`fixed inset-0 pointer-events-none transition-all duration-100 ${
+      className={`fixed inset-0 pointer-events-none transition-all duration-75 ${
         position === 'left' ? 'z-0' : position === 'right' ? 'z-0' : 'z-10'
       }`}
       style={{
         background: gradientDirection === 'radial' 
-          ? `radial-gradient(circle at center, ${color}${Math.floor(opacity * 255).toString(16).padStart(2, '0')} 0%, transparent 70%)`
-          : `linear-gradient(${gradientDirection}, ${color}${Math.floor(opacity * 255).toString(16).padStart(2, '0')} 0%, transparent 50%)`,
+          ? `radial-gradient(circle at center, 
+              ${primaryColor}${Math.floor(opacity * 255).toString(16).padStart(2, '0')} 0%, 
+              ${secondaryColor}${Math.floor(opacity * 0.3 * 255).toString(16).padStart(2, '0')} 40%, 
+              transparent 80%)`
+          : `linear-gradient(${gradientDirection}, 
+              ${primaryColor}${Math.floor(opacity * 255).toString(16).padStart(2, '0')} 0%, 
+              ${secondaryColor}${Math.floor(opacity * 0.4 * 255).toString(16).padStart(2, '0')} 30%, 
+              transparent 60%)`,
         transform: `scale(${scale})`,
-        opacity: pulseIntensity,
-        mixBlendMode: 'screen'
+        opacity: pulseIntensity * 0.9,
+        mixBlendMode: 'screen',
+        filter: `saturate(${1.5 + pulseIntensity}) brightness(${1.2 + pulseIntensity * 0.5})`
       }}
     />
   );
@@ -142,34 +174,34 @@ export function GlobalBeatVisualizer({
 }: GlobalBeatVisualizerProps) {
   return (
     <>
-      {/* Deck A (Left) - Cyan pulses */}
+      {/* Deck A (Left) - Vivid electric blue/purple pulses */}
       <BeatVisualizer
         isPlaying={deckAPlaying}
         bpm={deckABpm}
         analyser={deckAAnalyser}
-        color="#00d4ff"
-        intensity={1.2}
+        color="#0080ff"
+        intensity={1.5}
         position="left"
       />
       
-      {/* Deck B (Right) - Orange pulses */}
+      {/* Deck B (Right) - Vivid hot pink/orange pulses */}
       <BeatVisualizer
         isPlaying={deckBPlaying}
         bpm={deckBBpm}
         analyser={deckBAnalyser}
-        color="#ff6b00"
-        intensity={1.2}
+        color="#ff0080"
+        intensity={1.5}
         position="right"
       />
       
-      {/* Center combined effect when both playing */}
+      {/* Center combined effect when both playing - Rainbow spectrum */}
       {deckAPlaying && deckBPlaying && (
         <BeatVisualizer
           isPlaying={true}
           bpm={Math.max(deckABpm || 120, deckBBpm || 120)}
           analyser={deckAAnalyser || deckBAnalyser}
-          color="#9d4edd"
-          intensity={0.8}
+          color="#8000ff"
+          intensity={1.0}
           position="center"
         />
       )}

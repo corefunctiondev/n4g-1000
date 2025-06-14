@@ -159,6 +159,7 @@ Changelog:
 - June 14, 2025. Added SYNC button to gray CDJ transport control area alongside PLAY, STOP, and CUT FX buttons for consistent control layout on both decks
 - June 14, 2025. Removed duplicate SYNC button from black LCD area, keeping only the one in gray transport controls for cleaner interface
 - June 14, 2025. Removed duplicate CUT FX button from black LCD area, maintaining only transport controls in gray hardware section for authentic CDJ layout
+- June 14, 2025. Enhanced beat visualizer with vivid 10-color palette, dynamic color cycling, audio-responsive shifts, enhanced saturation/brightness filters, and multi-layer gradients for immersive club lighting experience
 
 ## User Preferences
 
